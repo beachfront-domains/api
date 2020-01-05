@@ -1,0 +1,76 @@
+# import Login from "login.graphql"
+# import Domain from "domain.graphql"
+# import User from "user.graphql"
+
+
+
+"""
+All the queries that enable Beachfront to function
+"""
+
+type Query {
+  """
+  Test the validity of a session
+  Arguments expected:
+  - email
+  - id (session ID)
+  """
+  authenticate(email: String, id: String): Login
+
+  """
+  Create an authenticated session
+  Arguments expected:
+  - email
+  - token
+  """
+  createSession(email: String, token: String): Login
+
+  """
+  Arguments expected:
+  - email
+  """
+  login(email: String): Login
+
+  """
+  Arguments expected:
+  - id
+  """
+  domain(id: ID, name: String): Domain
+  domains(owner: ID): [Domain]
+
+  user(id: ID, login: String): User
+  # userByEmail(email: String): User
+  # userByRole(role: String): User
+  # userByUsername(login: String): User
+}
+
+"""
+Helpful functions for typical CRUD operations
+"""
+
+type Mutation {
+  """
+  Create domain
+  """
+  createDomain(details: DomainInput!, owner: ID!): UpdatedDomain
+
+  """
+  Delete domain
+  """
+  deleteDomain(id: ID!, owner: ID!): UpdatedDomain
+
+  """
+  Update domain details
+  """
+  updateDomain(details: DomainInput!, id: ID!): UpdatedDomain
+
+  """
+  Delete user
+  """
+  deleteUser(session: String!, user: ID!): User
+
+  """
+  Update user details
+  """
+  updateUser(details: UserInput!, session: String!, user: ID!): User
+}

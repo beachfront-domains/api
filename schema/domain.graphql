@@ -1,0 +1,221 @@
+# import User from "/user.graphql"
+
+
+
+"""
+Valid tag types for CAA records.
+"""
+
+enum CAATag {
+  IODEF
+  ISSUE
+  ISSUEWILD
+}
+
+"""
+Valid record types for domains.
+"""
+
+enum RecordType {
+  A
+  AAAA
+  CAA
+  CNAME
+  MX
+  TXT
+  NS
+  SRV
+}
+
+"""
+Use @ to create the record at the root of the domain or enter a hostname to create it elsewhere. A records are for IPv4 addresses only and tell a request where your domain should direct to.
+"""
+
+type RecordA {
+  "IP address your domain should point to"
+  address: String!
+
+  "Use @ or hostname"
+  hostname: String!
+
+  "Enter time-to-live in seconds"
+  ttl: Int!
+}
+
+"""
+Use @ to create the record at the root of the domain or enter a hostname to create it elsewhere. AAAA records are for IPv6 addresses only and tell a request where your domain should direct to.
+"""
+
+type RecordAAAA {
+  "IP address your domain should point to"
+  address: String!
+
+  "Use @ or hostname"
+  hostname: String!
+
+  "Enter time-to-live in seconds"
+  ttl: Int!
+}
+
+"""
+CAA records specify which certificate authorities are permitted to issue certificates for a domain. Use them to reduce the risk of unintended certificate mis-issue.
+"""
+
+type RecordCAA {
+  authority: String!
+
+  flags: Int!
+
+  "Use @ or hostname"
+  hostname: String!
+
+  tag: CAATag
+
+  "Enter time-to-live in seconds"
+  ttl: Int!
+}
+
+"""
+CNAME records act as an alias by mapping a hostname to another hostname.
+"""
+
+type RecordCNAME {
+  alias: String!
+
+  "Use @ or hostname"
+  hostname: String!
+
+  "Enter time-to-live in seconds"
+  ttl: Int!
+}
+
+"""
+MX records specify the mail servers responsible for accepting emails on behalf of your domain, and priority value if your provider has a number of mail servers for contingency.
+"""
+
+type RecordMX {
+  "Use @ or hostname"
+  hostname: String!
+
+  priority: Int!
+
+  provider: String!
+
+  "Enter time-to-live in seconds"
+  ttl: Int!
+}
+
+"""
+NS records specify the servers which are providing DNS services for your domain. You can use these to create subzones if you need to direct part of your traffic to another DNS service.
+"""
+
+type RecordNS {
+  "Use @ or hostname"
+  hostname: String!
+
+  nameserver: String!
+
+  "Enter time-to-live in seconds"
+  ttl: Int!
+}
+
+"""
+SRV records specify the location (hostname and port number) of servers for specific services. You can use service records to direct certain types of traffic to particular servers.
+"""
+
+type RecordSRV {
+  endpoint: String!
+
+  "Use @ or hostname"
+  hostname: String!
+
+  "Enter port number"
+  port: Int!
+
+  "Enter priority"
+  priority: Int!
+
+  "Enter time-to-live in seconds"
+  ttl: Int!
+
+  "Enter weight"
+  weight: Int!
+}
+
+"""
+TXT records are used to associate a string of text with a hostname. These are primarily used for verification.
+"""
+
+type RecordTXT {
+  "Use @ or hostname"
+  hostname: String!
+
+  "Enter time-to-live in seconds"
+  ttl: Int!
+
+  "Enter text string here"
+  value: String!
+}
+
+"""
+The marketplace where your domain currently resides.
+"""
+
+type Registrar {
+  email: String
+  id: ID!
+  name: String
+  url: String
+}
+
+"""
+All the DNS and ownership details pertaining to your domain name.
+"""
+
+type Domain {
+  created: String
+  # dnssec: String
+  expires: String
+  id: ID!
+  name: String
+  nameservers: [String]
+  owner: User!
+  records: [String]
+  registrar: Registrar
+  renews: String
+  status: String
+  updated: String
+  wishlist: Boolean
+}
+
+type DeletedDomain {
+  "Human-readable response from API"
+  message: String
+
+  "Was the operation successful?"
+  success: Boolean
+}
+
+type UpdatedDomain {
+  "Human-readable response from API"
+  message: String
+
+  "When updating a domain it is useful to have the updated object returned"
+  domain: Domain
+
+  "Was the operation successful?"
+  success: Boolean
+}
+
+
+
+input DomainInput {
+  # dnssec: String
+  expires: String
+  id: ID
+  name: String
+  nameservers: [String]
+  renews: String
+  status: String
+  wishlist: Boolean
+}
