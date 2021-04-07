@@ -1,9 +1,0 @@
-declare module "archiver";
-declare module "bcrypt";
-declare module "cwd";
-declare module "jsonwebtoken";
-declare module "mailgun-js";
-declare module "redis";
-declare module "restify";
-declare module "restify-cors-middleware";
-declare module "vne";

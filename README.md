@@ -1,59 +1,73 @@
-# Beachfront API
+# api
 
 
 
 ## Prerequisites
 
-- Install [RethinkDB](https://rethinkdb.com/docs/install)
+- [Redis](https://formulae.brew.sh/cask/redis)
+- [RethinkDB](https://rethinkdb.com/docs/install)
 
-```bash
-# Install redis
-$ brew install redis
-```
+
 
 ## Prologue
-After RethinkDB is installed, update the default admin password.
 
-```bash
-$ rethinkdb --server-name beachfront --driver-port 44129 --initial-password "p@ssw0rd"
+There is a `database.conf.sample` file at the base of this repo. Fill out the parameters and remove `.sample` from the filename. After RethinkDB is installed, update the default admin password.
+
+```sh
+rethinkdb --config-file absolute/path/to/database.conf --initial-password "p@ssw0rd"
 ```
 
 ```js
 // Within the Data Explorer
-r.db("rethinkdb").table("users").get("admin").update({
+r.db("rethinkdb").table("users").insert([{
+  id: "beachfrontAdmin",
   password: "p@ssw0rd"
+}]);
+
+r.grant("beachfrontAdmin", {
+  config: true,
+  connect: true,
+  read: true,
+  write: true
 });
 ```
 
+
+
 ## Installation
 
-```bash
+```sh
 $ npm i
 ```
 
-## Development
 
-```bash
-# tab/window 1, "Beachfront" being the local directory
-$ cd Beachfront;rethinkdb --driver-port 44129
+
+## Development (different tabs/windows)
+
+```sh
+# tab/window 1
+$ cd beachfront;rethinkdb --driver-port 44129
 ```
 
-```bash
+```sh
 # tab/window 2
 $ redis-server
 ```
 
-```bash
+```sh
 # tab/window 3
 $ npm run watch
 ```
 
+
+
 ## Production
 
-```bash
+```sh
 $ npm start
 ```
 
 ## Notes (development)
-- [http://localhost:3354/graphql](http://localhost:3000/graphql) - API interface
-- [http://localhost:8080](http://localhost:8080) - RethinkDB interface
+- [http://localhost:3354/graphql](http://localhost:3354/graphql) - API interface
+- `44129` - RethinkDB port
+- [http://localhost:8080](http://localhost:8080) - RethinkDB GUI

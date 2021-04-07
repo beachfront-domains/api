@@ -1,21 +1,90 @@
 # import Login from "login.graphql"
-# import Domain from "domain.graphql"
-# import User from "user.graphql"
+# import LoginKeyResponse from "login.graphql"
 
+# import DeveloperKeyResponse from "developer.graphql";
+# import DomainSearchResults from "results.graphql";
 
+# import PaginationVariables from "pagination.graphql"
+
+# import Customer from "customer.graphql"
+# import CustomerExport from "customer.graphql"
+# import CustomerInput from "customer.graphql"
+# import CustomerUpdate from "customer.graphql"
+
+# import SLD from "sld.graphql"
+# import SLDInput from "sld.graphql"
+# import SLDUpdate from "sld.graphql"
 
 """
-All the queries that enable Beachfront to function
+All the queries that enable beachfront to function
 """
+
+scalar DateTime
+
+input Authentication {
+  customerId: ID!
+  sessionId: String!
+}
+
+type DeletedItem {
+  "Human-readable response from API"
+  message: String
+
+  "Was the operation successful?"
+  success: Boolean
+}
 
 type Query {
   """
   Test the validity of a session
   Arguments expected:
   - email
-  - id (session ID)
+  - token (session ID)
   """
-  authenticate(email: String, id: String): Login
+  authenticate(email: String, token: String): Login
+
+  """
+  If email does not exist in database, customer will be created.
+  """
+  login(email: String): Login
+
+  """
+  Login via API key
+  """
+  loginKey(key: String): LoginKeyResponse
+
+  """
+  Developer key query
+  - check for proof of a key's existence
+  - enter customer ID to obtain key
+  """
+  key(auth: Authentication): DeveloperKeyResponse
+
+
+
+  customer(email: String, id: ID, username: String): Customer
+
+
+
+  domain(id: ID, name: String, unicode: String): SLD
+  domains(owner: ID): [SLD]
+
+
+
+  search(
+    pagination: PaginationVariables = {},
+    name: String,
+    tld: String,
+    unicode: String
+  ): DomainSearchResults
+}
+
+type Mutation {
+  """
+  Create developer key
+  - this automatically deletes prior keys
+  """
+  createKey(auth: Authentication!): DeveloperKeyResponse
 
   """
   Create an authenticated session
@@ -25,52 +94,37 @@ type Query {
   """
   createSession(email: String, token: String): Login
 
-  """
-  Arguments expected:
-  - email
-  """
-  login(email: String): Login
+
 
   """
-  Arguments expected:
-  - id
+  Create a domain
   """
-  domain(id: ID, name: String): Domain
-  domains(owner: ID): [Domain]
-
-  user(id: ID, login: String): User
-  # userByEmail(email: String): User
-  # userByRole(role: String): User
-  # userByUsername(login: String): User
-}
-
-"""
-Helpful functions for typical CRUD operations
-"""
-
-type Mutation {
-  """
-  Create domain
-  """
-  createDomain(details: DomainInput!, owner: ID!): UpdatedDomain
+  createDomain(auth: Authentication!, detail: SLDInput!): SLDUpdate
 
   """
-  Delete domain
+  Delete a domain
   """
-  deleteDomain(id: ID!, owner: ID!): UpdatedDomain
+  deleteDomain(auth: Authentication!, id: ID!): DeletedItem
 
   """
-  Update domain details
+  Update a domain
   """
-  updateDomain(details: DomainInput!, id: ID!): UpdatedDomain
+  updateDomain(auth: Authentication!, changes: SLDInput!, id: ID!): SLDUpdate
+
+
 
   """
-  Delete user
+  Delete a customer
   """
-  deleteUser(session: String!, user: ID!): User
+  deleteCustomer(auth: Authentication!): DeletedItem
 
   """
-  Update user details
+  Export a customer
   """
-  updateUser(details: UserInput!, session: String!, user: ID!): User
+  exportCustomer(auth: Authentication!): CustomerExport
+
+  """
+  Update customer detail
+  """
+  updateCustomer(auth: Authentication!, changes: CustomerInput!): CustomerUpdate
 }

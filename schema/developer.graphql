@@ -1,0 +1,25 @@
+# import Customer from "customer.graphql"
+
+# Type
+
+type DeveloperKey {
+  id: String
+  key: String
+  owner: Customer
+}
+
+type DeveloperKeyDetails__ {
+  key: String
+  owner: Customer
+}
+
+type DeveloperKeyResponse {
+  "Key detail"
+  detail: DeveloperKeyDetails__
+
+  "Human-readable response from API"
+  message: String
+
+  "Was the operation successful?"
+  success: Boolean
+}

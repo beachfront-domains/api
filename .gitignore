@@ -1,14 +1,17 @@
-# OS garbage
+# —
 .DS_Store
 Thumbs.db
 
-# Folders
-api
+# Folder
+dist
 exports
 node_modules
 
-# Files
-.env
+# File
+*.css.map
+*.env
+*.key
 *.lock
 *.log
+database.conf
 package-lock.json

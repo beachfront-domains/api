@@ -1,0 +1,105 @@
+######
+# Type
+######
+
+type PremiumSLD {
+  name: String
+  price: Int
+  unicode: String
+}
+
+type ReservedSLD {
+  code: String
+  name: String
+  price: Int
+  unicode: String
+}
+
+type TLD {
+  id: ID
+
+  """
+  Unrendered punycode
+  """
+  name: String
+
+  """
+  Array of disallowed SLDs
+  """
+  nope: [String]
+
+  """
+  Array of related TLDs
+  """
+  pair: [String]
+
+  """
+  Array of premium SLD objects, with base pricing
+  """
+  premium: [PremiumSLD]
+
+  """
+  Base pricing for this TLD
+  """
+  price: Int
+
+  """
+  Array of reserved SLD objects
+  """
+  reserved: [ReservedSLD]
+
+  """
+  Rendered punycode
+  """
+  unicode: String
+  #
+  created: DateTime
+  updated: DateTime
+}
+
+type TLDUpdateDetail__ {
+  "TLD detail"
+  tld: TLD
+}
+
+type TLDUpdate {
+  detail: TLDUpdateDetail__
+
+  """
+  Human-readable response from API
+  """
+  message: String
+
+  """
+  Was the operation successful?
+  """
+  success: Boolean
+}
+
+
+
+#######
+# Input
+#######
+
+input PremiumSLDInput {
+  price: Int
+  sld: String
+}
+
+input ReservedSLDInput {
+  code: String
+  price: Int
+  sld: String
+}
+
+input TLDInput {
+  name: String
+  nope: [String]
+  pair: [String]
+  premium: [PremiumSLDInput]
+  reserved: [ReservedSLDInput]
+  unicode: String
+  # no created
+  # no updated
+}

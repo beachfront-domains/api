@@ -1,0 +1,2 @@
+- [ ] streamline email template/send process
+  - https://codechips.me/send-html-emails-with-mailgun-and-firebase-functions

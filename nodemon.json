@@ -1,9 +1,6 @@
 {
   "exec": "ts-node -r tsconfig-paths/register src/index.ts",
   "ext": "graphql,ts",
-  "ignore": [
-    "src/**/*.spec.ts"
-  ],
   "watch": [
     "schema",
     "src"

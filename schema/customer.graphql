@@ -1,0 +1,111 @@
+# Enums
+
+enum LoginMethod {
+  link
+  token
+}
+
+enum Pronoun {
+  ae
+  e
+  ey
+  fae
+  he
+  per
+  she
+  they
+  unspecified
+  ve
+  xe
+  ze
+  zie
+}
+
+enum Role {
+  admin
+  customer
+}
+
+
+
+# Types
+
+type Customer {
+  avatar: String
+  bio: String
+  email: String
+  homepage: String
+  id: ID
+  language: String
+  location: String
+  loginMethod: LoginMethod
+  logins: [String]
+  name: String
+  pronoun: Pronoun
+  role: Role
+  "Is this customer an employee of beachfront?"
+  staff: Boolean
+  timezone: String
+  username: String
+  verified: Boolean
+
+  created: String
+  updated: String
+}
+
+type _CustomerExportDetails {
+  "Customer detail"
+  customer: Customer
+
+  file: String
+}
+
+type _CustomerUpdateDetails {
+  "Customer detail"
+  customer: Customer
+}
+
+type CustomerExport {
+  detail: _CustomerExportDetails
+
+  "Human-readable response from API"
+  message: String
+
+  "Was the operation successful?"
+  success: Boolean
+}
+
+type CustomerUpdate {
+  detail: _CustomerUpdateDetails
+
+  "Human-readable response from API"
+  message: String
+
+  "Was the operation successful?"
+  success: Boolean
+}
+
+
+
+# Inputs
+
+input CustomerInput {
+  avatar: String
+  bio: String
+  email: String
+  homepage: String
+  id: ID
+  language: String
+  location: String
+  # no loginMethod
+  # no logins
+  name: String
+  pronoun: Pronoun
+  # no role
+  staff: Boolean
+  timezone: String
+  username: String
+  # no verified
+  # no created
+  # no updated
+}

@@ -1,0 +1,10 @@
+- [ ] create tests
+- [ ] prune dependencies
+- [×] seed database with TLDs
+- [ ] figure out pricing for TLDs and premium SLDs
+- [ ] create payments database
+  - [ ] support mobilecoin
+  - [ ] support legacy (Stripe)
+  - [ ] support btc
+  - [ ] support hns
+  - [ ] support eth

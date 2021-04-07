@@ -1,0 +1,9 @@
+# import AvailableSLD from "sld.graphql"
+# import Pagination from "pagination.graphql"
+
+# Type
+
+type DomainSearchResults {
+  pageInfo: Pagination
+  results: [AvailableSLD]
+}

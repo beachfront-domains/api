@@ -1,54 +1,50 @@
-"use strict";
 
 
 
-//  U T I L S
+///  I M P O R T
 
-import {
-  createDomain,
-  deleteDomain,
-  getDomain,
-  getDomains,
-  updateDomain
-} from "~module/domain/query";
+import { resolvers } from "graphql-scalars";
+
+///  U T I L
 
 import {
-  deleteUser,
-  exportUser,
-  getUser,
-  getUsers,
-  updateUser
-} from "~module/user/query";
+  getCustomer as customer,
+  updateCustomer
+} from "~service/human/index";
 
 import {
-  initSession,
+  createKey,
+  readKey as key
+} from "~service/develop/index";
+
+import {
   login,
-  validateAccess
-} from "~module/login/query";
+  loginViaKey as loginKey,
+  validateAccess as authenticate,
+  validateToken as createSession
+} from "~service/bouncer/index";
 
 
 
-//  E X P O R T
+///  E X P O R T
 
-export default () => {
-  return {
-    authenticate: validateAccess,
-    createSession: initSession,
-    login,
-
-    createDomain,
-    deleteDomain,
-    domain: getDomain,
-    domainss: getDomains,
-    updateDomain,
-
-    deleteUser,
-    exportUser,
-    user: getUser,
-    // userByEmail: getUser,
-    // userByRole: getUser,
-    // userByUsername: getUser,
-    users: getUsers,
-    updateUser
-  };
+export default {
+  ...resolvers,
+  /// bouncer
+  authenticate,
+  createSession,
+  login,
+  loginKey,
+  /// develop
+  createKey,
+  key,
+  /// human
+  customer,
+  updateCustomer
 };
+
+
+
+// deleteCustomer,
+// exportCustomer,
+// customers: getCustomers,
