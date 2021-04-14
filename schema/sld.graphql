@@ -42,14 +42,10 @@ enum SLDStatusType {
 # Type
 ######
 
-type AvailableSLD {
-  name: String
-  tld: String
-}
-
 type SLD {
   expiry: DateTime
   id: ID
+  # marketplace: Boolean
   name: String
   owner: Customer
   registrar: String
@@ -59,6 +55,12 @@ type SLD {
   #
   created: DateTime
   updated: DateTime
+}
+
+type AvailableSLD {
+  premium: Boolean
+  price: Decimal
+  sld: SLD
 }
 
 type SLDUpdateDetail__ {

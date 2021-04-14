@@ -2,9 +2,11 @@
 # import LoginKeyResponse from "login.graphql"
 
 # import DeveloperKeyResponse from "developer.graphql";
-# import DomainSearchResults from "results.graphql";
 
 # import PaginationVariables from "pagination.graphql"
+
+# import SearchResults from "search.graphql";
+# import SearchVariables from "search.graphql"
 
 # import Customer from "customer.graphql"
 # import CustomerExport from "customer.graphql"
@@ -20,6 +22,7 @@ All the queries that enable beachfront to function
 """
 
 scalar DateTime
+scalar Decimal
 
 input Authentication {
   customerId: ID!
@@ -73,10 +76,8 @@ type Query {
 
   search(
     pagination: PaginationVariables = {},
-    name: String,
-    tld: String,
-    unicode: String
-  ): DomainSearchResults
+    variables: SearchVariables = {}
+  ): SearchResults
 }
 
 type Mutation {

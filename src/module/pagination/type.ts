@@ -4,7 +4,7 @@
 ///  E X P O R T
 
 export type PaginationArgumentType = {
-  after: Date
+  after: number
   first: number
 };
 

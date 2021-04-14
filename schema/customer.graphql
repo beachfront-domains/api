@@ -48,7 +48,7 @@ type Customer {
   timezone: String
   username: String
   verified: Boolean
-
+  #
   created: String
   updated: String
 }

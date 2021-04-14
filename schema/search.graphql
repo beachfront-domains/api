@@ -1,0 +1,38 @@
+# import AvailableSLD from "sld.graphql"
+# import Customer from "customer.graphql"
+# import Pagination from "pagination.graphql"
+
+# Type
+
+type DomainResult {
+  available: Boolean
+  created: DateTime
+  name: String
+  premium: Boolean
+  price: Decimal
+  unicode: String
+}
+
+type _SearchResultDetails {
+  pageInfo: Pagination
+  results: [DomainResult]
+  viewer: Customer
+}
+
+type SearchResults {
+  detail: _SearchResultDetails
+
+  "Human-readable response from API"
+  message: String
+
+  "Was the operation successful?"
+  success: Boolean
+}
+
+# Input
+
+input SearchVariables {
+  name: String
+  tld: String
+  unicode: String
+}

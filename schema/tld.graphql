@@ -4,14 +4,14 @@
 
 type PremiumSLD {
   name: String
-  price: Int
+  price: Decimal
   unicode: String
 }
 
 type ReservedSLD {
   code: String
   name: String
-  price: Int
+  price: Decimal
   unicode: String
 }
 
@@ -41,7 +41,7 @@ type TLD {
   """
   Base pricing for this TLD
   """
-  price: Int
+  price: Decimal
 
   """
   Array of reserved SLD objects
@@ -83,13 +83,13 @@ type TLDUpdate {
 #######
 
 input PremiumSLDInput {
-  price: Int
+  price: Decimal
   sld: String
 }
 
 input ReservedSLDInput {
   code: String
-  price: Int
+  price: Decimal
   sld: String
 }
 

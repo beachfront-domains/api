@@ -157,6 +157,29 @@ price = 0.00
 reserved = []
 unicode = "backend"
 
+[tlds.bald]
+name = "bald"
+nope = []
+pair = []
+premium = [
+  { name = "aero", price = 0.00, unicode = "aero" },
+  { name = "aerodynamic", price = 0.00, unicode = "aerodynamic" },
+  { name = "are", price = 0.00, unicode = "are" },
+  { name = "be", price = 0.00, unicode = "be" },
+  { name = "cool", price = 0.00, unicode = "cool" },
+  { name = "im", price = 0.00, unicode = "im" },
+  { name = "my", price = 0.00, unicode = "my" },
+  { name = "sleek", price = 0.00, unicode = "sleek" },
+  { name = "smooth", price = 0.00, unicode = "smooth" },
+  { name = "us", price = 0.00, unicode = "us" },
+  { name = "we", price = 0.00, unicode = "we" },
+  { name = "weare", price = 0.00, unicode = "weare" },
+  { name = "were", price = 0.00, unicode = "were" }
+]
+price = 0.00
+reserved = []
+unicode = "bald"
+
 [tlds.ballpoint]
 name = "ballpoint"
 nope = []
@@ -589,8 +612,26 @@ unicode = "dingbats"
 [tlds.dinner]
 name = "dinner"
 nope = []
-pair = []
-premium = []
+pair = ["lunch"]
+premium = [
+  { name = "after", price = 0.00, unicode = "after" },
+  { name = "app", price = 0.00, unicode = "app" },
+  { name = "before", price = 0.00, unicode = "before" },
+  { name = "bill", price = 0.00, unicode = "bill" },
+  { name = "buffet", price = 0.00, unicode = "buffet" },
+  { name = "buy", price = 0.00, unicode = "buy" },
+  { name = "deliver", price = 0.00, unicode = "deliver" },
+  { name = "do", price = 0.00, unicode = "do" },
+  { name = "menu", price = 0.00, unicode = "menu" },
+  { name = "michelin", price = 0.00, unicode = "michelin" },
+  { name = "purchase", price = 0.00, unicode = "purchase" },
+  { name = "reserve", price = 0.00, unicode = "reserve" },
+  { name = "rsvp", price = 0.00, unicode = "rsvp" },
+  { name = "schedule", price = 0.00, unicode = "schedule" },
+  { name = "star", price = 0.00, unicode = "star" },
+  { name = "takeout", price = 0.00, unicode = "takeout" },
+  { name = "tv", price = 0.00, unicode = "tv" }
+]
 price = 0.00
 reserved = []
 unicode = "dinner"
@@ -679,14 +720,35 @@ price = 0.00
 reserved = []
 unicode = "doomscroll"
 
-[tlds.dopememe]
-name = "dopememe"
+[tlds.dopameme]
+name = "dopameme"
 nope = []
 pair = []
 premium = []
 price = 0.00
 reserved = []
-unicode = "dopememe"
+unicode = "dopameme"
+
+[tlds.drives]
+name = "drives"
+nope = []
+pair = []
+premium = [
+  { name = "cyber", price = 0.00, unicode = "cyber" },
+  { name = "hard", price = 0.00, unicode = "hard" },
+  { name = "hd", price = 0.00, unicode = "hd" },
+  { name = "hdd", price = 0.00, unicode = "hdd" },
+  { name = "local", price = 0.00, unicode = "local" },
+  { name = "remote", price = 0.00, unicode = "remote" },
+  { name = "solid", price = 0.00, unicode = "solid" },
+  { name = "solidstate", price = 0.00, unicode = "solidstate" },
+  { name = "ss", price = 0.00, unicode = "ss" },
+  { name = "ssd", price = 0.00, unicode = "ssd" },
+  { name = "web", price = 0.00, unicode = "web" }
+]
+price = 0.00
+reserved = []
+unicode = "drives"
 
 [tlds.ecmascript]
 name = "ecmascript"
@@ -820,6 +882,18 @@ price = 0.00
 reserved = []
 unicode = "grundare"
 
+[tlds.guffaw]
+name = "guffaw"
+nope = []
+pair = []
+premium = [
+  { name = "big", price = 0.00, unicode = "big" },
+  { name = "lol", price = 0.00, unicode = "lol" }
+]
+price = 0.00
+reserved = []
+unicode = "guffaw"
+
 [tlds.halide]
 name = "halide"
 nope = []
@@ -860,7 +934,7 @@ unicode = "hexa"
 [tlds.hieroglyph]
 name = "hieroglyph"
 nope = []
-pair = ["hieroglyphic", "hieroglyphics", "hieroglyphs"]
+pair = ["hieroglyphic", "hieroglyphics", "hieroglyphs", "pharoah"]
 premium = [
   { name = "ancient", price = 0.00, unicode = "ancient" },
   { name = "egypt", price = 0.00, unicode = "egypt" },
@@ -886,7 +960,7 @@ unicode = "hieroglyph"
 [tlds.hieroglyphic]
 name = "hieroglyphic"
 nope = []
-pair = ["hieroglyph", "hieroglyphics", "hieroglyphs"]
+pair = ["hieroglyph", "hieroglyphics", "hieroglyphs", "pharoah"]
 premium = [
   { name = "ancient", price = 0.00, unicode = "ancient" },
   { name = "egypt", price = 0.00, unicode = "egypt" },
@@ -912,7 +986,7 @@ unicode = "hieroglyphic"
 [tlds.hieroglyphics]
 name = "hieroglyphics"
 nope = []
-pair = ["hieroglyph", "hieroglyphic", "hieroglyphs"]
+pair = ["hieroglyph", "hieroglyphic", "hieroglyphs", "pharoah"]
 premium = [
   { name = "ancient", price = 0.00, unicode = "ancient" },
   { name = "egypt", price = 0.00, unicode = "egypt" },
@@ -938,7 +1012,7 @@ unicode = "hieroglyphics"
 [tlds.hieroglyphs]
 name = "hieroglyphs"
 nope = []
-pair = ["hieroglyph", "hieroglyphic", "hieroglyphics"]
+pair = ["hieroglyph", "hieroglyphic", "hieroglyphics", "pharoah"]
 premium = [
   { name = "ancient", price = 0.00, unicode = "ancient" },
   { name = "egypt", price = 0.00, unicode = "egypt" },
@@ -1010,11 +1084,20 @@ unicode = "htop"
 [tlds.humanoid]
 name = "humanoid"
 nope = []
-pair = []
+pair = ["humanoids"]
 premium = []
 price = 0.00
 reserved = []
 unicode = "humanoid"
+
+[tlds.humanoids]
+name = "humanoids"
+nope = []
+pair = ["humanoid"]
+premium = []
+price = 0.00
+reserved = []
+unicode = "humanoids"
 
 [tlds.hyphen]
 name = "hyphen"
@@ -1043,8 +1126,8 @@ price = 0.00
 reserved = []
 unicode = "illuminatus"
 
-[tlds.impressario]
-name = "impressario"
+[tlds.impresario]
+name = "impresario"
 nope = []
 pair = []
 premium = [
@@ -1056,7 +1139,7 @@ premium = [
 ]
 price = 0.00
 reserved = []
-unicode = "impressario"
+unicode = "impresario"
 
 [tlds.inasmuch]
 name = "inasmuch"
@@ -1308,8 +1391,26 @@ unicode = "loverboy"
 [tlds.lunch]
 name = "lunch"
 nope = []
-pair = []
-premium = []
+pair = ["dinner"]
+premium = [
+  { name = "after", price = 0.00, unicode = "after" },
+  { name = "app", price = 0.00, unicode = "app" },
+  { name = "before", price = 0.00, unicode = "before" },
+  { name = "bill", price = 0.00, unicode = "bill" },
+  { name = "buffet", price = 0.00, unicode = "buffet" },
+  { name = "buy", price = 0.00, unicode = "buy" },
+  { name = "deliver", price = 0.00, unicode = "deliver" },
+  { name = "do", price = 0.00, unicode = "do" },
+  { name = "menu", price = 0.00, unicode = "menu" },
+  { name = "michelin", price = 0.00, unicode = "michelin" },
+  { name = "power", price = 0.00, unicode = "power" },
+  { name = "purchase", price = 0.00, unicode = "purchase" },
+  { name = "reserve", price = 0.00, unicode = "reserve" },
+  { name = "rsvp", price = 0.00, unicode = "rsvp" },
+  { name = "schedule", price = 0.00, unicode = "schedule" },
+  { name = "star", price = 0.00, unicode = "star" },
+  { name = "takeout", price = 0.00, unicode = "takeout" }
+]
 price = 0.00
 reserved = []
 unicode = "lunch"
@@ -1459,6 +1560,21 @@ price = 0.00
 reserved = []
 unicode = "nonsequitur"
 
+[tlds.novae]
+name = "novae"
+nope = []
+pair = []
+premium = [
+  { name = "in", price = 0.00, unicode = "in" },
+  { name = "planet", price = 0.00, unicode = "planet" },
+  { name = "space", price = 0.00, unicode = "space" },
+  { name = "super", price = 0.00, unicode = "super" },
+  { name = "ultra", price = 0.00, unicode = "ultra" },
+]
+price = 0.00
+reserved = []
+unicode = "novae"
+
 [tlds.oooh]
 name = "oooh"
 nope = []
@@ -1472,6 +1588,21 @@ premium = [
 price = 0.00
 reserved = []
 unicode = "oooh"
+
+[tlds.operand]
+name = "operand"
+nope = []
+pair = []
+premium = [
+  { name = "logic", price = 0.00, unicode = "logic" },
+  { name = "logical", price = 0.00, unicode = "logical" },
+  { name = "math", price = 0.00, unicode = "math" },
+  { name = "mathematical", price = 0.00, unicode = "mathematical" },
+  { name = "symbol", price = 0.00, unicode = "symbol" }
+]
+price = 0.00
+reserved = []
+unicode = "operand"
 
 [tlds.outwork]
 name = "outwork"
@@ -1517,6 +1648,118 @@ price = 0.00
 reserved = []
 unicode = "paizuri"
 
+[tlds.param]
+name = "param"
+nope = []
+pair = ["params"]
+premium = [
+  { name = "app", price = 0.00, unicode = "app" },
+  { name = "arg", price = 0.00, unicode = "arg" },
+  { name = "args", price = 0.00, unicode = "args" },
+  { name = "argument", price = 0.00, unicode = "argument" },
+  { name = "arguments", price = 0.00, unicode = "arguments" },
+  { name = "comp", price = 0.00, unicode = "comp" },
+  { name = "compute", price = 0.00, unicode = "compute" },
+  { name = "computer", price = 0.00, unicode = "computer" },
+  { name = "css", price = 0.00, unicode = "css" },
+  { name = "function", price = 0.00, unicode = "function" },
+  { name = "functions", price = 0.00, unicode = "functions" },
+  { name = "fx", price = 0.00, unicode = "fx" },
+  { name = "html", price = 0.00, unicode = "html" },
+  { name = "js", price = 0.00, unicode = "js" },
+  { name = "jsx", price = 0.00, unicode = "jsx" },
+  { name = "keyword", price = 0.00, unicode = "keyword" },
+  { name = "keywords", price = 0.00, unicode = "keywords" },
+  { name = "machine", price = 0.00, unicode = "machine" },
+  { name = "machines", price = 0.00, unicode = "machines" },
+  { name = "optional", price = 0.00, unicode = "optional" },
+  { name = "parse", price = 0.00, unicode = "parse" },
+  { name = "query", price = 0.00, unicode = "query" },
+  { name = "required", price = 0.00, unicode = "required" },
+  { name = "string", price = 0.00, unicode = "string" },
+  { name = "strings", price = 0.00, unicode = "strings" },
+  { name = "super", price = 0.00, unicode = "super" },
+  { name = "supreme", price = 0.00, unicode = "supreme" },
+  { name = "url", price = 0.00, unicode = "url" },
+  { name = "val", price = 0.00, unicode = "val" },
+  { name = "var", price = 0.00, unicode = "var" },
+  { name = "variable", price = 0.00, unicode = "variable" },
+  { name = "variables", price = 0.00, unicode = "variables" },
+  { name = "vars", price = 0.00, unicode = "vars" },
+]
+price = 0.00
+reserved = []
+unicode = "param"
+
+[tlds.params]
+name = "params"
+nope = []
+pair = ["param"]
+premium = [
+  { name = "app", price = 0.00, unicode = "app" },
+  { name = "arg", price = 0.00, unicode = "arg" },
+  { name = "args", price = 0.00, unicode = "args" },
+  { name = "argument", price = 0.00, unicode = "argument" },
+  { name = "arguments", price = 0.00, unicode = "arguments" },
+  { name = "comp", price = 0.00, unicode = "comp" },
+  { name = "compute", price = 0.00, unicode = "compute" },
+  { name = "computer", price = 0.00, unicode = "computer" },
+  { name = "css", price = 0.00, unicode = "css" },
+  { name = "function", price = 0.00, unicode = "function" },
+  { name = "functions", price = 0.00, unicode = "functions" },
+  { name = "fx", price = 0.00, unicode = "fx" },
+  { name = "html", price = 0.00, unicode = "html" },
+  { name = "js", price = 0.00, unicode = "js" },
+  { name = "jsx", price = 0.00, unicode = "jsx" },
+  { name = "keyword", price = 0.00, unicode = "keyword" },
+  { name = "keywords", price = 0.00, unicode = "keywords" },
+  { name = "machine", price = 0.00, unicode = "machine" },
+  { name = "machines", price = 0.00, unicode = "machines" },
+  { name = "optional", price = 0.00, unicode = "optional" },
+  { name = "parse", price = 0.00, unicode = "parse" },
+  { name = "query", price = 0.00, unicode = "query" },
+  { name = "required", price = 0.00, unicode = "required" },
+  { name = "string", price = 0.00, unicode = "string" },
+  { name = "strings", price = 0.00, unicode = "strings" },
+  { name = "super", price = 0.00, unicode = "super" },
+  { name = "supreme", price = 0.00, unicode = "supreme" },
+  { name = "url", price = 0.00, unicode = "url" },
+  { name = "val", price = 0.00, unicode = "val" },
+  { name = "var", price = 0.00, unicode = "var" },
+  { name = "variable", price = 0.00, unicode = "variable" },
+  { name = "variables", price = 0.00, unicode = "variables" },
+  { name = "vars", price = 0.00, unicode = "vars" },
+]
+price = 0.00
+reserved = []
+unicode = "params"
+
+[tlds.pharoah]
+name = "pharoah"
+nope = []
+pair = ["hieroglyph", "hieroglyphic", "hieroglyphics", "hieroglyphs"]
+premium = [
+  { name = "ancient", price = 0.00, unicode = "ancient" },
+  { name = "egypt", price = 0.00, unicode = "egypt" },
+  { name = "egyptian", price = 0.00, unicode = "egyptian" },
+  { name = "emoji", price = 0.00, unicode = "emoji" },
+  { name = "lang", price = 0.00, unicode = "lang" },
+  { name = "language", price = 0.00, unicode = "language" },
+  { name = "lost", price = 0.00, unicode = "lost" },
+  { name = "mystic", price = 0.00, unicode = "mystic" },
+  { name = "mystical", price = 0.00, unicode = "mystical" },
+  { name = "mythic", price = 0.00, unicode = "mythic" },
+  { name = "mythical", price = 0.00, unicode = "mythical" },
+  { name = "original", price = 0.00, unicode = "original" },
+  { name = "sacred", price = 0.00, unicode = "sacred" },
+  { name = "script", price = 0.00, unicode = "script" },
+  { name = "scripts", price = 0.00, unicode = "scripts" },
+  { name = "write", price = 0.00, unicode = "write" }
+]
+price = 0.00
+reserved = []
+unicode = "pharoah"
+
 [tlds.pigeon]
 name = "pigeon"
 nope = []
@@ -1539,6 +1782,15 @@ premium = [
 price = 0.00
 reserved = []
 unicode = "pigeon"
+
+[tlds.plethora]
+name = "plethora"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "plethora"
 
 [tlds.pondering]
 name = "pondering"
@@ -1689,6 +1941,35 @@ price = 0.00
 reserved = []
 unicode = "shinderu"
 
+[tlds.shmup]
+name = "shmup"
+nope = []
+pair = []
+premium = [
+  { name = "game", price = 0.00, unicode = "game" },
+  { name = "fps", price = 0.00, unicode = "fps" },
+  { name = "mmo", price = 0.00, unicode = "mmo" },
+  { name = "mmorpg", price = 0.00, unicode = "mmorpg" },
+  { name = "pixel", price = 0.00, unicode = "pixel" },
+  { name = "rpg", price = 0.00, unicode = "rpg" },
+  { name = "rts", price = 0.00, unicode = "rts" },
+  { name = "scroll", price = 0.00, unicode = "scroll" },
+  { name = "side", price = 0.00, unicode = "side" },
+  { name = "sidescroll", price = 0.00, unicode = "sidescroll" }
+]
+price = 0.00
+reserved = []
+unicode = "shmup"
+
+[tlds.sike]
+name = "sike"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "sike"
+
 [tlds.slanguage]
 name = "slanguage"
 nope = []
@@ -1730,6 +2011,34 @@ premium = [
 price = 0.00
 reserved = []
 unicode = "soundfont"
+
+[tlds.soundteam]
+name = "soundteam"
+nope = []
+pair = ["soundteams"]
+premium = [
+  { name = "game", price = 0.00, unicode = "game" },
+  { name = "music", price = 0.00, unicode = "music" }
+]
+price = 0.00
+reserved = [
+  { code = "", name = "capcom", price = 0.00, unicode = "capcom" }
+]
+unicode = "soundteam"
+
+[tlds.soundteams]
+name = "soundteams"
+nope = []
+pair = ["soundteam"]
+premium = [
+  { name = "game", price = 0.00, unicode = "game" },
+  { name = "music", price = 0.00, unicode = "music" }
+]
+price = 0.00
+reserved = [
+  { code = "", name = "capcom", price = 0.00, unicode = "capcom" }
+]
+unicode = "soundteams"
 
 [tlds.southpaw]
 name = "southpaw"
@@ -1812,7 +2121,7 @@ unicode = "technobabble"
 [tlds.theblackfriday]
 name = "theblackfriday"
 nope = []
-pair = []
+pair = ["thecybermonday"]
 premium = [
   { name = "sale", price = 0.00, unicode = "sale" },
   { name = "sales", price = 0.00, unicode = "sales" },
@@ -1822,6 +2131,20 @@ premium = [
 price = 0.00
 reserved = []
 unicode = "theblackfriday"
+
+[tlds.thecybermonday]
+name = "thecybermonday"
+nope = []
+pair = ["theblackfriday"]
+premium = [
+  { name = "sale", price = 0.00, unicode = "sale" },
+  { name = "sales", price = 0.00, unicode = "sales" },
+  { name = "shop", price = 0.00, unicode = "shop" },
+  { name = "shops", price = 0.00, unicode = "shops" }
+]
+price = 0.00
+reserved = []
+unicode = "thecybermonday"
 
 [tlds.tiddies]
 name = "tiddies"
