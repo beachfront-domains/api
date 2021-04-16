@@ -15,6 +15,7 @@ export type TLD = {
   nope: string[]
   pair: string[]
   premium: PremiumSLD[]
+  premiumPrice: number
   price: number
   reserved: ReservedSLD[]
   unicode: string

@@ -2,6 +2,16 @@ title = "Neuenet TLDs"
 
 [tlds]
 
+# [tlds.aaa]
+# collection = []
+# name = "aaa"
+# nope = []
+# pair = []
+# premium = []
+# price = 0.00
+# reserved = []
+# unicode = "aaa"
+
 [tlds.acapella]
 collection = ["music"]
 name = "acapella"
@@ -13,8 +23,7 @@ premium = [
   { name = "rap", unicode = "rap" },
   { name = "sing", unicode = "sing" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "acapella"
 
@@ -29,10 +38,36 @@ premium = [
   { name = "rap", unicode = "rap" },
   { name = "sing", unicode = "sing" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "acappella"
+
+# Currently being staked on Namebase Registry
+# [tlds.adults]
+# collection = ["mature"]
+# name = "adults"
+# nope = []
+# pair = []
+# premium = [
+#   { name = "are", unicode = "are" },
+#   { name = "for", unicode = "for" },
+#   { name = "fuck", unicode = "fuck" },
+#   { name = "m4m", unicode = "m4m" },
+#   { name = "m4w", unicode = "m4w" },
+#   { name = "mfm", unicode = "mfm" },
+#   { name = "mfw", unicode = "mfw" },
+#   { name = "of", unicode = "of" },
+#   { name = "sex", unicode = "sex" },
+#   { name = "the", unicode = "the" },
+#   { name = "w4m", unicode = "w4m" },
+#   { name = "w4w", unicode = "w4w" },
+#   { name = "we", unicode = "we" },
+#   { name = "wfm", unicode = "wfm" },
+#   { name = "wfw", unicode = "wfw" }
+# ]
+# price = 0.00
+# reserved = []
+# unicode = "adults"
 
 [tlds.afrobeat]
 collection = ["music"]
@@ -40,8 +75,7 @@ name = "afrobeat"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "afrobeat"
 
@@ -55,8 +89,7 @@ premium = [
   { name = "television", unicode = "television" },
   { name = "tv", unicode = "tv" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "airtime"
 
@@ -66,8 +99,7 @@ name = "alladat"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "alladat"
 
@@ -77,8 +109,7 @@ name = "antifascist"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "antifascist"
 
@@ -95,13 +126,12 @@ premium = [
   { name = "now", unicode = "now" },
   { name = "the", unicode = "the" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "apocalypse"
 
 [tlds.architech]
-collection = ["design","development"]
+collection = ["design", "development"]
 name = "architech"
 nope = []
 pair = []
@@ -109,8 +139,7 @@ premium = [
   { name = "an", unicode = "an" },
   { name = "the", unicode = "the" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "architech"
 
@@ -132,8 +161,7 @@ premium = [
   { name = "sh", unicode = "sh" },
   { name = "shell", unicode = "shell" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "backend"
 
@@ -157,8 +185,7 @@ premium = [
   { name = "weare", unicode = "weare" },
   { name = "were", unicode = "were" }
 ]
-price = "9.00"
-pricePremium = "2430.00"
+price = 0.00
 reserved = []
 unicode = "bald"
 
@@ -168,8 +195,7 @@ name = "ballpoint"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "ballpoint"
 
@@ -179,8 +205,7 @@ name = "banjo"
 nope = []
 pair = []
 premium = []
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = []
 unicode = "banjo"
 
@@ -190,8 +215,7 @@ name = "barnacle"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "barnacle"
 
@@ -201,8 +225,7 @@ name = "battlechip"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "battlechip"
 
@@ -212,8 +235,7 @@ name = "beachfront"
 nope = []
 pair = []
 premium = []
-price = "5004.50"
-pricePremium = "5202.50"
+price = 5000
 reserved = []
 unicode = "beachfront"
 
@@ -223,8 +245,7 @@ name = "bigblackdick"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "bigblackdick"
 
@@ -234,8 +255,7 @@ name = "biochip"
 nope = []
 pair = ["biochips"]
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "biochip"
 
@@ -245,8 +265,7 @@ name = "biochips"
 nope = []
 pair = ["biochip"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "biochips"
 
@@ -259,8 +278,7 @@ premium = [
   { name = "black", unicode = "black" },
   { name = "power", unicode = "power" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "blvck"
 
@@ -270,8 +288,7 @@ name = "bootsector"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "bootsector"
 
@@ -281,8 +298,7 @@ name = "braggart"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "braggart"
 
@@ -290,7 +306,7 @@ unicode = "braggart"
 collection = ["mature"]
 name = "buttock"
 nope = []
-pair = ["buttocks","buttsecks","secks"]
+pair = ["buttocks", "buttsecks", "secks"]
 premium = [
   { name = "average", unicode = "average" },
   { name = "best", unicode = "best" },
@@ -312,8 +328,7 @@ premium = [
   { name = "wet", unicode = "wet" },
   { name = "white", unicode = "white" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "buttock"
 
@@ -321,7 +336,7 @@ unicode = "buttock"
 collection = ["mature"]
 name = "buttocks"
 nope = []
-pair = ["buttock","buttsecks","secks"]
+pair = ["buttock", "buttsecks", "secks"]
 premium = [
   { name = "average", unicode = "average" },
   { name = "best", unicode = "best" },
@@ -343,16 +358,15 @@ premium = [
   { name = "wet", unicode = "wet" },
   { name = "white", unicode = "white" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "buttocks"
 
 [tlds.buttsecks]
-collection = ["culture","mature"]
+collection = ["culture", "mature"]
 name = "buttsecks"
 nope = []
-pair = ["buttock","buttocks","secks"]
+pair = ["buttock", "buttocks", "secks"]
 premium = [
   { name = "average", unicode = "average" },
   { name = "best", unicode = "best" },
@@ -374,8 +388,7 @@ premium = [
   { name = "wet", unicode = "wet" },
   { name = "white", unicode = "white" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "buttsecks"
 
@@ -385,8 +398,7 @@ name = "canvass"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "canvass"
 
@@ -400,8 +412,7 @@ premium = [
   { name = "color", unicode = "color" },
   { name = "colour", unicode = "colour" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "cerulean"
 
@@ -411,8 +422,7 @@ name = "cherub"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "cherub"
 
@@ -422,8 +432,7 @@ name = "chown"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "chown"
 
@@ -433,8 +442,7 @@ name = "chroot"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "chroot"
 
@@ -451,8 +459,7 @@ premium = [
   { name = "editor", unicode = "editor" },
   { name = "sh", unicode = "sh" }
 ]
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = []
 unicode = "coda"
 
@@ -462,8 +469,7 @@ name = "codesh"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "codesh"
 
@@ -490,11 +496,10 @@ premium = [
   { name = "skin", unicode = "skin" },
   { name = "swatch", unicode = "swatch" }
 ]
-price = "9.00"
-pricePremium = "2430.00"
+price = 0.00
 reserved = [
-  { name = "copic", unicode = "copic" },
-  { name = "crayola", unicode = "crayola" }
+  { code = "", name = "copic", unicode = "copic" },
+  { code = "", name = "crayola", unicode = "crayola" }
 ]
 unicode = "colors"
 
@@ -512,8 +517,7 @@ premium = [
   { name = "llc", unicode = "llc" },
   { name = "ltd", unicode = "ltd" }
 ]
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = []
 unicode = "conglomerate"
 
@@ -523,19 +527,17 @@ name = "corsage"
 nope = []
 pair = []
 premium = []
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = []
 unicode = "corsage"
 
 [tlds.craftwork]
-collection = ["design","development"]
+collection = ["design", "development"]
 name = "craftwork"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "craftwork"
 
@@ -545,11 +547,10 @@ name = "creek"
 nope = []
 pair = []
 premium = []
-price = "9.00"
-pricePremium = "2430.00"
+price = 0.00
 reserved = [
-  { name = "dawson", unicode = "dawson" },
-  { name = "dawsons", unicode = "dawsons" }
+  { code = "", name = "dawson", unicode = "dawson" },
+  { code = "", name = "dawsons", unicode = "dawsons" }
 ]
 unicode = "creek"
 
@@ -559,13 +560,12 @@ name = "crud"
 nope = []
 pair = []
 premium = []
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = []
 unicode = "crud"
 
 [tlds.cursor]
-collection = ["design","development"]
+collection = ["design", "development"]
 name = "cursor"
 nope = []
 pair = []
@@ -577,8 +577,7 @@ premium = [
   { name = "pointer", unicode = "pointer" },
   { name = "the", unicode = "the" }
 ]
-price = "10.50"
-pricePremium = "4410.00"
+price = 0.00
 reserved = []
 unicode = "cursor"
 
@@ -588,8 +587,7 @@ name = "datastore"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "datastore"
 
@@ -599,8 +597,7 @@ name = "dedsec"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "dedsec"
 
@@ -608,10 +605,9 @@ unicode = "dedsec"
 collection = ["hack"]
 name = "dedware"
 nope = []
-pair = ["dedwares","dedwarez"]
+pair = ["dedwares", "dedwarez"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "dedware"
 
@@ -619,10 +615,9 @@ unicode = "dedware"
 collection = ["hack"]
 name = "dedwares"
 nope = []
-pair = ["dedware","dedwarez"]
+pair = ["dedware", "dedwarez"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "dedwares"
 
@@ -630,10 +625,9 @@ unicode = "dedwares"
 collection = ["hack"]
 name = "dedwarez"
 nope = []
-pair = ["dedware","dedwares"]
+pair = ["dedware", "dedwares"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "dedwarez"
 
@@ -643,8 +637,7 @@ name = "deepthrust"
 nope = []
 pair = ["deepthrusts"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "deepthrust"
 
@@ -654,8 +647,7 @@ name = "deepthrusts"
 nope = []
 pair = ["deepthrust"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "deepthrusts"
 
@@ -665,8 +657,7 @@ name = "dehost"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "dehost"
 
@@ -676,13 +667,12 @@ name = "demex"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "demex"
 
 [tlds.dingbat]
-collection = ["design","write"]
+collection = ["design", "write"]
 name = "dingbat"
 nope = []
 pair = ["dingbats"]
@@ -700,13 +690,12 @@ premium = [
   { name = "woff", unicode = "woff" },
   { name = "woff2", unicode = "woff2" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "dingbat"
 
 [tlds.dingbats]
-collection = ["design","write"]
+collection = ["design", "write"]
 name = "dingbats"
 nope = []
 pair = ["dingbat"]
@@ -724,8 +713,7 @@ premium = [
   { name = "woff", unicode = "woff" },
   { name = "woff2", unicode = "woff2" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "dingbats"
 
@@ -753,8 +741,7 @@ premium = [
   { name = "takeout", unicode = "takeout" },
   { name = "tv", unicode = "tv" }
 ]
-price = "10.50"
-pricePremium = "4410.00"
+price = 0.00
 reserved = []
 unicode = "dinner"
 
@@ -767,8 +754,7 @@ premium = [
   { name = "floppy", unicode = "floppy" },
   { name = "mb", unicode = "mb" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "diskette"
 
@@ -782,11 +768,10 @@ premium = [
   { name = "greatest", unicode = "greatest" },
   { name = "ultimate", unicode = "ultimate" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = [
-  { name = "doctor", unicode = "doctor" },
-  { name = "dr", unicode = "dr" }
+  { code = "", name = "doctor", unicode = "doctor" },
+  { code = "", name = "dr", unicode = "dr" }
 ]
 unicode = "disrespect"
 
@@ -796,8 +781,7 @@ name = "dist"
 nope = []
 pair = []
 premium = []
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = []
 unicode = "dist"
 
@@ -817,8 +801,7 @@ premium = [
   { name = "spiritual", unicode = "spiritual" },
   { name = "tarot", unicode = "tarot" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "diviner"
 
@@ -838,30 +821,27 @@ premium = [
   { name = "spiritual", unicode = "spiritual" },
   { name = "tarot", unicode = "tarot" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "diviners"
 
 [tlds.doomscroll]
-collection = ["culture","tech"]
+collection = ["culture", "tech"]
 name = "doomscroll"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "doomscroll"
 
 [tlds.dopameme]
-collection = ["culture","tech"]
+collection = ["culture", "tech"]
 name = "dopameme"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "dopameme"
 
@@ -883,8 +863,7 @@ premium = [
   { name = "ssd", unicode = "ssd" },
   { name = "web", unicode = "web" }
 ]
-price = "9.00"
-pricePremium = "2430.00"
+price = 0.00
 reserved = []
 unicode = "drives"
 
@@ -900,13 +879,12 @@ premium = [
   { name = "js", unicode = "js" },
   { name = "program", unicode = "program" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "ecmascript"
 
 [tlds.editor]
-collection = ["design","development"]
+collection = ["design", "development"]
 name = "editor"
 nope = []
 pair = []
@@ -919,8 +897,7 @@ premium = [
   { name = "palette", unicode = "palette" },
   { name = "text", unicode = "text" }
 ]
-price = "10.50"
-pricePremium = "4410.00"
+price = 0.00
 reserved = []
 unicode = "editor"
 
@@ -930,8 +907,7 @@ name = "exclamation"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "exclamation"
 
@@ -941,8 +917,7 @@ name = "external"
 nope = []
 pair = []
 premium = []
-price = "9.00"
-pricePremium = "2430.00"
+price = 0.00
 reserved = []
 unicode = "external"
 
@@ -961,8 +936,7 @@ premium = [
   { name = "sport", unicode = "sport" },
   { name = "sports", unicode = "sports" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "extracurricular"
 
@@ -975,8 +949,7 @@ premium = [
   { name = "argue", unicode = "argue" },
   { name = "debate", unicode = "debate" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "fairpoint"
 
@@ -986,8 +959,7 @@ name = "futuros"
 nope = []
 pair = ["futurus"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "futuros"
 
@@ -997,8 +969,7 @@ name = "futurus"
 nope = []
 pair = ["futuros"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "futurus"
 
@@ -1015,8 +986,7 @@ premium = [
   { name = "shop", unicode = "shop" },
   { name = "xxx", unicode = "xxx" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "garterbelt"
 
@@ -1026,8 +996,7 @@ name = "glacier"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "glacier"
 
@@ -1037,13 +1006,12 @@ name = "grundare"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "grundare"
 
 [tlds.guffaw]
-collection = ["comedy","generic"]
+collection = ["comedy", "generic"]
 name = "guffaw"
 nope = []
 pair = []
@@ -1051,8 +1019,7 @@ premium = [
   { name = "big", unicode = "big" },
   { name = "lol", unicode = "lol" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "guffaw"
 
@@ -1066,22 +1033,20 @@ premium = [
   { name = "camera", unicode = "camera" },
   { name = "photography", unicode = "photography" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = [
-  { name = "app", unicode = "app" },
-  { name = "ios", unicode = "ios" }
+  { code = "", name = "app", unicode = "app" },
+  { code = "", name = "ios", unicode = "ios" }
 ]
 unicode = "halide"
 
 [tlds.handyname]
-collection = ["generic","handshake"]
+collection = ["generic", "handshake"]
 name = "handyname"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "handyname"
 
@@ -1095,8 +1060,7 @@ premium = [
   { name = "colour", unicode = "colour" },
   { name = "palette", unicode = "palette" }
 ]
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = []
 unicode = "hexa"
 
@@ -1104,7 +1068,7 @@ unicode = "hexa"
 collection = ["culture"]
 name = "hieroglyph"
 nope = []
-pair = ["hieroglyphic","hieroglyphics","hieroglyphs","pharoah"]
+pair = ["hieroglyphic", "hieroglyphics", "hieroglyphs", "pharoah"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -1123,8 +1087,7 @@ premium = [
   { name = "scripts", unicode = "scripts" },
   { name = "write", unicode = "write" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "hieroglyph"
 
@@ -1132,7 +1095,7 @@ unicode = "hieroglyph"
 collection = ["culture"]
 name = "hieroglyphic"
 nope = []
-pair = ["hieroglyph","hieroglyphics","hieroglyphs","pharoah"]
+pair = ["hieroglyph", "hieroglyphics", "hieroglyphs", "pharoah"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -1151,8 +1114,7 @@ premium = [
   { name = "scripts", unicode = "scripts" },
   { name = "write", unicode = "write" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "hieroglyphic"
 
@@ -1160,7 +1122,7 @@ unicode = "hieroglyphic"
 collection = ["culture"]
 name = "hieroglyphics"
 nope = []
-pair = ["hieroglyph","hieroglyphic","hieroglyphs","pharoah"]
+pair = ["hieroglyph", "hieroglyphic", "hieroglyphs", "pharoah"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -1179,8 +1141,7 @@ premium = [
   { name = "scripts", unicode = "scripts" },
   { name = "write", unicode = "write" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "hieroglyphics"
 
@@ -1188,7 +1149,7 @@ unicode = "hieroglyphics"
 collection = ["culture"]
 name = "hieroglyphs"
 nope = []
-pair = ["hieroglyph","hieroglyphic","hieroglyphics","pharoah"]
+pair = ["hieroglyph", "hieroglyphic", "hieroglyphics", "pharoah"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -1207,8 +1168,7 @@ premium = [
   { name = "scripts", unicode = "scripts" },
   { name = "write", unicode = "write" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "hieroglyphs"
 
@@ -1233,8 +1193,7 @@ premium = [
   { name = "secondary", unicode = "secondary" },
   { name = "xyz", unicode = "xyz" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "homeroom"
 
@@ -1248,8 +1207,7 @@ premium = [
   { name = "colour", unicode = "colour" },
   { name = "palette", unicode = "palette" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "hsla"
 
@@ -1259,8 +1217,7 @@ name = "htop"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "htop"
 
@@ -1270,8 +1227,7 @@ name = "humanoid"
 nope = []
 pair = ["humanoids"]
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "humanoid"
 
@@ -1281,8 +1237,7 @@ name = "humanoids"
 nope = []
 pair = ["humanoid"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "humanoids"
 
@@ -1292,8 +1247,7 @@ name = "hyphen"
 nope = []
 pair = []
 premium = []
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = []
 unicode = "hyphen"
 
@@ -1303,8 +1257,7 @@ name = "hyphop"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "hyphop"
 
@@ -1314,8 +1267,7 @@ name = "illuminatus"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "illuminatus"
 
@@ -1331,8 +1283,7 @@ premium = [
   { name = "perform", unicode = "perform" },
   { name = "performance", unicode = "performance" }
 ]
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = []
 unicode = "impresario"
 
@@ -1342,8 +1293,7 @@ name = "inasmuch"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "inasmuch"
 
@@ -1353,8 +1303,7 @@ name = "incorpo"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "incorpo"
 
@@ -1364,19 +1313,17 @@ name = "infocenter"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "infocenter"
 
 [tlds.infolink]
-collection = ["deus ex","tech"]
+collection = ["deus ex", "tech"]
 name = "infolink"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "infolink"
 
@@ -1386,13 +1333,12 @@ name = "insomuch"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "insomuch"
 
 [tlds.interior]
-collection = ["design","generic"]
+collection = ["design", "generic"]
 name = "interior"
 nope = []
 pair = []
@@ -1402,8 +1348,7 @@ premium = [
   { name = "design", unicode = "design" },
   { name = "secretary", unicode = "secretary" }
 ]
-price = "9.00"
-pricePremium = "2430.00"
+price = 0.00
 reserved = []
 unicode = "interior"
 
@@ -1418,8 +1363,7 @@ premium = [
   { name = "my", unicode = "my" },
   { name = "win", unicode = "win" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "internetpoint"
 
@@ -1434,8 +1378,7 @@ premium = [
   { name = "my", unicode = "my" },
   { name = "win", unicode = "win" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "internetpoints"
 
@@ -1455,8 +1398,7 @@ premium = [
   { name = "thick", unicode = "thick" },
   { name = "thin", unicode = "thin" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "labia"
 
@@ -1466,8 +1408,7 @@ name = "labio"
 nope = []
 pair = []
 premium = []
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = []
 unicode = "labio"
 
@@ -1482,19 +1423,17 @@ premium = [
   { name = "next", unicode = "next" },
   { name = "previous", unicode = "previous" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "leapyear"
 
 [tlds.lefty]
-collection = ["design","generic","politics"]
+collection = ["design", "generic", "politics"]
 name = "lefty"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "lefty"
 
@@ -1524,8 +1463,7 @@ premium = [
   { name = "summer", unicode = "summer" },
   { name = "winter", unicode = "winter" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "lewk"
 
@@ -1555,8 +1493,7 @@ premium = [
   { name = "summer", unicode = "summer" },
   { name = "winter", unicode = "winter" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "lewks"
 
@@ -1570,8 +1507,7 @@ premium = [
   { name = "books", unicode = "books" },
   { name = "read", unicode = "read" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "libr"
 
@@ -1581,10 +1517,9 @@ name = "liss"
 nope = []
 pair = []
 premium = []
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = [
-  { name = "casey", unicode = "casey" }
+  { code = "", name= "casey", unicode = "casey" }
 ]
 unicode = "liss"
 
@@ -1594,30 +1529,27 @@ name = "litre"
 nope = []
 pair = []
 premium = []
-price = "10.50"
-pricePremium = "4410.00"
+price = 0.00
 reserved = []
 unicode = "litre"
 
 [tlds.loverboi]
-collection = ["love","mature"]
+collection = ["love", "mature"]
 name = "loverboi"
 nope = []
 pair = ["loverboy"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "loverboi"
 
 [tlds.loverboy]
-collection = ["love","mature"]
+collection = ["love", "mature"]
 name = "loverboy"
 nope = []
 pair = ["loverboi"]
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "loverboy"
 
@@ -1645,13 +1577,12 @@ premium = [
   { name = "star", unicode = "star" },
   { name = "takeout", unicode = "takeout" }
 ]
-price = "10.50"
-pricePremium = "4410.00"
+price = 0.00
 reserved = []
 unicode = "lunch"
 
 [tlds.lynk]
-collection = ["generic","tech"]
+collection = ["generic", "tech"]
 name = "lynk"
 nope = []
 pair = []
@@ -1663,8 +1594,7 @@ premium = [
   { name = "url", unicode = "url" },
   { name = "your", unicode = "your" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "lynk"
 
@@ -1674,8 +1604,7 @@ name = "marshmallow"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "marshmallow"
 
@@ -1692,17 +1621,16 @@ premium = [
   { name = "kitty", unicode = "kitty" },
   { name = "meow", unicode = "meow" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = [
-  { name = "mirror", unicode = "mirror" }
+  { code = "", name = "mirror", unicode = "mirror" }
 ]
 unicode = "maru"
 
 [tlds.melanin]
 collection = ["culture"]
 name = "melanin"
-nope = ["bitch","poor","ratchet","slut","ugly"]
+nope = ["bitch", "poor", "ratchet", "slut", "ugly"]
 pair = []
 premium = [
   { name = "beautiful", unicode = "beautiful" },
@@ -1711,8 +1639,7 @@ premium = [
   { name = "sun", unicode = "sun" },
   { name = "sunkissed", unicode = "sunkissed" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "melanin"
 
@@ -1726,30 +1653,27 @@ premium = [
   { name = "moe", unicode = "moe" },
   { name = "waifu", unicode = "waifu" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "moemoe"
 
 [tlds.moodring]
-collection = ["culture","generic"]
+collection = ["culture", "generic"]
 name = "moodring"
 nope = []
 pair = ["moodrings"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "moodring"
 
 [tlds.moodrings]
-collection = ["culture","generic"]
+collection = ["culture", "generic"]
 name = "moodrings"
 nope = []
 pair = ["moodring"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "moodrings"
 
@@ -1766,8 +1690,7 @@ premium = [
   { name = "project", unicode = "project" },
   { name = "template", unicode = "template" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "mvc"
 
@@ -1790,8 +1713,7 @@ premium = [
   { name = "typeface", unicode = "typeface" },
   { name = "types", unicode = "types" }
 ]
-price = "9.00"
-pricePremium = "2430.00"
+price = 0.00
 reserved = []
 unicode = "neue"
 
@@ -1801,8 +1723,7 @@ name = "newline"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "newline"
 
@@ -1812,8 +1733,7 @@ name = "nonsequitur"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "nonsequitur"
 
@@ -1827,10 +1747,9 @@ premium = [
   { name = "planet", unicode = "planet" },
   { name = "space", unicode = "space" },
   { name = "super", unicode = "super" },
-  { name = "ultra", unicode = "ultra" }
+  { name = "ultra", unicode = "ultra" },
 ]
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = []
 unicode = "novae"
 
@@ -1843,10 +1762,9 @@ premium = [
   { name = "present", unicode = "present" },
   { name = "presents", unicode = "presents" },
   { name = "surprise", unicode = "surprise" },
-  { name = "surprises", unicode = "surprises" }
+  { name = "surprises", unicode = "surprises" },
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "oooh"
 
@@ -1862,8 +1780,7 @@ premium = [
   { name = "mathematical", unicode = "mathematical" },
   { name = "symbol", unicode = "symbol" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "operand"
 
@@ -1873,8 +1790,7 @@ name = "outwork"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "outwork"
 
@@ -1886,10 +1802,9 @@ pair = []
 premium = [
   { name = "deliver", unicode = "deliver" },
   { name = "delivery", unicode = "delivery" },
-  { name = "package", unicode = "package" }
+  { name = "package", unicode = "package" },
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "pacote"
 
@@ -1899,13 +1814,12 @@ name = "pagefault"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "pagefault"
 
 [tlds.paizuri]
-collection = ["japan","mature"]
+collection = ["japan", "mature"]
 name = "paizuri"
 nope = []
 pair = []
@@ -1914,8 +1828,7 @@ premium = [
   { name = "tentacle", unicode = "tentacle" },
   { name = "xn--gi8h", unicode = "🍆" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "paizuri"
 
@@ -1957,10 +1870,9 @@ premium = [
   { name = "var", unicode = "var" },
   { name = "variable", unicode = "variable" },
   { name = "variables", unicode = "variables" },
-  { name = "vars", unicode = "vars" }
+  { name = "vars", unicode = "vars" },
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "param"
 
@@ -2002,10 +1914,9 @@ premium = [
   { name = "var", unicode = "var" },
   { name = "variable", unicode = "variable" },
   { name = "variables", unicode = "variables" },
-  { name = "vars", unicode = "vars" }
+  { name = "vars", unicode = "vars" },
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "params"
 
@@ -2013,7 +1924,7 @@ unicode = "params"
 collection = ["culture"]
 name = "pharoah"
 nope = []
-pair = ["hieroglyph","hieroglyphic","hieroglyphics","hieroglyphs"]
+pair = ["hieroglyph", "hieroglyphic", "hieroglyphics", "hieroglyphs"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -2032,8 +1943,7 @@ premium = [
   { name = "scripts", unicode = "scripts" },
   { name = "write", unicode = "write" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "pharoah"
 
@@ -2057,8 +1967,7 @@ premium = [
   { name = "sub", unicode = "sub" },
   { name = "subway", unicode = "subway" }
 ]
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = []
 unicode = "pigeon"
 
@@ -2068,8 +1977,7 @@ name = "plethora"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "plethora"
 
@@ -2079,8 +1987,7 @@ name = "pondering"
 nope = []
 pair = ["ponderings"]
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "pondering"
 
@@ -2090,8 +1997,7 @@ name = "ponderings"
 nope = []
 pair = ["pondering"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "ponderings"
 
@@ -2101,19 +2007,17 @@ name = "pynk"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "pynk"
 
 [tlds.righty]
-collection = ["design","generic","politics"]
+collection = ["design", "generic", "politics"]
 name = "righty"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "righty"
 
@@ -2127,19 +2031,18 @@ premium = [
   { name = "game", unicode = "game" },
   { name = "my", unicode = "my" },
   { name = "no", unicode = "no" },
-  { name = "your", unicode = "your" }
+  { name = "your", unicode = "your" },
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = [
-  { name = "microsoft", unicode = "microsoft" },
-  { name = "ms", unicode = "ms" },
-  { name = "nintendo", unicode = "nintendo" },
-  { name = "ninty", unicode = "ninty" },
-  { name = "playstation", unicode = "playstation" },
-  { name = "ps", unicode = "ps" },
-  { name = "sony", unicode = "sony" },
-  { name = "xbox", unicode = "xbox" }
+  { code = "", name = "microsoft", unicode = "microsoft" },
+  { code = "", name = "ms", unicode = "ms" },
+  { code = "", name = "nintendo", unicode = "nintendo" },
+  { code = "", name = "ninty", unicode = "ninty" },
+  { code = "", name = "playstation", unicode = "playstation" },
+  { code = "", name = "ps", unicode = "ps" },
+  { code = "", name = "sony", unicode = "sony" },
+  { code = "", name = "xbox", unicode = "xbox" },
 ]
 unicode = "savepoint"
 
@@ -2153,49 +2056,46 @@ premium = [
   { name = "game", unicode = "game" },
   { name = "my", unicode = "my" },
   { name = "no", unicode = "no" },
-  { name = "your", unicode = "your" }
+  { name = "your", unicode = "your" },
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = [
-  { name = "microsoft", unicode = "microsoft" },
-  { name = "ms", unicode = "ms" },
-  { name = "nintendo", unicode = "nintendo" },
-  { name = "ninty", unicode = "ninty" },
-  { name = "playstation", unicode = "playstation" },
-  { name = "ps", unicode = "ps" },
-  { name = "sony", unicode = "sony" },
-  { name = "xbox", unicode = "xbox" }
+  { code = "", name = "microsoft", unicode = "microsoft" },
+  { code = "", name = "ms", unicode = "ms" },
+  { code = "", name = "nintendo", unicode = "nintendo" },
+  { code = "", name = "ninty", unicode = "ninty" },
+  { code = "", name = "playstation", unicode = "playstation" },
+  { code = "", name = "ps", unicode = "ps" },
+  { code = "", name = "sony", unicode = "sony" },
+  { code = "", name = "xbox", unicode = "xbox" },
 ]
 unicode = "savepoints"
 
 [tlds.scrot]
-collection = ["design","tech"]
+collection = ["design", "tech"]
 name = "scrot"
 nope = []
 pair = ["scrots"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "scrot"
 
 [tlds.scrots]
-collection = ["design","tech"]
+collection = ["design", "tech"]
 name = "scrots"
 nope = []
 pair = ["scrot"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "scrots"
 
 [tlds.secks]
-collection = ["culture","mature"]
+collection = ["culture", "mature"]
 name = "secks"
 nope = []
-pair = ["buttock","buttocks","buttsecks"]
+pair = ["buttock", "buttocks", "buttsecks"]
 premium = [
   { name = "average", unicode = "average" },
   { name = "best", unicode = "best" },
@@ -2217,8 +2117,7 @@ premium = [
   { name = "wet", unicode = "wet" },
   { name = "white", unicode = "white" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "secks"
 
@@ -2228,8 +2127,7 @@ name = "shindeiru"
 nope = []
 pair = ["shinderu"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "shindeiru"
 
@@ -2239,8 +2137,7 @@ name = "shinderu"
 nope = []
 pair = ["shindeiru"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "shinderu"
 
@@ -2261,8 +2158,7 @@ premium = [
   { name = "side", unicode = "side" },
   { name = "sidescroll", unicode = "sidescroll" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "shmup"
 
@@ -2272,8 +2168,7 @@ name = "sike"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "sike"
 
@@ -2283,35 +2178,32 @@ name = "slanguage"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "slanguage"
 
 [tlds.snapback]
-collection = ["culture","fashion"]
+collection = ["culture", "fashion"]
 name = "snapback"
 nope = []
 pair = ["snapbacks"]
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "snapback"
 
 [tlds.snapbacks]
-collection = ["culture","fashion"]
+collection = ["culture", "fashion"]
 name = "snapbacks"
 nope = []
 pair = ["snapback"]
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "snapbacks"
 
 [tlds.soundfont]
-collection = ["music","tech"]
+collection = ["music", "tech"]
 name = "soundfont"
 nope = []
 pair = []
@@ -2320,15 +2212,14 @@ premium = [
   { name = "files", unicode = "files" },
   { name = "game", unicode = "game" },
   { name = "games", unicode = "games" },
-  { name = "play", unicode = "play" }
+  { name = "play", unicode = "play" },
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "soundfont"
 
 [tlds.soundteam]
-collection = ["game","music"]
+collection = ["game", "music"]
 name = "soundteam"
 nope = []
 pair = ["soundteams"]
@@ -2336,15 +2227,14 @@ premium = [
   { name = "game", unicode = "game" },
   { name = "music", unicode = "music" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = [
-  { name = "capcom", unicode = "capcom" }
+  { code = "", name = "capcom", unicode = "capcom" }
 ]
 unicode = "soundteam"
 
 [tlds.soundteams]
-collection = ["game","music"]
+collection = ["game", "music"]
 name = "soundteams"
 nope = []
 pair = ["soundteam"]
@@ -2352,10 +2242,9 @@ premium = [
   { name = "game", unicode = "game" },
   { name = "music", unicode = "music" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = [
-  { name = "capcom", unicode = "capcom" }
+  { code = "", name = "capcom", unicode = "capcom" }
 ]
 unicode = "soundteams"
 
@@ -2365,8 +2254,7 @@ name = "southpaw"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "southpaw"
 
@@ -2385,8 +2273,7 @@ premium = [
   { name = "sup", unicode = "sup" },
   { name = "the", unicode = "the" }
 ]
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "starboard"
 
@@ -2396,24 +2283,22 @@ name = "sushirrito"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "sushirrito"
 
 [tlds.svpply]
-collection = ["design","development"]
+collection = ["design", "development"]
 name = "svpply"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "svpply"
 
 [tlds.symbols]
-collection = ["design","development","spiritual"]
+collection = ["design", "development", "spiritual"]
 name = "symbols"
 nope = []
 pair = []
@@ -2433,8 +2318,7 @@ premium = [
   { name = "xyz", unicode = "xyz" },
   { name = "zodiac", unicode = "zodiac" }
 ]
-price = "9.00"
-pricePremium = "2430.00"
+price = 0.00
 reserved = []
 unicode = "symbols"
 
@@ -2444,8 +2328,7 @@ name = "technobabble"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "technobabble"
 
@@ -2460,8 +2343,7 @@ premium = [
   { name = "shop", unicode = "shop" },
   { name = "shops", unicode = "shops" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "theblackfriday"
 
@@ -2476,8 +2358,7 @@ premium = [
   { name = "shop", unicode = "shop" },
   { name = "shops", unicode = "shops" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "thecybermonday"
 
@@ -2487,8 +2368,7 @@ name = "tiddies"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "tiddies"
 
@@ -2523,8 +2403,7 @@ premium = [
   { name = "ws", unicode = "ws" },
   { name = "zip", unicode = "zip" }
 ]
-price = "9.00"
-pricePremium = "2430.00"
+price = 0.00
 reserved = []
 unicode = "transmit"
 
@@ -2543,8 +2422,7 @@ premium = [
   { name = "wily", unicode = "wily" },
   { name = "worldthree", unicode = "worldthree" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "undernet"
 
@@ -2557,8 +2435,7 @@ premium = [
   { name = "color", unicode = "color" },
   { name = "universe", unicode = "universe" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "univeige"
 
@@ -2577,8 +2454,7 @@ premium = [
   { name = "wily", unicode = "wily" },
   { name = "worldthree", unicode = "worldthree" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "uranet"
 
@@ -2588,8 +2464,7 @@ name = "vendo"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "vendo"
 
@@ -2599,8 +2474,7 @@ name = "waveform"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "waveform"
 
@@ -2610,8 +2484,7 @@ name = "webbrowser"
 nope = []
 pair = ["webrowser"]
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "webbrowser"
 
@@ -2621,8 +2494,7 @@ name = "webrowser"
 nope = []
 pair = ["webbrowser"]
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "webrowser"
 
@@ -2632,16 +2504,15 @@ name = "whizbang"
 nope = []
 pair = []
 premium = []
-price = "4.50"
-pricePremium = "202.50"
+price = 0.00
 reserved = []
 unicode = "whizbang"
 
 [tlds.xn--co8hfc]
-collection = ["food","nature"]
+collection = ["food", "nature"]
 name = "xn--co8hfc"
 nope = []
-pair = ["xn--pr9hoa","xn--qj8h57g"]
+pair = ["xn--pr9hoa", "xn--qj8h57g"]
 premium = [
   { name = "breakfast", unicode = "breakfast" },
   { name = "delish", unicode = "delish" },
@@ -2654,8 +2525,7 @@ premium = [
   { name = "xn--4r9h", unicode = "🥢" },
   { name = "xn--rj8h", unicode = "🍴" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "🐷🐔"
 
@@ -2694,8 +2564,7 @@ premium = [
   { name = "xfiles", unicode = "xfiles" },
   { name = "wtf", unicode = "wtf" }
 ]
-price = "9.00"
-pricePremium = "2430.00"
+price = 0.00
 reserved = []
 unicode = "👽"
 
@@ -2731,8 +2600,7 @@ premium = [
   { name = "white", unicode = "white" },
   { name = "xxx", unicode = "xxx" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "🍑🍆"
 
@@ -2747,8 +2615,7 @@ premium = [
   { name = "fax", unicode = "fax" },
   { name = "folx", unicode = "folx" }
 ]
-price = "9.00"
-pricePremium = "2430.00"
+price = 0.00
 reserved = []
 unicode = "👏🏾"
 
@@ -2756,7 +2623,7 @@ unicode = "👏🏾"
 collection = ["food"]
 name = "xn--pr9hoa"
 nope = []
-pair = ["xn--co8hfc","xn--qj8h57g"]
+pair = ["xn--co8hfc", "xn--qj8h57g"]
 premium = [
   { name = "breakfast", unicode = "breakfast" },
   { name = "delish", unicode = "delish" },
@@ -2769,8 +2636,7 @@ premium = [
   { name = "xn--4r9h", unicode = "🥢" },
   { name = "xn--rj8h", unicode = "🍴" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "🥓🥚"
 
@@ -2778,7 +2644,7 @@ unicode = "🥓🥚"
 collection = ["food"]
 name = "xn--qj8h57g"
 nope = []
-pair = ["xn--co8hfc","xn--pr9hoa"]
+pair = ["xn--co8hfc", "xn--pr9hoa"]
 premium = [
   { name = "breakfast", unicode = "breakfast" },
   { name = "delish", unicode = "delish" },
@@ -2791,8 +2657,7 @@ premium = [
   { name = "xn--4r9h", unicode = "🥢" },
   { name = "xn--rj8h", unicode = "🍴" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "🥓🍳"
 
@@ -2828,8 +2693,7 @@ premium = [
   { name = "white", unicode = "white" },
   { name = "xxx", unicode = "xxx" }
 ]
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "🍑💦"
 
@@ -2839,8 +2703,7 @@ name = "xra"
 nope = []
 pair = []
 premium = []
-price = "3.75"
-pricePremium = "70.31"
+price = 0.00
 reserved = []
 unicode = "xra"
 
@@ -2850,7 +2713,6 @@ name = "xref"
 nope = []
 pair = []
 premium = []
-price = "7.50"
-pricePremium = "1125.00"
+price = 0.00
 reserved = []
 unicode = "xref"

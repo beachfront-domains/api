@@ -8,6 +8,7 @@ import { join } from "path";
 
 ///  I M P O R T S
 
+import Big from "big.js";
 import TOML from "@ltd/j-toml";
 import { r } from "rethinkdb-ts";
 
@@ -59,8 +60,7 @@ export default async() => {
         nope: tldData.nope,
         pair: tldData.pair,
         premium: tldData.premium,
-        // TODO: check if I need to do parsing specific to USD currency
-        price: parseInt(tldData.price),
+        price: new Big("`${tldData.price}`"),
         reserved: tldData.reserved,
         unicode: tldData.unicode
       };

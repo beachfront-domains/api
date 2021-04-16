@@ -39,6 +39,11 @@ type TLD {
   premium: [PremiumSLD]
 
   """
+  Premium pricing for this TLD
+  """
+  premiumPrice: Decimal
+
+  """
   Base pricing for this TLD
   """
   price: Decimal

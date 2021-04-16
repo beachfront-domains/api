@@ -5,6 +5,7 @@
 // 𐄂 first half is "name"
 // 𐄂 second half is "tld" (name)
 // : max results should be ~50
+// : toggle to show mature TLDs
 
 
 
@@ -22,6 +23,7 @@ import {
   regexZeroWidth
 } from "~util/index";
 
+import dictionary from "../util/dictionary";
 import removeVowels from "../util/remove-vowels";
 import thesaurus from "../util/thesaurus";
 
@@ -47,6 +49,11 @@ interface FunctionResponse extends FunctionResponseInterface {
 
 ///  E X P O R T
 
+// @ts-ignore
+export async function _searchDomainsRAW(suppliedData: Partial<SLDRequestInterface>): Promise<FunctionResponse> {
+  // TBD
+}
+
 export async function searchDomains(suppliedData: Partial<SLDRequestInterface>): Promise<FunctionResponse> {
   const databaseConnection = await r.connect(databaseOptions);
   const query: LooseObjectInterface = {};
@@ -57,6 +64,7 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
   // TODO
   // : test for "pagination" and "variables" existence
   // : maybe only look for "name" since we punycode the input _anyway_...no need for "unicode"
+  // : if domain is reserved, require code to purchase
 
   const { variables } = suppliedData;
 
@@ -173,6 +181,9 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
     console.log(response);
     console.log(";; sld info");
     databaseConnection.close();
+
+    // console.log(await dictionary(punycode.toUnicode(query.name))); // boolean
+    // console.log(";; ooh");
 
     if (response.length === 0) {
       console.log("desired domain is available");
