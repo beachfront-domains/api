@@ -212,27 +212,15 @@ const priceFloor = new Big("3.00");
 
 const basicMultipleDefault = new Big("0.25");
 const basicMultipleCommon = new Big("0.5");
-const basicMultipleRare = new Big("1.5");
-const basicMultipleEpic = new Big("2");
-const basicMultipleLegendary = new Big("2.5");
+const basicMultipleRare = new Big("1");
+const basicMultipleEpic = new Big("1.5");
+const basicMultipleLegendary = new Big("2");
 
 const premiumMultipleDefault = new Big("5");
 const premiumMultipleCommon = new Big("10");
 const premiumMultipleRare = new Big("20");
 const premiumMultipleEpic = new Big("30");
 const premiumMultipleLegendary = new Big("40");
-
-const basicPriceDefault = new Big("3.75");
-const basicPriceCommon = new Big("4.50");
-const basicPriceRare = new Big("7.50");
-const basicPriceEpic = new Big("9.00");
-const basicPriceLegendary = new Big("10.50");
-
-const premiumPriceDefault = new Big("70.30");
-const premiumPriceCommon = new Big("202.50");
-const premiumPriceRare = new Big("112.50");
-const premiumPriceEpic = new Big("2430.00");
-const premiumPriceLegendary = new Big("4410.00");
 
 
 

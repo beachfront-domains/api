@@ -5,8 +5,11 @@
 
 import cheerio from "cheerio";
 import got from "got";
+import env from "vne";
 
 ///  U T I L
+
+import { thesaurusKey } from "~util/index";
 
 interface FunctionResponse {
   antonyms: string[];
@@ -18,47 +21,44 @@ interface FunctionResponse {
 ///  E X P O R T
 
 export default async(suppliedWord: string): Promise<FunctionResponse> => {
-  let antonyms: string[] = [];
-  let synonyms: string[] = [];
+  const unwantedCharactersRegex = /\s|-|\./g;
+  let antonyms: any = [];
+  let synonyms: any = [];
 
   try {
-    const response = await got(`https://www.thesaurus.com/browse/${encodeURIComponent(String(suppliedWord))}`);
+    let response = await got(`https://www.dictionaryapi.com/api/v3/references/thesaurus/json/${encodeURIComponent(String(suppliedWord))}?key=${thesaurusKey}`).json();
 
-    if (response.statusCode !== 200) {
+    // if (response.statusCode !== 200) {
+    //   return {
+    //     antonyms,
+    //     synonyms
+    //   };
+    // }
+
+    if (!response) {
       return {
         antonyms,
         synonyms
       };
     }
 
-    const $ = cheerio.load(response.body, { ignoreWhitespace: true });
-
     // @ts-ignore
-    antonyms = $("body #antonyms").find("ul li a");
+    response = response[0].meta;
     // @ts-ignore
-    synonyms = $("body #meanings").find("ul li a");
+    const { ants, syns } = response;
 
-    // @ts-ignore
-    antonyms = antonyms.map(function() {
-      // @ts-ignore
-      const text = $(this).text();
+    antonyms = [...new Set(ants.flat())].sort();
+    synonyms = [...new Set(syns.flat())].sort();
 
-      if (!text.includes("-"))
-        return text.trim();
+    antonyms = antonyms.map((word: string) => {
+      if (word && !unwantedCharactersRegex.test(word))
+        return word;
+    });
 
-      // @ts-ignore
-    }).get().sort();
-
-    // @ts-ignore
-    synonyms = synonyms.map(function() {
-      // @ts-ignore
-      const text = $(this).text();
-
-      if (!text.includes("-"))
-        return text.trim();
-
-      // @ts-ignore
-    }).get().sort();
+    synonyms = synonyms.map((word: string) => {
+      if (word && !unwantedCharactersRegex.test(word))
+        return word;
+    });
   } catch(error) {
     /// IGNORE
     /// Probably not a dictionary word
@@ -69,3 +69,8 @@ export default async(suppliedWord: string): Promise<FunctionResponse> => {
     };
   }
 }
+
+
+
+// TODO
+// : extract this file and apply to Neuenet

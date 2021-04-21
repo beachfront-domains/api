@@ -20,8 +20,7 @@ export default async(suppliedWord: string): Promise<boolean> => {
       return false;
 
     const $ = cheerio.load(response.body, { ignoreWhitespace: true });
-    // @ts-ignore
-    const word = $("body #top-definitions-section").find("h1").text();
+    const word = $("body #top-definitions-section").find("h1").text().trim();
 
     if (word)
       isWord = true;
@@ -32,3 +31,8 @@ export default async(suppliedWord: string): Promise<boolean> => {
     return isWord;
   }
 }
+
+
+
+// TODO
+// : extract this file and apply to Neuenet

@@ -6,6 +6,7 @@
 
 - [Redis](https://formulae.brew.sh/cask/redis)
 - [RethinkDB](https://rethinkdb.com/docs/install)
+- [toml-sort](https://github.com/pappasam/toml-sort)
 
 
 
@@ -41,6 +42,24 @@ $ npm i
 ```
 
 
+
+## Generators
+
+```sh
+# This parses "neuenet.toml" and spits
+# out "tlds.toml" with pricing information
+#
+# If there is an error, that means a name
+# was added that was not rated on Niami yet
+#
+# Add "console.log(tldData.name);"
+# in the "generateTOML" function to find it
+$ node ./data/generate-toml.mjs
+
+# The organizes "tlds.toml" in place to
+# alphabetical order
+$ toml-sort ./data/tlds.toml --in-place
+```
 
 ## Development (different tabs/windows)
 

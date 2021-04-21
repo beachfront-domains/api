@@ -8,7 +8,6 @@ import { join } from "path";
 
 ///  I M P O R T S
 
-import Big from "big.js";
 import TOML from "@ltd/j-toml";
 import { r } from "rethinkdb-ts";
 
@@ -56,11 +55,13 @@ export default async() => {
       const tldData = tlds[tld];
 
       const dataToInsert = {
+        collection: tldData.collection,
         name: tldData.name,
         nope: tldData.nope,
         pair: tldData.pair,
         premium: tldData.premium,
-        price: new Big("`${tldData.price}`"),
+        price: tldData.price,
+        pricePremium: tldData.pricePremium,
         reserved: tldData.reserved,
         unicode: tldData.unicode
       };
@@ -75,7 +76,7 @@ export default async() => {
     }));
 
     databaseConnection.close();
-    printSuccess("TLDs created");
+    printSuccess(">>> TLDs created");
 
     return {
       httpCode: 201,
@@ -84,6 +85,6 @@ export default async() => {
     };
   } catch(error) {
     databaseConnection.close();
-    printError("tld query failed");
+    printError("<<< TLD query failed");
   }
 };

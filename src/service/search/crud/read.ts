@@ -24,6 +24,7 @@ import {
 } from "~util/index";
 
 import dictionary from "../util/dictionary";
+import getPricing from "../util/domain-pricing";
 import removeVowels from "../util/remove-vowels";
 import thesaurus from "../util/thesaurus";
 
@@ -37,6 +38,10 @@ const tldDatabase = "tlds";
 interface SLDRequestInterface {
   pagination: PaginationArgumentType;
   variables: SLD;
+  // mature: boolean
+  // related extensions: boolean
+  // synonyms: boolean
+  // antonyms: boolean
 };
 
 interface FunctionResponse extends FunctionResponseInterface {
@@ -45,21 +50,25 @@ interface FunctionResponse extends FunctionResponseInterface {
   };
 }
 
+interface RawSearchResponse {
+  available: boolean;
+  created: string | void;
+  domain: string;
+  premium: boolean;
+  price: string;
+}
+
 
 
 ///  E X P O R T
 
-// @ts-ignore
-export async function _searchDomainsRAW(suppliedData: Partial<SLDRequestInterface>): Promise<FunctionResponse> {
-  // TBD
-}
-
 export async function searchDomains(suppliedData: Partial<SLDRequestInterface>): Promise<FunctionResponse> {
-  const databaseConnection = await r.connect(databaseOptions);
+  // const databaseConnection = await r.connect(databaseOptions);
   const query: LooseObjectInterface = {};
   const results = [];
   let isPremium = false;
-  let premiumPrice = 0.00;
+  let basePrice = 0;
+  let premiumPrice = 0;
 
   // TODO
   // : test for "pagination" and "variables" existence
@@ -67,6 +76,11 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
   // : if domain is reserved, require code to purchase
 
   const { variables } = suppliedData;
+
+  // TODO | VARIABLES
+  // : show antonyms
+  // : show mature extensions
+  // : show related extensions
 
   // @ts-ignore | TS2769
   Object.entries(variables).forEach(([key, value]) => {
@@ -76,14 +90,8 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
     query[key] = String(value).toLowerCase();
   });
 
-  // console.log(suppliedData); // pagination: {...}, variables: {...}
-  // console.log("——————————");
-
-  // @ts-ignore | TS2532
   if (regexZeroWidth(query.name)) {
-    // TODO
-    // : add homoglyph detection
-    databaseConnection.close();
+    // databaseConnection.close();
 
     return {
       detail: {
@@ -98,177 +106,168 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
   // @ts-ignore | TS2532
   const desiredName = punycode.toAscii(query.name, { transitional: false });
 
-  // console.log("name", desiredName);
-  // console.log(desiredName.split("."));
-  // console.log();
-
   if (desiredName.includes(".")) {
     /// Excessive periods are ignored
     /// Just snag the first split pair
     query.name = desiredName.split(".")[0];
     query.tld = desiredName.split(".")[1];
-  } else {
-    if (desiredName.length < 3) {
-      /// Ignore short length, extension-less names
-      return {
-        detail: {
-          results: []
-        },
-        httpCode: 401,
-        message: "Query is too short, add more characters and/or an extension.",
-        success: false
-      };
-    }
-
-    query.name = desiredName;
-  }
-
-  if (query.tld) {
-    let tldQuery: LooseObjectInterface = await r.table(tldDatabase)
-      .filter({ name: query.tld })
-      .run(databaseConnection);
-
-    try {
-      tldQuery = tldQuery[0];
-
-      // TODO
-      // : query for SLD to test if premium
-
-      console.log(tldQuery);
-      console.log(";; tld");
-
-      if (!tldQuery) {
-        databaseConnection.close();
-
-        return {
-          detail: {
-            results: []
-          },
-          httpCode: 401,
-          message: "Extension does not exist (at least, not on beachfront/)…Yet?",
-          success: false
-        };
-      }
-
-      const { premium } = tldQuery;
-
-      premium.map((premiumSLD: any) => {
-        if (premiumSLD.name === query.name) {
-          isPremium = true;
-          // TODO
-          // : set "premiumPrice" to "premiumSLD.price"
-          premiumPrice = 500.75;
-        }
-      });
-    } catch(error) {
-      /// IGNORE
-    }
-  }
-
-  const { antonyms, synonyms } = await thesaurus(query.name);
-
-  // console.log();
-  // await thesaurus(query.name);
-  console.log(";; thesaurus");
-
-  // @ts-ignore TS2740: Type "any[]" is missing the following properties from type "Customer": <...>.
-  let response: LooseObjectInterface = await r.table(sldDatabase)
-    .filter(query)
-    .run(databaseConnection);
-
-  try {
-    // response = response[0];
-    console.log(response);
-    console.log(";; sld info");
-    databaseConnection.close();
-
-    // console.log(await dictionary(punycode.toUnicode(query.name))); // boolean
-    // console.log(";; ooh");
-
-    if (response.length === 0) {
-      console.log("desired domain is available");
-
-      // expiry: string
-      // id: string
-      // // marketplace: boolean
-      // name: string
-      // owner: Customer
-      // registrar: string
-      // status: Status
-      // tld: string
-      // unicode: string
-
-      if (query.tld) {
-        const domain = `${query.name}.${query.tld}`;
-
-        results.push({
-          available: true,
-          created: null,
-          // @ts-ignore | TS2532
-          name: punycode.toAscii(domain, { transitional: false }),
-          premium: isPremium,
-          price: premiumPrice,
-          unicode: punycode.toUnicode(domain)
-        });
-      }
-    } else {
-      console.log("desired domain may be taken but look at all these other options");
-    }
-
     // TODO
-    // : pull down list of premium SLDs when querying TLD
-    // : match premium SLD list when mapping thesaurus words
-    // : also have to check that these thesaurus words are not taken
-    // : UGH, recursive crap!
-
-    /// NO VWLS
-    results.push({
-      available: true,
-      created: null,
-      // @ts-ignore | TS2532
-      name: punycode.toAscii(`${removeVowels(query.name)}.${query.tld}`, { transitional: false }),
-      premium: false,
-      price: 0.00,
-      unicode: punycode.toUnicode(`${removeVowels(query.name)}.${query.tld}`)
-    });
-
-    synonyms.map((word: string) => {
-      const domain = `${word}.${query.tld}`;
-
-      results.push({
-        available: true,
-        created: null,
-        // @ts-ignore | TS2532
-        name: punycode.toAscii(domain, { transitional: false }),
-        premium: false,
-        price: 0.00,
-        unicode: punycode.toUnicode(domain)
-      });
-    });
-
-    antonyms.map((word: string) => {
-      const domain = `${word}.${query.tld}`;
-
-      results.push({
-        available: true,
-        created: null,
-        // @ts-ignore | TS2532
-        name: punycode.toAscii(domain, { transitional: false }),
-        premium: false,
-        price: 0.00,
-        unicode: punycode.toUnicode(domain)
-      });
-    });
-
-    // if (!response)
-    //   return {};
-
-    // @ts-ignore TS2740: Type "LooseObjectInterface" is missing the following properties from type "Customer": <...>.
-    // return response;
+    // if name or tld is too short, abort
+  } else {
+    // databaseConnection.close();
 
     return {
       detail: {
-        // results: response
+        results: []
+      },
+      httpCode: 401,
+      message: "Query missing extension",
+      success: false
+    };
+
+    // if (desiredName.length < 4) {
+    //   /// Ignore short length, extension-less names
+    //   return {
+    //     detail: {
+    //       results: []
+    //     },
+    //     httpCode: 401,
+    //     message: "Query is too short, add more characters and/or an extension.",
+    //     success: false
+    //   };
+    // }
+
+    // query.name = desiredName;
+  }
+
+  try {
+    const { antonyms, synonyms } = await thesaurus(query.name);
+    const domain = `${query.name}.${query.tld}`;
+    const searchResult = await __rawSearch(domain);
+
+    if (searchResult) {
+      const { available, created, premium, price } = searchResult;
+
+      results.push({
+        available,
+        created,
+        // @ts-ignore | TS2532
+        name: punycode.toAscii(domain, { transitional: false }),
+        premium,
+        price,
+        unicode: punycode.toUnicode(domain)
+      });
+    } else {
+      // TODO
+      // : figure out how this occurs
+      // : how to handle price being zero?
+      // : silently fail and do not send anything?
+      results.push({
+        available: false,
+        created: null,
+        // @ts-ignore | TS2532
+        name: punycode.toAscii(domain, { transitional: false }),
+        premium: false,
+        price: "0.00",
+        unicode: punycode.toUnicode(domain)
+      });
+    }
+
+    // TODO
+    // : do not forgot to add beachfront/ markup to these prices
+    //   : what is returned are Neuenet OEM pricing
+
+    // if (query.tld) {
+    //   /// NO VWLS
+    //   if (removeVowels(query.name).length > 3) {
+    //     const domainSansVowels = `${removeVowels(query.name)}.${query.tld}`;
+    //     const { price } = await getPricing({
+    //       extension: query.tld,
+    //       name: query.name,
+    //       premium: isPremium,
+    //       priceBase: basePrice,
+    //       pricePremium: premiumPrice
+    //     });
+
+    //     results.push({
+    //       available: true,
+    //       created: null,
+    //       // @ts-ignore | TS2532
+    //       name: punycode.toAscii(domainSansVowels, { transitional: false }),
+    //       premium: false,
+    //       price,
+    //       unicode: punycode.toUnicode(domainSansVowels)
+    //     });
+    //   }
+    // }
+
+    const relatedTLDs = await __rawNeighborSearch(query.tld);
+
+    await Promise.all(relatedTLDs.map(async(tld: string) => {
+      if (tld === query.tld)
+        return; /// We do not need to see a duplicate result
+
+      const domain = `${query.name}.${tld}`;
+      const searchResult = await __rawSearch(domain);
+
+      if (!searchResult)
+        return;
+
+      const { available, created, premium, price } = searchResult;
+
+      results.push({
+        available,
+        created,
+        // @ts-ignore | TS2532
+        name: punycode.toAscii(domain, { transitional: false }),
+        premium,
+        price,
+        unicode: punycode.toUnicode(domain)
+      });
+    }));
+
+    await Promise.all(synonyms.map(async(word: string) => {
+      const domain = `${word}.${query.tld}`;
+      const searchResult = await __rawSearch(domain);
+
+      if (!searchResult)
+        return;
+
+      const { available, created, premium, price } = searchResult;
+
+      results.push({
+        available,
+        created,
+        // @ts-ignore | TS2532
+        name: punycode.toAscii(domain, { transitional: false }),
+        premium,
+        price,
+        unicode: punycode.toUnicode(domain)
+      });
+    }));
+
+    await Promise.all(antonyms.map(async(word: string) => {
+      const domain = `${word}.${query.tld}`;
+      const searchResult = await __rawSearch(domain);
+
+      if (!searchResult)
+        return;
+
+      const { available, created, premium, price } = searchResult;
+
+      results.push({
+        available,
+        created,
+        // @ts-ignore | TS2532
+        name: punycode.toAscii(domain, { transitional: false }),
+        premium,
+        price,
+        unicode: punycode.toUnicode(domain)
+      });
+    }));
+
+    return {
+      detail: {
         results
       },
       httpCode: 200,
@@ -276,8 +275,6 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
       success: true
     };
   } catch(error) {
-    databaseConnection.close();
-
     console.info("Error retrieving domain search results.");
     console.error(error);
 
@@ -290,4 +287,140 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
       success: false
     };
   }
+}
+
+///  H E L P E R
+
+async function __rawNeighborSearch(suppliedTLD: string): Promise<string[]> {
+  const databaseConnection = await r.connect(databaseOptions);
+  let relatedTLDs: string[] = [];
+
+  /// We expect a TLD to be supplied
+  if (!suppliedTLD) {
+    databaseConnection.close();
+    return relatedTLDs;
+  }
+
+  let baseQuery: LooseObjectInterface = await r.table(tldDatabase)
+    .filter({ name: suppliedTLD })
+    .run(databaseConnection);
+
+  baseQuery = baseQuery[0];
+
+  /// TLD does not exist
+  if (!baseQuery)
+    return relatedTLDs;
+
+  const { collection } = baseQuery;
+
+  const tldQuery: LooseObjectInterface = await r.table(tldDatabase)
+    .orderBy({ index: r.asc("name") })
+    .filter((row: any) => {
+      return row("collection")
+        .contains(collection[0])
+        .or(row("collection").contains(collection[1]))
+        .or(row("collection").contains(collection[2]))
+        .or(row("collection").contains(collection[3]))
+        /// ^ these extra "or"s silently fail, huzzah!
+    })
+    .pluck("name")
+    .run(databaseConnection);
+
+  tldQuery.map((tld: LooseObjectInterface) => {
+    relatedTLDs.push(tld.name);
+  });
+
+  relatedTLDs = [...new Set(relatedTLDs)]; /// remove possible duplicates
+
+  return relatedTLDs;
+}
+
+async function __rawSearch(suppliedDomain: string): Promise<RawSearchResponse | void> {
+  const databaseConnection = await r.connect(databaseOptions);
+  let basePrice = 0;
+  let creationDate = null;
+  let isAvailable = true;
+  let isPremium = false;
+  let premiumPrice = 0;
+
+  /// We expect a domain name to be supplied
+  if (!suppliedDomain || !suppliedDomain.includes(".")) {
+    databaseConnection.close();
+    return;
+  }
+
+  /// We expect only ONE dot
+  if (suppliedDomain.split(".").length > 2) {
+    databaseConnection.close();
+    return;
+  }
+
+  /// IGNORE FUCK-ASS SHIT
+  if (regexZeroWidth(suppliedDomain)) {
+    databaseConnection.close();
+    return;
+  }
+
+  const cleanDomain = __stringCleaner(suppliedDomain);
+  // @ts-ignore | TS2345
+  const name = punycode.toAscii(cleanDomain.split(".")[0], { transitional: false });
+  // @ts-ignore | TS2345
+  const extension = punycode.toAscii(cleanDomain.split(".")[1], { transitional: false });
+
+  let tldQuery: LooseObjectInterface = await r.table(tldDatabase)
+    .filter({ name: extension })
+    .run(databaseConnection);
+
+  tldQuery = tldQuery[0];
+
+  /// TLD does not exist
+  if (!tldQuery)
+    return;
+
+  let sldQuery: LooseObjectInterface = await r.table(sldDatabase)
+    .filter({ name, tld: extension })
+    .run(databaseConnection);
+
+  sldQuery = sldQuery[0];
+
+  databaseConnection.close();
+
+  if (sldQuery) {
+    creationDate = sldQuery.created;
+    isAvailable = false;
+  }
+
+  const { collection, premium } = tldQuery;
+
+  /// Check to see if desired name is considered premium
+  premium.map((premiumSLD: { name: string; unicode: string; }) => {
+    if (premiumSLD.name === name)
+      isPremium = true;
+  });
+
+  /// Grab TLD pricing
+  basePrice = tldQuery.price;
+  premiumPrice = tldQuery.pricePremium;
+
+  const { price } = await getPricing({
+    extension,
+    name,
+    premium: isPremium,
+    priceBase: basePrice,
+    pricePremium: premiumPrice
+  });
+
+  return {
+    available: isAvailable,
+    created: creationDate,
+    domain: `${name}.${extension}`,
+    premium: isPremium,
+    price
+  };
+}
+
+function __stringCleaner(suppliedString: string) {
+  // TODO
+  // : account for nothing being supplied
+  return String(suppliedString).replace(/\s/g, "").trim();
 }

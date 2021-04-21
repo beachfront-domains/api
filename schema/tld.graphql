@@ -39,14 +39,14 @@ type TLD {
   premium: [PremiumSLD]
 
   """
-  Premium pricing for this TLD
-  """
-  premiumPrice: Decimal
-
-  """
   Base pricing for this TLD
   """
   price: Decimal
+
+  """
+  Premium pricing for this TLD
+  """
+  pricePremium: Decimal
 
   """
   Array of reserved SLD objects

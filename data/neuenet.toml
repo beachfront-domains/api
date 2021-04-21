@@ -209,6 +209,31 @@ price = 0.00
 reserved = []
 unicode = "banjo"
 
+[tlds.baremetal]
+collection = ["tech"]
+name = "baremetal"
+nope = []
+pair = []
+premium = [
+  { name = "analog", unicode = "analog" },
+  { name = "analogue", unicode = "analogue" },
+  { name = "api", unicode = "api" },
+  { name = "buy", unicode = "buy" },
+  { name = "comp", unicode = "comp" },
+  { name = "compute", unicode = "compute" },
+  { name = "computer", unicode = "computer" },
+  { name = "kernel", unicode = "kernel" },
+  { name = "os", unicode = "os" },
+  { name = "serve", unicode = "serve" },
+  { name = "server", unicode = "server" },
+  { name = "shop", unicode = "shop" },
+  { name = "system", unicode = "system" },
+  { name = "unikernel", unicode = "unikernel" }
+]
+price = 0.00
+reserved = []
+unicode = "baremetal"
+
 [tlds.barnacle]
 collection = ["nature"]
 name = "barnacle"
@@ -789,7 +814,7 @@ unicode = "dist"
 collection = ["spiritual"]
 name = "diviner"
 nope = []
-pair = ["diviners"]
+pair = ["diviners", "divinity"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "angel", unicode = "angel" },
@@ -809,7 +834,7 @@ unicode = "diviner"
 collection = ["spiritual"]
 name = "diviners"
 nope = []
-pair = ["diviner"]
+pair = ["diviner", "divinity"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "angel", unicode = "angel" },
@@ -824,6 +849,26 @@ premium = [
 price = 0.00
 reserved = []
 unicode = "diviners"
+
+[tlds.divinity]
+collection = ["spiritual"]
+name = "divinity"
+nope = []
+pair = ["diviner", "diviners"]
+premium = [
+  { name = "ancient", unicode = "ancient" },
+  { name = "angel", unicode = "angel" },
+  { name = "astro", unicode = "astro" },
+  { name = "astrology", unicode = "astrology" },
+  { name = "god", unicode = "god" },
+  { name = "goddess", unicode = "goddess" },
+  { name = "spirit", unicode = "spirit" },
+  { name = "spiritual", unicode = "spiritual" },
+  { name = "tarot", unicode = "tarot" }
+]
+price = 0.00
+reserved = []
+unicode = "divinity"
 
 [tlds.doomscroll]
 collection = ["culture", "tech"]
@@ -1221,6 +1266,16 @@ price = 0.00
 reserved = []
 unicode = "htop"
 
+[tlds.httpx]
+collection = ["tech"]
+name = "httpx"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "httpx"
+
 [tlds.humanoid]
 collection = ["generic"]
 name = "humanoid"
@@ -1381,6 +1436,25 @@ premium = [
 price = 0.00
 reserved = []
 unicode = "internetpoints"
+
+[tlds.jargon]
+collection = ["tech"]
+name = "jargon"
+nope = []
+pair = ["technobabble"]
+premium = [
+  { name = "activity", unicode = "activity" },
+  { name = "group", unicode = "group" },
+  { name = "obscure", unicode = "obscure" },
+  { name = "pro", unicode = "pro" },
+  { name = "tech", unicode = "tech" },
+  { name = "technical", unicode = "technical" },
+  { name = "techno", unicode = "techno" },
+  { name = "trade", unicode = "trade" }
+]
+price = 0.00
+reserved = []
+unicode = "jargon"
 
 [tlds.labia]
 collection = ["mature"]
@@ -1643,6 +1717,48 @@ price = 0.00
 reserved = []
 unicode = "melanin"
 
+[tlds.microsystem]
+collection = ["tech"]
+name = "microsystem"
+nope = []
+pair = ["microsystems"]
+premium = [
+  { name = "device", unicode = "device" },
+  { name = "devices", unicode = "devices" },
+  { name = "inner", unicode = "inner" },
+  { name = "machine", unicode = "machine" },
+  { name = "machines", unicode = "machines" },
+  { name = "mini", unicode = "mini" },
+  { name = "nano", unicode = "nano" },
+  { name = "os", unicode = "os" },
+  { name = "system", unicode = "system" },
+  { name = "tiny", unicode = "tiny" }
+]
+price = 0.00
+reserved = []
+unicode = "microsystem"
+
+[tlds.microsystems]
+collection = ["tech"]
+name = "microsystems"
+nope = []
+pair = ["microsystem"]
+premium = [
+  { name = "device", unicode = "device" },
+  { name = "devices", unicode = "devices" },
+  { name = "inner", unicode = "inner" },
+  { name = "machine", unicode = "machine" },
+  { name = "machines", unicode = "machines" },
+  { name = "mini", unicode = "mini" },
+  { name = "nano", unicode = "nano" },
+  { name = "os", unicode = "os" },
+  { name = "system", unicode = "system" },
+  { name = "tiny", unicode = "tiny" }
+]
+price = 0.00
+reserved = []
+unicode = "microsystems"
+
 [tlds.moemoe]
 collection = ["japan"]
 name = "moemoe"
@@ -1752,6 +1868,34 @@ premium = [
 price = 0.00
 reserved = []
 unicode = "novae"
+
+[tlds.onprem]
+collection = ["business"]
+name = "onprem"
+nope = []
+pair = []
+premium = [
+  { name = "cloud", unicode = "cloud" },
+  { name = "code", unicode = "code" },
+  { name = "compute", unicode = "compute" },
+  { name = "farm", unicode = "farm" },
+  { name = "fossil", unicode = "fossil" },
+  { name = "git", unicode = "git" },
+  { name = "hardware", unicode = "hardware" },
+  { name = "native", unicode = "native" },
+  { name = "network", unicode = "network" },
+  { name = "remote", unicode = "remote" },
+  { name = "scm", unicode = "scm" },
+  { name = "server", unicode = "server" },
+  { name = "servers", unicode = "servers" },
+  { name = "software", unicode = "software" },
+  { name = "svn", unicode = "svn" },
+  { name = "virtual", unicode = "virtual" },
+  { name = "vpc", unicode = "vpc" }
+]
+price = 0.00
+reserved = []
+unicode = "onprem"
 
 [tlds.oooh]
 collection = ["generic"]
@@ -2121,6 +2265,16 @@ price = 0.00
 reserved = []
 unicode = "secks"
 
+[tlds.serene]
+collection = ["spiritual"]
+name = "serene"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "serene"
+
 [tlds.shindeiru]
 collection = ["japan"]
 name = "shindeiru"
@@ -2326,8 +2480,17 @@ unicode = "symbols"
 collection = ["tech"]
 name = "technobabble"
 nope = []
-pair = []
-premium = []
+pair = ["jargon"]
+premium = [
+  { name = "activity", unicode = "activity" },
+  { name = "group", unicode = "group" },
+  { name = "obscure", unicode = "obscure" },
+  { name = "pro", unicode = "pro" },
+  { name = "tech", unicode = "tech" },
+  { name = "technical", unicode = "technical" },
+  { name = "techno", unicode = "techno" },
+  { name = "trade", unicode = "trade" }
+]
 price = 0.00
 reserved = []
 unicode = "technobabble"
@@ -2497,6 +2660,36 @@ premium = []
 price = 0.00
 reserved = []
 unicode = "webrowser"
+
+[tlds.webscape]
+collection = ["tech"]
+name = "webscape"
+nope = []
+pair = []
+premium = [
+  { name = "browse", unicode = "browse" },
+  { name = "internet", unicode = "internet" },
+  { name = "net", unicode = "net" },
+  { name = "surf", unicode = "surf" }
+]
+price = 0.00
+reserved = []
+unicode = "webscape"
+
+[tlds.websurf]
+collection = ["tech"]
+name = "websurf"
+nope = []
+pair = []
+premium = [
+  #
+  { name = "browse", unicode = "browse" },
+  { name = "internet", unicode = "internet" },
+  { name = "net", unicode = "net" }
+]
+price = 0.00
+reserved = []
+unicode = "websurf"
 
 [tlds.whizbang]
 collection = ["tech"]

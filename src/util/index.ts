@@ -17,6 +17,7 @@ import {
   siteEmail,
   siteName,
   siteUrl,
+  thesaurusKey,
   uploadDirectory
 } from "./constant";
 
@@ -118,6 +119,7 @@ export {
   siteName,
   siteUrl,
   // streamTypes,
+  thesaurusKey,
   uploadDirectory,
   verifyHash,
   verifyProof
