@@ -284,6 +284,16 @@ price = 0.00
 reserved = []
 unicode = "bigblackdick"
 
+[tlds.bigmood]
+collection = ["culture"]
+name = "bigmood"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "bigmood"
+
 [tlds.biochip]
 collection = ["deus ex"]
 name = "biochip"
@@ -616,6 +626,16 @@ price = 0.00
 reserved = []
 unicode = "cursor"
 
+[tlds.cxnt]
+collection = ["mature"]
+name = "cxnt"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "cxnt"
+
 [tlds.datastore]
 collection = ["tech"]
 name = "datastore"
@@ -894,7 +914,7 @@ unicode = "divinity"
 collection = ["culture", "tech"]
 name = "doomscroll"
 nope = []
-pair = []
+pair = ["goodscroll"]
 premium = []
 price = 0.00
 reserved = []
@@ -1065,6 +1085,16 @@ price = 0.00
 reserved = []
 unicode = "glacier"
 
+[tlds.goodscroll]
+collection = ["culture", "tech"]
+name = "goodscroll"
+nope = []
+pair = ["doomscroll"]
+premium = []
+price = 0.00
+reserved = []
+unicode = "goodscroll"
+
 [tlds.grundare]
 collection = ["generic"]
 name = "grundare"
@@ -1114,6 +1144,16 @@ premium = []
 price = 0.00
 reserved = []
 unicode = "handyname"
+
+[tlds.herbivore]
+collection = ["food", "generic"]
+name = "herbivore"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "herbivore"
 
 [tlds.hexa]
 collection = ["design"]
@@ -1720,6 +1760,16 @@ reserved = [
   { code = "", name = "mirror", unicode = "mirror" }
 ]
 unicode = "maru"
+
+[tlds.megatech]
+collection = ["tech"]
+name = "megatech"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "megatech"
 
 [tlds.melanin]
 collection = ["culture"]

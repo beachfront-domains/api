@@ -106,5 +106,5 @@
     "--watch": "tsc --watch"
   },
   "types": "dist/index.d.ts",
-  "version": "2021.05.02"
+  "version": "2021.05.02.1"
 }
