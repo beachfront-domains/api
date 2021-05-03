@@ -311,6 +311,7 @@ export async function getNiamiInfo(suppliedName) {
   } catch(error) {
     // console.log(error);
     console.log("— ERROR");
+    console.log(`"${suppliedName}" may need to be rated on Niami`);
 
     /// Most likely, this is a 404 error.
     /// All that is needed is to go to the applicable page

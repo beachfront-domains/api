@@ -62,5 +62,6 @@ export const siteUrl = _isDevelopment ?
   _env.dev.app :
   _env.prod.app;
 
+export const coinmarketcapKey = _env.coinmarketcap.api;
 export const thesaurusKey = _env.thesaurus.api;
 export const uploadDirectory = `${cwd()}/uploads`;

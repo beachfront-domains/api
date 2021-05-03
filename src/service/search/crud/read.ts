@@ -28,6 +28,8 @@ import getPricing from "../util/domain-pricing";
 import removeVowels from "../util/remove-vowels";
 import thesaurus from "../util/thesaurus";
 
+import hnsPrice from "~util/hns/current-price";
+
 import type { PaginationArgumentType } from "~module/pagination/type";
 import type { SLD } from "~module/sld/type";
 import type { TLD } from "~module/tld/type";
@@ -35,13 +37,17 @@ import type { TLD } from "~module/tld/type";
 const sldDatabase = "slds";
 const tldDatabase = "tlds";
 
+interface VariablesInterface {
+  antonym?: boolean;
+  mature?: boolean;
+  name: string;
+  relatedExtension?: boolean;
+  synonym?: boolean;
+};
+
 interface SLDRequestInterface {
   pagination: PaginationArgumentType;
-  variables: SLD;
-  // mature: boolean
-  // related extensions: boolean
-  // synonyms: boolean
-  // antonyms: boolean
+  variables: VariablesInterface;
 };
 
 interface FunctionResponse extends FunctionResponseInterface {
@@ -62,8 +68,7 @@ interface RawSearchResponse {
 
 ///  E X P O R T
 
-export async function searchDomains(suppliedData: Partial<SLDRequestInterface>): Promise<FunctionResponse> {
-  // const databaseConnection = await r.connect(databaseOptions);
+export async function searchDomains(suppliedData: SLDRequestInterface): Promise<FunctionResponse> {
   const query: LooseObjectInterface = {};
   const results = [];
   let isPremium = false;
@@ -77,22 +82,11 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
 
   const { variables } = suppliedData;
 
-  // TODO | VARIABLES
-  // : show antonyms
-  // : show mature extensions
-  // : show related extensions
-
-  // @ts-ignore | TS2769
   Object.entries(variables).forEach(([key, value]) => {
-    if (key === "owner" || key === "status")
-      return; /// IGNORE
-
-    query[key] = String(value).toLowerCase();
+    query[key] = value;
   });
 
   if (regexZeroWidth(query.name)) {
-    // databaseConnection.close();
-
     return {
       detail: {
         results: []
@@ -103,8 +97,7 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
     };
   }
 
-  // @ts-ignore | TS2532
-  const desiredName = punycode.toAscii(query.name, { transitional: false });
+  const desiredName = punycode.toAscii(query.name);
 
   if (desiredName.includes(".")) {
     /// Excessive periods are ignored
@@ -114,8 +107,6 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
     // TODO
     // if name or tld is too short, abort
   } else {
-    // databaseConnection.close();
-
     return {
       detail: {
         results: []
@@ -124,26 +115,13 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
       message: "Query missing extension",
       success: false
     };
-
-    // if (desiredName.length < 4) {
-    //   /// Ignore short length, extension-less names
-    //   return {
-    //     detail: {
-    //       results: []
-    //     },
-    //     httpCode: 401,
-    //     message: "Query is too short, add more characters and/or an extension.",
-    //     success: false
-    //   };
-    // }
-
-    // query.name = desiredName;
   }
 
   try {
     const { antonyms, synonyms } = await thesaurus(query.name);
     const domain = `${query.name}.${query.tld}`;
     const searchResult = await __rawSearch(domain);
+    const hns = await hnsPrice();
 
     if (searchResult) {
       const { available, created, premium, price } = searchResult;
@@ -151,8 +129,8 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
       results.push({
         available,
         created,
-        // @ts-ignore | TS2532
-        name: punycode.toAscii(domain, { transitional: false }),
+        hns: __formatHNS(price, hns),
+        name: punycode.toAscii(domain),
         premium,
         price,
         unicode: punycode.toUnicode(domain)
@@ -162,44 +140,32 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
       // : figure out how this occurs
       // : how to handle price being zero?
       // : silently fail and do not send anything?
-      results.push({
-        available: false,
-        created: null,
-        // @ts-ignore | TS2532
-        name: punycode.toAscii(domain, { transitional: false }),
-        premium: false,
-        price: "0.00",
-        unicode: punycode.toUnicode(domain)
-      });
+      console.log("<<< wtf");
     }
 
     // TODO
     // : do not forgot to add beachfront/ markup to these prices
     //   : what is returned are Neuenet OEM pricing
 
-    // if (query.tld) {
-    //   /// NO VWLS
-    //   if (removeVowels(query.name).length > 3) {
-    //     const domainSansVowels = `${removeVowels(query.name)}.${query.tld}`;
-    //     const { price } = await getPricing({
-    //       extension: query.tld,
-    //       name: query.name,
-    //       premium: isPremium,
-    //       priceBase: basePrice,
-    //       pricePremium: premiumPrice
-    //     });
+    /// NO VWLS
+    if (removeVowels(query.name).length > 3) {
+      const domainSansVowels = `${removeVowels(query.name)}.${query.tld}`;
+      const searchResult = await __rawSearch(domainSansVowels);
 
-    //     results.push({
-    //       available: true,
-    //       created: null,
-    //       // @ts-ignore | TS2532
-    //       name: punycode.toAscii(domainSansVowels, { transitional: false }),
-    //       premium: false,
-    //       price,
-    //       unicode: punycode.toUnicode(domainSansVowels)
-    //     });
-    //   }
-    // }
+      if (searchResult) {
+        const { available, created, premium, price } = searchResult;
+
+        results.push({
+          available,
+          created,
+          hns: __formatHNS(price, hns),
+          name: punycode.toAscii(domainSansVowels),
+          premium,
+          price,
+          unicode: punycode.toUnicode(domainSansVowels)
+        });
+      }
+    }
 
     const relatedTLDs = await __rawNeighborSearch(query.tld);
 
@@ -218,8 +184,8 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
       results.push({
         available,
         created,
-        // @ts-ignore | TS2532
-        name: punycode.toAscii(domain, { transitional: false }),
+        hns: __formatHNS(price, hns),
+        name: punycode.toAscii(domain),
         premium,
         price,
         unicode: punycode.toUnicode(domain)
@@ -238,8 +204,8 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
       results.push({
         available,
         created,
-        // @ts-ignore | TS2532
-        name: punycode.toAscii(domain, { transitional: false }),
+        hns: __formatHNS(price, hns),
+        name: punycode.toAscii(domain),
         premium,
         price,
         unicode: punycode.toUnicode(domain)
@@ -258,8 +224,8 @@ export async function searchDomains(suppliedData: Partial<SLDRequestInterface>):
       results.push({
         available,
         created,
-        // @ts-ignore | TS2532
-        name: punycode.toAscii(domain, { transitional: false }),
+        hns: __formatHNS(price, hns),
+        name: punycode.toAscii(domain),
         premium,
         price,
         unicode: punycode.toUnicode(domain)
@@ -363,9 +329,9 @@ async function __rawSearch(suppliedDomain: string): Promise<RawSearchResponse | 
 
   const cleanDomain = __stringCleaner(suppliedDomain);
   // @ts-ignore | TS2345
-  const name = punycode.toAscii(cleanDomain.split(".")[0], { transitional: false });
+  const name = punycode.toAscii(cleanDomain.split(".")[0]);
   // @ts-ignore | TS2345
-  const extension = punycode.toAscii(cleanDomain.split(".")[1], { transitional: false });
+  const extension = punycode.toAscii(cleanDomain.split(".")[1]);
 
   let tldQuery: LooseObjectInterface = await r.table(tldDatabase)
     .filter({ name: extension })
@@ -417,6 +383,10 @@ async function __rawSearch(suppliedDomain: string): Promise<RawSearchResponse | 
     premium: isPremium,
     price
   };
+}
+
+function __formatHNS(priceInUSD: string, hns: number) {
+  return (parseInt(priceInUSD) / hns).toFixed(2);
 }
 
 function __stringCleaner(suppliedString: string) {
