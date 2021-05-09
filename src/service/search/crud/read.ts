@@ -69,6 +69,17 @@ interface RawSearchResponse {
 ///  E X P O R T
 
 export async function searchDomains(suppliedData: SLDRequestInterface): Promise<FunctionResponse> {
+  if (!suppliedData) {
+    return {
+      detail: {
+        results: []
+      },
+      httpCode: 401,
+      message: "Please refer to our documentation on API usage.",
+      success: false
+    };
+  }
+
   const query: LooseObjectInterface = {};
   const results = [];
   let isPremium = false;
@@ -92,7 +103,7 @@ export async function searchDomains(suppliedData: SLDRequestInterface): Promise<
         results: []
       },
       httpCode: 401,
-      message: "Query contains invalid characters…remove them",
+      message: "Query contains invalid characters…remove them.",
       success: false
     };
   }
@@ -140,7 +151,16 @@ export async function searchDomains(suppliedData: SLDRequestInterface): Promise<
       // : figure out how this occurs
       // : how to handle price being zero?
       // : silently fail and do not send anything?
-      console.log("<<< wtf");
+      // console.log("<<< wtf");
+
+      return {
+        detail: {
+          results: []
+        },
+        httpCode: 200,
+        message: "Zero domains found, you probably queried for an extension we do not support.",
+        success: true
+      };
     }
 
     // TODO
@@ -237,7 +257,7 @@ export async function searchDomains(suppliedData: SLDRequestInterface): Promise<
         results
       },
       httpCode: 200,
-      message: "Found some domain options for you",
+      message: "Found some domain options for you.",
       success: true
     };
   } catch(error) {
@@ -286,7 +306,7 @@ async function __rawNeighborSearch(suppliedTLD: string): Promise<string[]> {
         .contains(collection[0])
         .or(row("collection").contains(collection[1]))
         .or(row("collection").contains(collection[2]))
-        .or(row("collection").contains(collection[3]))
+        .or(row("collection").contains(collection[3]));
         /// ^ these extra "or"s silently fail, huzzah!
     })
     .pluck("name")

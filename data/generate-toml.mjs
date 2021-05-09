@@ -6,7 +6,7 @@
 import fs from "fs";
 import { join } from "path";
 
-///  I M P O R T S
+///  I M P O R T
 
 import Big from "big.js";
 import TOML from "@ltd/j-toml";
@@ -18,6 +18,14 @@ import { getNiamiInfo } from "./pricing.mjs";
 const source = join(process.cwd(), "data", "neuenet.toml");
 const sourceData = fs.readFileSync(source, "utf8");
 const { tlds } = TOML.parse(sourceData, 1.0, "\n");
+
+const getNameValue = (suppliedName, index) => new Promise(res => {
+  setTimeout(async() => {
+    const { pricing } = await getNiamiInfo(suppliedName);
+    res({ pricing });
+    /// give Niami a break, with a throttle
+  }, 250 * index);
+});
 
 
 
@@ -64,9 +72,9 @@ async function generateTOML() {
     fileToWrite += `title = "Neuenet TLDs"\n\n`;
     fileToWrite += `[tlds]\n\n\n\n`;
 
-    await Promise.all(Object.keys(tlds).map(async(tld) => {
+    await Promise.all(Object.keys(tlds).map(async(tld, index) => {
       const tldData = tlds[tld];
-      const { pricing } = await getNiamiInfo(tldData.name);
+      const { pricing } = await getNameValue(tldData.name, index);
 
       fileToWrite += `[tlds.${tldData.name}]\n`;
       fileToWrite += `collection = ${formatArray(tldData.collection)}\n`;

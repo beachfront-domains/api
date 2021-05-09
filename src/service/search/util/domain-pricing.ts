@@ -29,9 +29,92 @@ interface priceResponse {
   price: string;
 }
 
+///  T I E R   U T I L
+
+const nnDefaultBasic = new Big("3.75");
+const nnDefaultPremium = new Big("70.31");
+const markupDefaultBasic = new Big("5.25");
+const markupDefaultPremium = new Big("50.69");
+
+const nnCommonBasic = new Big("4.50");
+const nnCommonPremium = new Big("202.50");
+const markupCommonBasic = new Big("10.60");
+const markupCommonPremium = new Big("100.50");
+
+const nnRareBasic = new Big("6");
+const nnRarePremium = new Big("720");
+const markupRareBasic = new Big("15");
+const markupRarePremium = new Big("150");
+
+const nnEpicBasic = new Big("7.50");
+const nnEpicPremium = new Big("1687.50");
+const markupEpicBasic = new Big("20.50");
+const markupEpicPremium = new Big("200.50");
+
+const nnLegendaryBasic = new Big("9");
+const nnLegendaryPremium = new Big("3240");
+const markupLegendaryBasic = new Big("25");
+const markupLegendaryPremium = new Big("250");
+
+const nnMythicBasic = new Big("3000");
+const nnMythicPremium = new Big("10000");
+const markupMythicBasic = new Big("2000");
+const markupMythicPremium = new Big("5000");
+
 
 
 ///  E X P O R T
+
+function generateMarkup(suppliedPrice: number | string, isPremium?: boolean) {
+  // console.log(suppliedPrice);
+  // console.log(typeof suppliedPrice);
+  // console.log(isPremium);
+  // console.log("———");
+
+  if (isPremium) {
+    switch (suppliedPrice) {
+      case "70.31":
+        return nnDefaultPremium.plus(markupDefaultPremium);
+
+      case "202.50":
+        return nnCommonPremium.plus(markupCommonPremium);
+
+      case "720":
+        return nnRarePremium.plus(markupRarePremium);
+
+      case "1687.50":
+        return nnEpicPremium.plus(markupEpicPremium);
+
+      case "3240":
+        return nnLegendaryPremium.plus(markupLegendaryPremium);
+
+      case "10000":
+      default:
+        return nnMythicPremium.plus(markupMythicPremium);
+    }
+  } else {
+    switch (suppliedPrice) {
+      case "3.75":
+        return nnDefaultBasic.plus(markupDefaultBasic);
+
+      case "4.50":
+        return nnCommonBasic.plus(markupCommonBasic);
+
+      case "6.00":
+        return nnRareBasic.plus(markupRareBasic);
+
+      case "7.50":
+        return nnEpicBasic.plus(markupEpicBasic);
+
+      case "9.00":
+        return nnLegendaryBasic.plus(markupLegendaryBasic);
+
+      case "3000":
+      default:
+        return nnMythicBasic.plus(markupMythicBasic);
+    }
+  }
+}
 
 export default async(suppliedContent: priceRequestInterface): Promise<priceResponse> => {
   const { extension, name, premium, priceBase, pricePremium } = suppliedContent;
@@ -40,6 +123,9 @@ export default async(suppliedContent: priceRequestInterface): Promise<priceRespo
       String(name)
     )
   );
+
+  // console.log(tldQuery);
+  // console.log(">>> —")
 
   let finalPrice = new Big(0);
   let isPremium = false;
@@ -78,30 +164,34 @@ export default async(suppliedContent: priceRequestInterface): Promise<priceRespo
     switch(true) {
       case isOneCharacter:
       default:
-        operand2 = new Big(priceBase).times(characterMultiplier1);
+        operand2 = new Big(generateMarkup(priceBase)).times(characterMultiplier1);
         break;
 
       case isTwoCharacters:
-        operand2 = new Big(priceBase).times(characterMultiplier2);
+        operand2 = new Big(generateMarkup(priceBase)).times(characterMultiplier2);
         break;
 
       case isThreeCharacters:
-        operand2 = new Big(priceBase).times(characterMultiplier3);
+        operand2 = new Big(generateMarkup(priceBase)).times(characterMultiplier3);
         break;
     }
 
     if (isDictionaryWord)
       operand3 = operand2.times(dictionaryMultiplier);
   } else {
-    operand2 = new Big(priceBase);
+    operand2 = new Big(generateMarkup(priceBase));
 
     if (isDictionaryWord)
       operand3 = operand2.times(dictionaryMultiplier);
   }
 
   finalPrice = isPremium ?
-    new Big(pricePremium).plus(operand1).plus(operand2).plus(operand3) :
+    new Big(generateMarkup(pricePremium, true)).plus(operand1).plus(operand2).plus(operand3) :
     operand1.plus(operand2).plus(operand3);
+
+  // console.log(`${name}.${extension}`);
+  // console.log(priceBase);
+  // console.log(finalPrice + "\n");
 
   return {
     domain: `${name}.${extension}`,

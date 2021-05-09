@@ -229,15 +229,67 @@ const premiumMultipleLegendary = new Big("40");
 // console.log(await Promise.all(go()));
 // await Promise.all(go());
 
-function go() {
-  const results = [];
+// function go() {
+//   const results = [];
 
-  nameList.map(name => {
-    results.push(getNiamiInfo(name));
-  });
+//   nameList.map(name => {
+//     results.push(getNiamiInfo(name));
+//   });
 
-  return results;
+//   return results;
+// }
+
+
+
+///  E X P O R T
+
+export async function getNiamiInfo(suppliedName) {
+  const info = {
+    rarity: null,
+    rating: null
+  };
+
+  try {
+    const response = await got(`https://api.niami.io/api/domain/${suppliedName}`).json();
+    const { data } = response;
+
+    if (!data) {
+      console.log("— NO DATA");
+      info.domain = suppliedName;
+    } else {
+      info.domain = data[0].domain;
+      info.rarity = data[0].rarity;
+      info.rating = data[0].niami_rating;
+
+      if (suppliedName === "beachfront") {
+        const { base, premium } = generateTLDPricing(data[0].rarity);
+
+        info.pricing = {
+          base: new Big("3000").toFixed(2),
+          premium: new Big("10000").toFixed(2)
+        };
+      } else {
+        info.pricing = generateTLDPricing(data[0].rarity);
+      }
+    }
+  } catch(error) {
+    console.error(error.toString());
+    // console.error("— ERROR");
+    console.error(`"${suppliedName}" may need to be rated on Niami`);
+
+    /// Most likely, this is a 40x error.
+    /// All that is needed is to go to the applicable page
+    /// on Niami and trigger the rating.
+
+    info.domain = suppliedName;
+  } finally {
+    return order(info);
+  }
 }
+
+
+
+///  H E L P E R
 
 function generateTLDPricing(suppliedRarity) {
   let basePrice = new Big("0");
@@ -277,48 +329,4 @@ function generateTLDPricing(suppliedRarity) {
     base: basePrice.toFixed(2),
     premium: premiumPrice.toFixed(2)
   };
-}
-
-export async function getNiamiInfo(suppliedName) {
-  const info = {
-    rarity: null,
-    rating: null
-  };
-
-  try {
-    const response = await got(`https://api.niami.io/api/domain/${suppliedName}`).json();
-    const { data } = response;
-
-    if (!data) {
-      console.log("— NO DATA");
-      info.domain = suppliedName;
-    } else {
-      info.domain = data[0].domain;
-      info.rarity = data[0].rarity;
-      info.rating = data[0].niami_rating;
-
-      if (suppliedName === "beachfront") {
-        const { base, premium } = generateTLDPricing(data[0].rarity);
-
-        info.pricing = {
-          base: new Big("5000").plus(base).toFixed(2),
-          premium: new Big("5000").plus(premium).toFixed(2)
-        };
-      } else {
-        info.pricing = generateTLDPricing(data[0].rarity);
-      }
-    }
-  } catch(error) {
-    // console.log(error);
-    console.log("— ERROR");
-    console.log(`"${suppliedName}" may need to be rated on Niami`);
-
-    /// Most likely, this is a 404 error.
-    /// All that is needed is to go to the applicable page
-    /// on Niami and trigger the rating.
-
-    info.domain = suppliedName;
-  } finally {
-    return order(info);
-  }
 }

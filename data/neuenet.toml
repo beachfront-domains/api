@@ -522,7 +522,7 @@ unicode = "codesh"
 collection = ["design"]
 name = "colors"
 nope = []
-pair = []
+pair = ["kolor", "kolors"]
 premium = [
   { name = "a11y", unicode = "a11y" },
   { name = "bad", unicode = "bad" },
@@ -1183,7 +1183,7 @@ unicode = "hexa"
 collection = ["culture"]
 name = "hieroglyph"
 nope = []
-pair = ["hieroglyphic", "hieroglyphics", "hieroglyphs", "pharaoh"]
+pair = ["hieroglyphic", "hieroglyphics", "hieroglyphs"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -1210,7 +1210,7 @@ unicode = "hieroglyph"
 collection = ["culture"]
 name = "hieroglyphic"
 nope = []
-pair = ["hieroglyph", "hieroglyphics", "hieroglyphs", "pharaoh"]
+pair = ["hieroglyph", "hieroglyphics", "hieroglyphs"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -1237,7 +1237,7 @@ unicode = "hieroglyphic"
 collection = ["culture"]
 name = "hieroglyphics"
 nope = []
-pair = ["hieroglyph", "hieroglyphic", "hieroglyphs", "pharaoh"]
+pair = ["hieroglyph", "hieroglyphic", "hieroglyphs"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -1264,7 +1264,7 @@ unicode = "hieroglyphics"
 collection = ["culture"]
 name = "hieroglyphs"
 nope = []
-pair = ["hieroglyph", "hieroglyphic", "hieroglyphics", "pharaoh"]
+pair = ["hieroglyph", "hieroglyphic", "hieroglyphics"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -1525,6 +1525,66 @@ premium = [
 price = 0.00
 reserved = []
 unicode = "jargon"
+
+[tlds.kolor]
+collection = ["design"]
+name = "kolor"
+nope = []
+pair = ["colors", "kolors"]
+premium = [
+  { name = "a11y", unicode = "a11y" },
+  { name = "bad", unicode = "bad" },
+  { name = "best", unicode = "best" },
+  { name = "bright", unicode = "bright" },
+  { name = "dull", unicode = "dull" },
+  { name = "fav", unicode = "fav" },
+  { name = "favorite", unicode = "favorite" },
+  { name = "favourite", unicode = "favourite" },
+  { name = "flesh", unicode = "flesh" },
+  { name = "good", unicode = "good" },
+  { name = "great", unicode = "great" },
+  { name = "my", unicode = "my" },
+  { name = "paint", unicode = "paint" },
+  { name = "pantone", unicode = "pantone" },
+  { name = "skin", unicode = "skin" },
+  { name = "swatch", unicode = "swatch" }
+]
+price = 0.00
+reserved = [
+  { code = "", name = "copic", unicode = "copic" },
+  { code = "", name = "crayola", unicode = "crayola" }
+]
+unicode = "kolor"
+
+[tlds.kolors]
+collection = ["design"]
+name = "kolors"
+nope = []
+pair = ["colors", "kolor"]
+premium = [
+  { name = "a11y", unicode = "a11y" },
+  { name = "bad", unicode = "bad" },
+  { name = "best", unicode = "best" },
+  { name = "bright", unicode = "bright" },
+  { name = "dull", unicode = "dull" },
+  { name = "fav", unicode = "fav" },
+  { name = "favorite", unicode = "favorite" },
+  { name = "favourite", unicode = "favourite" },
+  { name = "flesh", unicode = "flesh" },
+  { name = "good", unicode = "good" },
+  { name = "great", unicode = "great" },
+  { name = "my", unicode = "my" },
+  { name = "paint", unicode = "paint" },
+  { name = "pantone", unicode = "pantone" },
+  { name = "skin", unicode = "skin" },
+  { name = "swatch", unicode = "swatch" }
+]
+price = 0.00
+reserved = [
+  { code = "", name = "copic", unicode = "copic" },
+  { code = "", name = "crayola", unicode = "crayola" }
+]
+unicode = "kolors"
 
 [tlds.labia]
 collection = ["mature"]
@@ -2148,7 +2208,7 @@ unicode = "params"
 collection = ["culture"]
 name = "pharaoh"
 nope = []
-pair = ["hieroglyph", "hieroglyphic", "hieroglyphics", "hieroglyphs"]
+pair = []
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -3041,3 +3101,23 @@ premium = []
 price = 0.00
 reserved = []
 unicode = "xref"
+
+[tlds.yaga]
+collection = ["culture"]
+name = "yaga"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "yaga"
+
+[tlds.zaddy]
+collection = ["culture", "mature"]
+name = "zaddy"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "zaddy"
