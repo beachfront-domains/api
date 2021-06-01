@@ -24,7 +24,7 @@ const getNameValue = (suppliedName, index) => new Promise(res => {
     const { pricing } = await getNiamiInfo(suppliedName);
     res({ pricing });
     /// give Niami a break, with a throttle
-  }, 250 * index);
+  }, 25 * index);
 });
 
 
@@ -86,6 +86,10 @@ async function generateTOML() {
       fileToWrite += `pricePremium = "${pricing.premium}"\n`;
       fileToWrite += `reserved = ${formatArrayObjects(tldData.reserved)}\n`;
       fileToWrite += `unicode = "${tldData.unicode}"\n\n`;
+
+      // TODO
+      // : show progress
+      // : PROCESSED NAME # OF TLD.LENGTH
     }));
 
     fs.writeFileSync(join(process.cwd(), "data", "tlds.toml"), fileToWrite, "utf-8");

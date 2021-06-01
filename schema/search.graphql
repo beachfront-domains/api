@@ -7,6 +7,7 @@
 type DomainResult {
   available: Boolean
   created: DateTime
+  duration: Int
   hns: Decimal
   name: String
   premium: Boolean

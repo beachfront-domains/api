@@ -60,6 +60,7 @@ interface RawSearchResponse {
   available: boolean;
   created: string | void;
   domain: string;
+  duration: number;
   premium: boolean;
   price: string;
 }
@@ -135,11 +136,12 @@ export async function searchDomains(suppliedData: SLDRequestInterface): Promise<
     const hns = await hnsPrice();
 
     if (searchResult) {
-      const { available, created, premium, price } = searchResult;
+      const { available, created, duration, premium, price } = searchResult;
 
       results.push({
         available,
         created,
+        duration,
         hns: __formatHNS(price, hns),
         name: punycode.toAscii(domain),
         premium,
@@ -173,11 +175,12 @@ export async function searchDomains(suppliedData: SLDRequestInterface): Promise<
       const searchResult = await __rawSearch(domainSansVowels);
 
       if (searchResult) {
-        const { available, created, premium, price } = searchResult;
+        const { available, created, duration, premium, price } = searchResult;
 
         results.push({
           available,
           created,
+          duration,
           hns: __formatHNS(price, hns),
           name: punycode.toAscii(domainSansVowels),
           premium,
@@ -199,11 +202,12 @@ export async function searchDomains(suppliedData: SLDRequestInterface): Promise<
       if (!searchResult)
         return;
 
-      const { available, created, premium, price } = searchResult;
+      const { available, created, duration, premium, price } = searchResult;
 
       results.push({
         available,
         created,
+        duration,
         hns: __formatHNS(price, hns),
         name: punycode.toAscii(domain),
         premium,
@@ -219,11 +223,12 @@ export async function searchDomains(suppliedData: SLDRequestInterface): Promise<
       if (!searchResult)
         return;
 
-      const { available, created, premium, price } = searchResult;
+      const { available, created, duration, premium, price } = searchResult;
 
       results.push({
         available,
         created,
+        duration,
         hns: __formatHNS(price, hns),
         name: punycode.toAscii(domain),
         premium,
@@ -239,11 +244,12 @@ export async function searchDomains(suppliedData: SLDRequestInterface): Promise<
       if (!searchResult)
         return;
 
-      const { available, created, premium, price } = searchResult;
+      const { available, created, duration, premium, price } = searchResult;
 
       results.push({
         available,
         created,
+        duration,
         hns: __formatHNS(price, hns),
         name: punycode.toAscii(domain),
         premium,
@@ -368,7 +374,6 @@ async function __rawSearch(suppliedDomain: string): Promise<RawSearchResponse | 
     .run(databaseConnection);
 
   sldQuery = sldQuery[0];
-
   databaseConnection.close();
 
   if (sldQuery) {
@@ -400,6 +405,7 @@ async function __rawSearch(suppliedDomain: string): Promise<RawSearchResponse | 
     available: isAvailable,
     created: creationDate,
     domain: `${name}.${extension}`,
+    duration: 2,
     premium: isPremium,
     price
   };

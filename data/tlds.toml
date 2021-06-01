@@ -249,8 +249,8 @@ name = "beachfront"
 nope = []
 pair = []
 premium = []
-price = "5004.50"
-pricePremium = "5202.50"
+price = "3000.00"
+pricePremium = "10000.00"
 reserved = []
 unicode = "beachfront"
 
@@ -333,6 +333,17 @@ price = "3.75"
 pricePremium = "70.31"
 reserved = []
 unicode = "braggart"
+
+[tlds.brandalism]
+collection = ["hack"]
+name = "brandalism"
+nope = []
+pair = []
+premium = []
+price = "3.75"
+pricePremium = "70.31"
+reserved = []
+unicode = "brandalism"
 
 [tlds.buttock]
 collection = ["mature"]
@@ -519,7 +530,7 @@ unicode = "codesh"
 collection = ["design"]
 name = "colors"
 nope = []
-pair = []
+pair = ["kolor", "kolors"]
 premium = [
   { name = "a11y", unicode = "a11y" },
   { name = "bad", unicode = "bad" },
@@ -564,6 +575,17 @@ price = "6.00"
 pricePremium = "720.00"
 reserved = []
 unicode = "conglomerate"
+
+[tlds.coroutine]
+collection = ["development", "tech"]
+name = "coroutine"
+nope = []
+pair = []
+premium = []
+price = "4.50"
+pricePremium = "202.50"
+reserved = []
+unicode = "coroutine"
 
 [tlds.corsage]
 collection = ["love"]
@@ -662,6 +684,28 @@ price = "3.75"
 pricePremium = "70.31"
 reserved = []
 unicode = "datastores"
+
+[tlds.datastruct]
+collection = ["tech"]
+name = "datastruct"
+nope = []
+pair = ["datastructs"]
+premium = []
+price = "3.75"
+pricePremium = "70.31"
+reserved = []
+unicode = "datastruct"
+
+[tlds.datastructs]
+collection = ["tech"]
+name = "datastructs"
+nope = []
+pair = ["datastruct"]
+premium = []
+price = "3.75"
+pricePremium = "70.31"
+reserved = []
+unicode = "datastructs"
 
 [tlds.dedsec]
 collection = ["hack"]
@@ -1228,7 +1272,7 @@ unicode = "hexa"
 collection = ["culture"]
 name = "hieroglyph"
 nope = []
-pair = ["hieroglyphic", "hieroglyphics", "hieroglyphs", "pharaoh"]
+pair = ["hieroglyphic", "hieroglyphics", "hieroglyphs"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -1256,7 +1300,7 @@ unicode = "hieroglyph"
 collection = ["culture"]
 name = "hieroglyphic"
 nope = []
-pair = ["hieroglyph", "hieroglyphics", "hieroglyphs", "pharaoh"]
+pair = ["hieroglyph", "hieroglyphics", "hieroglyphs"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -1284,7 +1328,7 @@ unicode = "hieroglyphic"
 collection = ["culture"]
 name = "hieroglyphics"
 nope = []
-pair = ["hieroglyph", "hieroglyphic", "hieroglyphs", "pharaoh"]
+pair = ["hieroglyph", "hieroglyphic", "hieroglyphs"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -1312,7 +1356,7 @@ unicode = "hieroglyphics"
 collection = ["culture"]
 name = "hieroglyphs"
 nope = []
-pair = ["hieroglyph", "hieroglyphic", "hieroglyphics", "pharaoh"]
+pair = ["hieroglyph", "hieroglyphic", "hieroglyphics"]
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -1594,6 +1638,68 @@ pricePremium = "3240.00"
 reserved = []
 unicode = "jargon"
 
+[tlds.kolor]
+collection = ["design"]
+name = "kolor"
+nope = []
+pair = ["colors", "kolors"]
+premium = [
+  { name = "a11y", unicode = "a11y" },
+  { name = "bad", unicode = "bad" },
+  { name = "best", unicode = "best" },
+  { name = "bright", unicode = "bright" },
+  { name = "dull", unicode = "dull" },
+  { name = "fav", unicode = "fav" },
+  { name = "favorite", unicode = "favorite" },
+  { name = "favourite", unicode = "favourite" },
+  { name = "flesh", unicode = "flesh" },
+  { name = "good", unicode = "good" },
+  { name = "great", unicode = "great" },
+  { name = "my", unicode = "my" },
+  { name = "paint", unicode = "paint" },
+  { name = "pantone", unicode = "pantone" },
+  { name = "skin", unicode = "skin" },
+  { name = "swatch", unicode = "swatch" }
+]
+price = "3.75"
+pricePremium = "70.31"
+reserved = [
+  { name = "copic", unicode = "copic" },
+  { name = "crayola", unicode = "crayola" }
+]
+unicode = "kolor"
+
+[tlds.kolors]
+collection = ["design"]
+name = "kolors"
+nope = []
+pair = ["colors", "kolor"]
+premium = [
+  { name = "a11y", unicode = "a11y" },
+  { name = "bad", unicode = "bad" },
+  { name = "best", unicode = "best" },
+  { name = "bright", unicode = "bright" },
+  { name = "dull", unicode = "dull" },
+  { name = "fav", unicode = "fav" },
+  { name = "favorite", unicode = "favorite" },
+  { name = "favourite", unicode = "favourite" },
+  { name = "flesh", unicode = "flesh" },
+  { name = "good", unicode = "good" },
+  { name = "great", unicode = "great" },
+  { name = "my", unicode = "my" },
+  { name = "paint", unicode = "paint" },
+  { name = "pantone", unicode = "pantone" },
+  { name = "skin", unicode = "skin" },
+  { name = "swatch", unicode = "swatch" }
+]
+price = "3.75"
+pricePremium = "70.31"
+reserved = [
+  { name = "copic", unicode = "copic" },
+  { name = "crayola", unicode = "crayola" }
+]
+unicode = "kolors"
+
 [tlds.labia]
 collection = ["mature"]
 name = "labia"
@@ -1753,6 +1859,17 @@ price = "9.00"
 pricePremium = "3240.00"
 reserved = []
 unicode = "litre"
+
+[tlds.loupe]
+collection = ["design", "fashion", "photography", "science"]
+name = "loupe"
+nope = []
+pair = []
+premium = []
+price = "6.00"
+pricePremium = "720.00"
+reserved = []
+unicode = "loupe"
 
 [tlds.loverboi]
 collection = ["love", "mature"]
@@ -1925,6 +2042,28 @@ price = "6.00"
 pricePremium = "720.00"
 reserved = []
 unicode = "microsystems"
+
+[tlds.milliamp]
+collection = ["tech"]
+name = "milliamp"
+nope = []
+pair = []
+premium = []
+price = "4.50"
+pricePremium = "202.50"
+reserved = []
+unicode = "milliamp"
+
+[tlds.millihenry]
+collection = ["science"]
+name = "millihenry"
+nope = []
+pair = []
+premium = []
+price = "4.50"
+pricePremium = "202.50"
+reserved = []
+unicode = "millihenry"
 
 [tlds.moemoe]
 collection = ["japan"]
@@ -2248,11 +2387,33 @@ pricePremium = "70.31"
 reserved = []
 unicode = "params"
 
+[tlds.pearlstone]
+collection = ["nature"]
+name = "pearlstone"
+nope = []
+pair = []
+premium = []
+price = "4.50"
+pricePremium = "202.50"
+reserved = []
+unicode = "pearlstone"
+
+[tlds.permafrost]
+collection = ["nature"]
+name = "permafrost"
+nope = []
+pair = []
+premium = []
+price = "6.00"
+pricePremium = "720.00"
+reserved = []
+unicode = "permafrost"
+
 [tlds.pharaoh]
 collection = ["culture"]
 name = "pharaoh"
 nope = []
-pair = ["hieroglyph", "hieroglyphic", "hieroglyphics", "hieroglyphs"]
+pair = []
 premium = [
   { name = "ancient", unicode = "ancient" },
   { name = "egypt", unicode = "egypt" },
@@ -2333,6 +2494,28 @@ price = "3.75"
 pricePremium = "70.31"
 reserved = []
 unicode = "ponderings"
+
+[tlds.postseason]
+collection = ["sports"]
+name = "postseason"
+nope = []
+pair = []
+premium = []
+price = "4.50"
+pricePremium = "202.50"
+reserved = []
+unicode = "postseason"
+
+[tlds.pxem]
+collection = ["development"]
+name = "pxem"
+nope = []
+pair = []
+premium = []
+price = "3.75"
+pricePremium = "70.31"
+reserved = []
+unicode = "pxem"
 
 [tlds.pynk]
 collection = ["generic"]
@@ -3199,3 +3382,36 @@ price = "6.00"
 pricePremium = "720.00"
 reserved = []
 unicode = "xref"
+
+[tlds.yaga]
+collection = ["culture"]
+name = "yaga"
+nope = []
+pair = []
+premium = []
+price = "3.75"
+pricePremium = "70.31"
+reserved = []
+unicode = "yaga"
+
+[tlds.yoink]
+collection = ["culture", "generic"]
+name = "yoink"
+nope = []
+pair = []
+premium = []
+price = "3.75"
+pricePremium = "70.31"
+reserved = []
+unicode = "yoink"
+
+[tlds.zaddy]
+collection = ["culture", "mature"]
+name = "zaddy"
+nope = []
+pair = []
+premium = []
+price = "3.75"
+pricePremium = "70.31"
+reserved = []
+unicode = "zaddy"

@@ -347,6 +347,16 @@ price = 0.00
 reserved = []
 unicode = "braggart"
 
+[tlds.brandalism]
+collection = ["hack"]
+name = "brandalism"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "brandalism"
+
 [tlds.buttock]
 collection = ["mature"]
 name = "buttock"
@@ -566,6 +576,16 @@ price = 0.00
 reserved = []
 unicode = "conglomerate"
 
+[tlds.coroutine]
+collection = ["development", "tech"]
+name = "coroutine"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "coroutine"
+
 [tlds.corsage]
 collection = ["love"]
 name = "corsage"
@@ -655,6 +675,26 @@ premium = []
 price = 0.00
 reserved = []
 unicode = "datastores"
+
+[tlds.datastruct]
+collection = ["tech"]
+name = "datastruct"
+nope = []
+pair = ["datastructs"]
+premium = []
+price = 0.00
+reserved = []
+unicode = "datastruct"
+
+[tlds.datastructs]
+collection = ["tech"]
+name = "datastructs"
+nope = []
+pair = ["datastruct"]
+premium = []
+price = 0.00
+reserved = []
+unicode = "datastructs"
 
 [tlds.dedsec]
 collection = ["hack"]
@@ -1737,6 +1777,16 @@ price = 0.00
 reserved = []
 unicode = "litre"
 
+[tlds.loupe]
+collection = ["design", "fashion", "photography", "science"]
+name = "loupe"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "loupe"
+
 [tlds.loverboi]
 collection = ["love", "mature"]
 name = "loverboi"
@@ -1898,6 +1948,26 @@ premium = [
 price = 0.00
 reserved = []
 unicode = "microsystems"
+
+[tlds.milliamp]
+collection = ["tech"]
+name = "milliamp"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "milliamp"
+
+[tlds.millihenry]
+collection = ["science"]
+name = "millihenry"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "millihenry"
 
 [tlds.moemoe]
 collection = ["japan"]
@@ -2204,6 +2274,26 @@ price = 0.00
 reserved = []
 unicode = "params"
 
+[tlds.pearlstone]
+collection = ["nature"]
+name = "pearlstone"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "pearlstone"
+
+[tlds.permafrost]
+collection = ["nature"]
+name = "permafrost"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "permafrost"
+
 [tlds.pharaoh]
 collection = ["culture"]
 name = "pharaoh"
@@ -2285,6 +2375,16 @@ price = 0.00
 reserved = []
 unicode = "ponderings"
 
+[tlds.postseason]
+collection = ["sports"]
+name = "postseason"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "postseason"
+
 [tlds.pynk]
 collection = ["generic"]
 name = "pynk"
@@ -2294,6 +2394,16 @@ premium = []
 price = 0.00
 reserved = []
 unicode = "pynk"
+
+[tlds.pxem]
+collection = ["development"]
+name = "pxem"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "pxem"
 
 [tlds.righty]
 collection = ["design", "generic", "politics"]
@@ -3111,6 +3221,16 @@ premium = []
 price = 0.00
 reserved = []
 unicode = "yaga"
+
+[tlds.yoink]
+collection = ["culture", "generic"]
+name = "yoink"
+nope = []
+pair = []
+premium = []
+price = 0.00
+reserved = []
+unicode = "yoink"
 
 [tlds.zaddy]
 collection = ["culture", "mature"]
