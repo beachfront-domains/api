@@ -1,0 +1,117 @@
+# import Customer from "customer.graphql"
+# import CustomerInput from "customer.graphql"
+
+
+
+######
+# Enum
+######
+
+enum DomainStatusCode {
+  """
+  Server Status Codes are Set by Your Domain's Registry
+  - https://www.icann.org/resources/pages/epp-status-codes-2014-06-16-en
+  """
+  ADD_PERIOD
+  AUTO_RENEW_PERIOD
+  INACTIVE
+  OK
+  PENDING_CREATE
+  PENDING_DELETE
+  PENDING_RENEW
+  PENDING_RESTORE
+  PENDING_TRANSFER
+  PENDING_UPDATE
+  REDEMPTION_PERIOD
+  RENEW_PERIOD
+  SERVER_DELETE_PROHIBITED
+  SERVER_HOLD
+  SERVER_RENEW_PROHIBITED
+  SERVER_TRANSFER_PROHIBITED
+  SERVER_UPDATE_PROHIBITED
+  TRANSFER_PERIOD
+
+  """
+  Client Status Codes are Set by Your Domain's Registrar
+  - https://www.icann.org/resources/pages/epp-status-codes-2014-06-16-en
+  """
+  CLIENT_DELETE_PROHIBITED
+  CLIENT_HOLD
+  CLIENT_RENEW_PROHIBITED
+  CLIENT_TRANSFER_PROHIBITED
+  CLIENT_UPDATE_PROHIBITED
+}
+
+
+
+######
+# Type
+######
+
+type Domain {
+  ascii: String
+  expiry: DateTime
+  extension: String
+  name: String
+  owner: Customer
+  status: DomainStatusCode
+  #
+  created: DateTime!
+  id: ID!
+  updated: DateTime!
+}
+
+type AvailableDomain {
+  premium: Boolean
+  price: Decimal
+  sld: SLD
+}
+
+type DomainResponse {
+  detail: Domain
+}
+
+type DomainsResponse {
+  detail: [Domain]
+  pageInfo: Pagination
+}
+
+
+
+#######
+# Input
+#######
+
+input DomainInput {
+  ascii: String
+  expiry: DateTime
+  extension: ID
+  name: String
+  owner: ID
+  status: DomainStatusCode
+  # no created
+  # no id
+  # no updated
+}
+
+input DomainQuery {
+  id: ID
+  """
+  Expects `sld.extension` format
+  Will automatically parse and search for ASCII representations of domain parts
+  """
+  name: String
+}
+
+input DomainsQuery {
+  emoji: Boolean
+  idn: Boolean
+  length: Int
+  number: Boolean
+  owner: ID
+  startsWith: String
+}
+
+
+
+### be sure to keep this file in sync with `src/schema/domain/type.ts`

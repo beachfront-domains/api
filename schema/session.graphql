@@ -1,0 +1,58 @@
+# import Customer from "customer.graphql"
+# import CustomerInput from "customer.graphql"
+# import Pagination from "pagination.graphql"
+
+
+
+######
+# Type
+######
+
+type Session {
+  """
+  Array of domain names
+  """
+  cart: [String]
+  customer: Customer
+  #
+  created: DateTime!
+  id: ID!
+  updated: DateTime!
+}
+
+type SessionResponse {
+  detail: Session
+}
+
+type SessionsResponse {
+  detail: [Session]
+  pageInfo: Pagination
+}
+
+
+
+#######
+# Input
+#######
+
+input SessionInput {
+  cart: [String]
+  customer: ID
+  # no created
+  # no id
+  # no updated
+}
+
+input SessionQuery {
+  id: ID
+}
+
+input SessionsQuery {
+  created: DateTime
+  customer: ID
+  updated: DateTime
+}
+
+
+
+### be sure to keep this file in sync with `src/schema/session/type.ts`

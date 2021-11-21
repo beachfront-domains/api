@@ -1,0 +1,68 @@
+# import Pagination from "pagination.graphql"
+
+
+
+######
+# Type
+######
+
+type Extension {
+  """
+  ASCII representation of extension
+  """
+  ascii: String
+  """
+  Unicode representation of extension
+  """
+  name: String
+  """
+  Name of registry this extension comes from
+  """
+  registry: String
+  #
+  created: DateTime!
+  id: ID!
+  updated: DateTime!
+}
+
+type ExtensionResponse {
+  detail: Extension
+}
+
+type ExtensionsResponse {
+  detail: [Extension]
+  pageInfo: Pagination
+}
+
+
+
+#######
+# Input
+#######
+
+input ExtensionInput {
+  ascii: String
+  name: String
+  # no created
+  # no id
+  # no updated
+}
+
+input ExtensionQuery {
+  ascii: String
+  id: ID
+  name: String
+}
+
+input ExtensionsQuery {
+  emoji: Boolean
+  idn: Boolean
+  length: Int
+  number: Boolean
+  registry: String
+  startsWith: String
+}
+
+
+
+### be sure to keep this file in sync with `src/schema/extension/type.ts`

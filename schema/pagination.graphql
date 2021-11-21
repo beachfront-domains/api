@@ -2,21 +2,32 @@
 Have pagination, will enumerate.
 """
 
-type Pagination {
-  "This will most likely be the `created` parameter"
-  cursor: String
 
+
+######
+# Type
+######
+
+type Pagination {
+  "This will most likely be the `created` parameter of a post or customer"
+  cursor: String
   "Does this pagination query have additional pages?"
   hasNextPage: Boolean
-
   "Does this pagination query have previous pages?"
   hasPreviousPage: Boolean
 }
 
-# Input
 
-input PaginationVariables {
-  # after: DateTime
-  after: Int
+
+#######
+# Input
+#######
+
+input PaginationOptions {
+  after: DateTime
   first: Int
 }
+
+
+
+### be sure to keep this file in sync with `src/schema/pagination/type.ts`

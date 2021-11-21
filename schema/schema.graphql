@@ -1,131 +1,95 @@
-# import Login from "login.graphql"
-# import LoginKeyResponse from "login.graphql"
-
-# import DeveloperKeyResponse from "developer.graphql";
-
-# import PaginationVariables from "pagination.graphql"
-
-# import SearchResults from "search.graphql";
-# import SearchVariables from "search.graphql"
-
-# import Customer from "customer.graphql"
-# import CustomerExport from "customer.graphql"
-# import CustomerInput from "customer.graphql"
-# import CustomerUpdate from "customer.graphql"
-
-# import SLD from "sld.graphql"
-# import SLDInput from "sld.graphql"
-# import SLDUpdate from "sld.graphql"
-
-"""
-All the queries that enable beachfront to function
-"""
-
 scalar DateTime
 scalar Decimal
 
-input Authentication {
-  customerId: ID!
-  sessionId: String!
-}
+# import CustomerInput from "customer.graphql"
+# import CustomerQuery from "customer.graphql"
+# import CustomerResponse from "customer.graphql"
+# import CustomersQuery from "customer.graphql"
+# import CustomersResponse from "customer.graphql"
 
-type DeletedItem {
-  "Human-readable response from API"
-  message: String
+# import DomainInput from "domain.graphql"
+# import DomainQuery from "domain.graphql"
+# import DomainResponse from "domain.graphql"
+# import DomainsQuery from "domain.graphql"
+# import DomainsResponse from "domain.graphql"
+# import RegistrantInput from "domain.graphql"
 
-  "Was the operation successful?"
+# import ExtensionInput from "extension.graphql"
+# import ExtensionQuery from "extension.graphql"
+# import ExtensionResponse from "extension.graphql"
+# import ExtensionsQuery from "extension.graphql"
+# import ExtensionsResponse from "extension.graphql"
+
+# import PaginationOptions from "pagination.graphql"
+
+# import SearchQuery from "search.graphql"
+# import SearchResponse from "search.graphql"
+
+# import SessionInput from "session.graphql"
+# import SessionQuery from "session.graphql"
+# import SessionResponse from "session.graphql"
+# import SessionsQuery from "session.graphql"
+# import SessionsResponse from "session.graphql"
+
+"""
+All the queries that enable the registrar API to function
+"""
+
+type DeleteResponse {
+  "Was the deletion successful?"
   success: Boolean
 }
 
 type Query {
   """
-  Test the validity of a session
-  Arguments expected:
-  - email
-  - token (session ID)
+  Customer queries
   """
-  authenticate(email: String, token: String): Login
-
+  customer(options: CustomerQuery): CustomerResponse
+  customers(options: CustomersQuery, pagination: PaginationOptions): CustomersResponse
   """
-  If email does not exist in database, customer will be created.
+  Domain queries
   """
-  login(email: String): Login
-
+  domain(options: DomainQuery): DomainResponse
+  domains(options: DomainsQuery, pagination: PaginationOptions): DomainsResponse
   """
-  Login via API key
+  Extension queries
   """
-  loginKey(key: String): LoginKeyResponse
-
+  extension(options: ExtensionQuery): ExtensionResponse
+  extensions(options: ExtensionsQuery, pagination: PaginationOptions): ExtensionsResponse
   """
-  Developer key query
-  - check for proof of a key's existence
-  - enter customer ID to obtain key
+  Search queries
   """
-  key(auth: Authentication): DeveloperKeyResponse
-
-
-
-  customer(email: String, id: ID, username: String): Customer
-
-
-
-  domain(id: ID, name: String, unicode: String): SLD
-  domains(owner: ID): [SLD]
-
-
-
-  search(
-    pagination: PaginationVariables = {},
-    variables: SearchVariables = {}
-  ): SearchResults
+  search(options: SearchQuery, pagination: PaginationOptions): SearchResponse
+  """
+  Session queries
+  """
+  session(options: SessionQuery): SessionResponse
+  sessions(options: SessionsQuery, pagination: PaginationOptions): SessionsResponse
 }
 
 type Mutation {
   """
-  Create developer key
-  - this automatically deletes prior keys
+  Customer mutations
   """
-  createKey(auth: Authentication!): DeveloperKeyResponse
-
+  createCustomer(options: CustomerInput): CustomerResponse
+  deleteCustomer(options: CustomerQuery): DeleteResponse
+  updateCustomer(changes: CustomerInput, options: CustomerQuery): CustomerResponse
   """
-  Create an authenticated session
-  Arguments expected:
-  - email
-  - token
+  Domain mutations
   """
-  createSession(email: String, token: String): Login
-
-
-
+  createDomain(options: DomainInput): DomainResponse
+  deleteDomain(options: DomainQuery): DeleteResponse
+  updateDomain(changes: DomainInput, options: DomainQuery): DomainResponse
   """
-  Create a domain
+  Extension mutations
   """
-  createDomain(auth: Authentication!, detail: SLDInput!): SLDUpdate
-
+  createExtension(options: ExtensionInput): ExtensionResponse
+  deleteExtension(options: ExtensionQuery): DeleteResponse
+  updateExtension(changes: ExtensionInput, options: ExtensionQuery): ExtensionResponse
   """
-  Delete a domain
+  Session mutations
   """
-  deleteDomain(auth: Authentication!, id: ID!): DeletedItem
-
-  """
-  Update a domain
-  """
-  updateDomain(auth: Authentication!, changes: SLDInput!, id: ID!): SLDUpdate
-
-
-
-  """
-  Delete a customer
-  """
-  deleteCustomer(auth: Authentication!): DeletedItem
-
-  """
-  Export a customer
-  """
-  exportCustomer(auth: Authentication!): CustomerExport
-
-  """
-  Update customer detail
-  """
-  updateCustomer(auth: Authentication!, changes: CustomerInput!): CustomerUpdate
+  createSession(options: SessionInput): SessionResponse
+  deleteSession(options: SessionQuery): DeleteResponse
+  updateSession(changes: SessionInput, options: SessionQuery): SessionResponse
 }

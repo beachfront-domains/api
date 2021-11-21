@@ -1,10 +1,14 @@
-# import AvailableSLD from "sld.graphql"
 # import Customer from "customer.graphql"
 # import Pagination from "pagination.graphql"
 
-# Type
 
-type DomainResult {
+
+######
+# Type
+######
+
+type SearchResult {
+  ascii: String
   available: Boolean
   created: DateTime
   duration: Int
@@ -12,29 +16,31 @@ type DomainResult {
   name: String
   premium: Boolean
   price: Decimal
-  unicode: String
 }
 
-type _SearchResultDetails {
+type SearchResponse {
+  detail: [SearchResult]
   pageInfo: Pagination
-  results: [DomainResult]
   viewer: Customer
 }
 
-type SearchResults {
-  detail: _SearchResultDetails
 
-  "Human-readable response from API"
-  message: String
 
-  "Was the operation successful?"
-  success: Boolean
-}
-
+#######
 # Input
+#######
 
-input SearchVariables {
+input SearchQuery {
+  ascii: String
+  emoji: Boolean
+  extension: String
+  idn: Boolean
+  length: Int
   name: String
-  tld: String
-  unicode: String
+  number: Boolean
+  startsWith: String
 }
+
+
+
+### be sure to keep this file in sync with `src/schema/search/type.ts`

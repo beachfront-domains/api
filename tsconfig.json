@@ -4,15 +4,17 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "importsNotUsedAsValues": "error",
     "module": "commonjs",
     "moduleResolution": "node",
+    "noImplicitAny": false,
     "outDir": "dist",
     "paths": {
-      "~module/*": ["./src/module/*"],
-      "~root/*": ["./*"],
-      "~service/*": ["./src/service/*"],
-      "~schema/*": ["./src/schema/*"],
-      "~util/*": ["./src/util/*"]
+      "~root/*": ["*"],
+      "~service/*": ["src/service/*"],
+      "~schema/*": ["src/schema/*"],
+      "~util/*": ["src/utility/*"]
     },
     "pretty": true,
     "removeComments": true,
@@ -23,10 +25,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "target": "esnext"
   },
-  "exclude": [
-    "node_modules/*"
-  ],
   "include": [
-    "./src/**/*"
+    "src/**/*.ts"
   ]
 }

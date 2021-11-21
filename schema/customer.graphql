@@ -1,24 +1,14 @@
-# Enums
+# import Pagination from "pagination.graphql"
+
+
+
+######
+# Enum
+######
 
 enum LoginMethod {
   link
   token
-}
-
-enum Pronoun {
-  ae
-  e
-  ey
-  fae
-  he
-  per
-  she
-  they
-  unspecified
-  ve
-  xe
-  ze
-  zie
 }
 
 enum Role {
@@ -28,84 +18,76 @@ enum Role {
 
 
 
-# Types
+######
+# Type
+######
 
 type Customer {
-  avatar: String
-  bio: String
   email: String
-  homepage: String
-  id: ID
-  language: String
-  location: String
   loginMethod: LoginMethod
-  logins: [String]
   name: String
-  pronoun: Pronoun
+  """
+  Is this person a customer or admin?
+  Default value is `customer`.
+  """
   role: Role
-  "Is this customer an employee of beachfront?"
+  """
+  Is this person a registrar employee?
+  Default value is `false`.
+  """
   staff: Boolean
   timezone: String
   username: String
   verified: Boolean
   #
-  created: String
-  updated: String
+  created: DateTime!
+  id: ID!
+  updated: DateTime!
 }
 
-type _CustomerExportDetails {
-  "Customer detail"
-  customer: Customer
-
-  file: String
+type CustomerResponse {
+  detail: Customer
 }
 
-type _CustomerUpdateDetails {
-  "Customer detail"
-  customer: Customer
-}
-
-type CustomerExport {
-  detail: _CustomerExportDetails
-
-  "Human-readable response from API"
-  message: String
-
-  "Was the operation successful?"
-  success: Boolean
-}
-
-type CustomerUpdate {
-  detail: _CustomerUpdateDetails
-
-  "Human-readable response from API"
-  message: String
-
-  "Was the operation successful?"
-  success: Boolean
+type CustomersResponse {
+  detail: [Customer]
+  pageInfo: Pagination
 }
 
 
 
-# Inputs
+#######
+# Input
+#######
 
 input CustomerInput {
-  avatar: String
-  bio: String
   email: String
-  homepage: String
-  id: ID
-  language: String
-  location: String
-  # no loginMethod
-  # no logins
+  loginMethod: LoginMethod
   name: String
-  pronoun: Pronoun
-  # no role
+  role: Role
   staff: Boolean
   timezone: String
   username: String
   # no verified
   # no created
+  # no id
   # no updated
 }
+
+input CustomerQuery {
+  email: String
+  id: ID
+  username: String
+}
+
+input CustomersQuery {
+  created: DateTime
+  staff: Boolean
+  timezone: String
+  updated: DateTime
+  verified: Boolean
+}
+
+
+
+### be sure to keep this file in sync with `src/schema/customer/type.ts`

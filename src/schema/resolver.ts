@@ -4,57 +4,66 @@
 ///  I M P O R T
 
 import { resolvers } from "graphql-scalars";
-import DecimalScalar from "../graphql/scalar/decimal";
 
 ///  U T I L
 
+import DecimalScalar from "../graphql/scalar/decimal";
+
 import {
+  create as createCustomer,
+  del as deleteCustomer,
   getCustomer as customer,
-  updateCustomer
-} from "~service/human/index";
-
-import { getDomain as domain } from "~service/domain/index";
-import { searchDomains as search } from "~service/search/index";
+  getCustomers as customers,
+  update as updateCustomer
+} from "~service/customer/index";
 
 import {
-  createKey,
-  readKey as key
-} from "~service/develop/index";
+  create as createDomain,
+  del as deleteDomain,
+  getDomain as domain,
+  getDomains as domains,
+  update as updateDomain
+} from "~service/domain/index";
 
 import {
-  login,
-  loginViaKey as loginKey,
-  validateAccess as authenticate,
-  validateToken as createSession
-} from "~service/bouncer/index";
+  create as createExtension,
+  del as deleteExtension,
+  getExtension as extension,
+  getExtensions as extensions,
+  update as updateExtension
+} from "~service/extension/index";
+
+import { search } from "~service/search/index";
 
 
 
 ///  E X P O R T
 
 export default {
-  /// scalars
   ...resolvers,
   DecimalScalar,
-  /// bouncer
-  authenticate,
-  createSession,
-  login,
-  loginKey,
-  /// develop
-  createKey,
-  key,
-  /// human
+
+  /// customer
+  createCustomer,
   customer,
+  customers,
+  deleteCustomer,
   updateCustomer,
-  /// sld
+
+  /// domain
+  createDomain,
+  deleteDomain,
   domain,
+  domains,
+  updateDomain,
+
+  /// extension
+  createExtension,
+  deleteExtension,
+  extension,
+  extensions,
+  updateExtension,
+
   /// search
   search
 };
-
-
-
-// deleteCustomer,
-// exportCustomer,
-// customers: getCustomers,

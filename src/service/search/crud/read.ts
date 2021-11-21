@@ -11,78 +11,107 @@
 
 ///  I M P O R T
 
+import Big from "big.js";
+// import { gql, request } from "graphql-request";
+import { createClient, defaultExchanges, gql } from "@urql/core";
+import fetch from "cross-fetch";
 import punycode from "idna-uts46-hx";
 import { r } from "rethinkdb-ts";
+import type { RDatum } from "rethinkdb-ts";
 
 ///  U T I L
 
+import { getDomain } from "~service/domain/index";
+import { getExtension } from "~service/extension/index";
+
 import {
   databaseOptions,
-  FunctionResponseInterface,
-  LooseObjectInterface,
-  regexZeroWidth
+  LooseObject,
+  regexZeroWidth,
+  registryAPI
 } from "~util/index";
 
-import dictionary from "../util/dictionary";
-import getPricing from "../util/domain-pricing";
-import removeVowels from "../util/remove-vowels";
-import thesaurus from "../util/thesaurus";
+import type {
+  // Domain,
+  // Extension,
+  PaginationArgument,
+  SearchRequest,
+  SearchResult
+} from "~schema/index";
+
+import dictionary from "../utility/dictionary";
+import getPricing from "../utility/domain-pricing";
+import removeVowels from "../utility/remove-vowels";
+import thesaurus from "../utility/thesaurus";
 
 import hnsPrice from "~util/hns/current-price";
 
-import type { PaginationArgumentType } from "~module/pagination/type";
-import type { SLD } from "~module/sld/type";
-import type { TLD } from "~module/tld/type";
+const sldDatabase = "domain";
+const tldDatabase = "extension";
 
-const sldDatabase = "slds";
-const tldDatabase = "tlds";
+const registryClient = createClient({
+  exchanges: defaultExchanges,
+  fetch,
+  url: registryAPI
+});
 
-interface VariablesInterface {
-  antonym?: boolean;
-  mature?: boolean;
-  name: string;
-  relatedExtension?: boolean;
-  synonym?: boolean;
-};
+// interface VariablesInterface {
+//   antonym?: boolean;
+//   mature?: boolean;
+//   name: string;
+//   relatedExtension?: boolean;
+//   synonym?: boolean;
+// };
 
-interface SLDRequestInterface {
-  pagination: PaginationArgumentType;
-  variables: VariablesInterface;
-};
+// interface SLDRequestInterface {
+//   pagination: PaginationArgument;
+//   variables: VariablesInterface;
+// };
 
-interface FunctionResponse extends FunctionResponseInterface {
-  detail?: {
-    results: {} | []
-  };
-}
+// interface FunctionResponse extends FunctionResponseInterface {
+//   detail?: {
+//     results: {} | []
+//   };
+// }
 
-interface RawSearchResponse {
-  available: boolean;
-  created: string | void;
-  domain: string;
-  duration: number;
-  premium: boolean;
-  price: string;
-}
+// interface RawSearchResponse {
+//   available: boolean;
+//   created: string | void;
+//   domain: string;
+//   duration: number;
+//   premium: boolean;
+//   price: string;
+// }
 
 
 
 ///  E X P O R T
 
-export async function searchDomains(suppliedData: SLDRequestInterface): Promise<FunctionResponse> {
-  if (!suppliedData) {
-    return {
-      detail: {
-        results: []
-      },
-      httpCode: 401,
-      message: "Please refer to our documentation on API usage.",
-      success: false
-    };
-  }
+export default async(suppliedData: SearchRequest) => {
+  const { options } = suppliedData;
 
-  const query: LooseObjectInterface = {};
-  const results = [];
+  // console.log(options);
+  // console.log(">>> vowels");
+
+  /// NOTE
+  /// > homoglyph detection and removal happens on the API side
+
+  // if (domainQuery.match(regexDomain))
+  //   searchQueryStore.set(domainQuery);
+
+  // console.log(">>> suppliedData");
+  // console.log(suppliedData);
+
+  // TODO
+  // : clean input
+  // : cycle through array of portfolio extensions
+  //   : how to do a cached search in RethinkDB?
+  //   : run this search when API boots in order to have it cached?
+  // : search registry API
+  // : search internal API
+
+  const query: LooseObject = {};
+  const results: SearchResult[] = [];
   let isPremium = false;
   let basePrice = 0;
   let premiumPrice = 0;
@@ -92,197 +121,163 @@ export async function searchDomains(suppliedData: SLDRequestInterface): Promise<
   // : maybe only look for "name" since we punycode the input _anyway_...no need for "unicode"
   // : if domain is reserved, require code to purchase
 
-  const { variables } = suppliedData;
+  // const { variables } = suppliedData;
 
-  Object.entries(variables).forEach(([key, value]) => {
+  Object.entries(options).forEach(([key, value]) => {
     query[key] = value;
   });
 
   if (regexZeroWidth(query.name)) {
+    console.group("Query contains invalid characters");
+    console.info(String(query.name));
+    console.groupEnd();
+
     return {
-      detail: {
-        results: []
-      },
-      httpCode: 401,
-      message: "Query contains invalid characters…remove them.",
-      success: false
+      detail: []
     };
   }
 
-  const desiredName = punycode.toAscii(query.name);
+  const desiredName = __stringCleaner(query.name);
 
-  if (desiredName.includes(".")) {
-    /// Excessive periods are ignored
-    /// Just snag the first split pair
-    query.name = desiredName.split(".")[0];
-    query.tld = desiredName.split(".")[1];
-    // TODO
-    // if name or tld is too short, abort
-  } else {
+  // TODO
+  // : get query.name as well, punycode transitional
+
+  if (desiredName.split(".").length !== 2) {
+    console.group("Query missing extension");
+    console.info(query);
+    console.info("\n");
+    console.groupEnd();
+
     return {
-      detail: {
-        results: []
-      },
-      httpCode: 401,
-      message: "Query missing extension",
-      success: false
+      detail: []
     };
   }
+
+  /// Excessive periods are silently ignored
+  /// Just snag the first split pair
+  query.ascii = desiredName.split(".")[0];
+  query.extension = desiredName.split(".")[1];
+  /// Re-use `query.name`
+  query.name = punycode.toUnicode(query.ascii);
+
+  // TODO
+  // if name or tld is too short, abort
 
   try {
     const { antonyms, synonyms } = await thesaurus(query.name);
-    const domain = `${query.name}.${query.tld}`;
-    const searchResult = await __rawSearch(domain);
+    const domain = `${query.ascii}.${query.extension}`;
+    const searchResult = await __findDomain(domain);
     const hns = await hnsPrice();
 
-    if (searchResult) {
-      const { available, created, duration, premium, price } = searchResult;
-
-      results.push({
-        available,
-        created,
-        duration,
-        hns: __formatHNS(price, hns),
-        name: punycode.toAscii(domain),
-        premium,
-        price,
-        unicode: punycode.toUnicode(domain)
-      });
-    } else {
+    if (!searchResult) {
       // TODO
       // : figure out how this occurs
+      //   : extension does not exist
       // : how to handle price being zero?
       // : silently fail and do not send anything?
-      // console.log("<<< wtf");
+
+      console.group("Zero domains found");
+      console.info(query);
+      console.groupEnd();
 
       return {
-        detail: {
-          results: []
-        },
-        httpCode: 200,
-        message: "Zero domains found, you probably queried for an extension we do not support.",
-        success: true
+        detail: []
       };
     }
 
-    // TODO
-    // : do not forgot to add beachfront/ markup to these prices
-    //   : what is returned are Neuenet OEM pricing
+    const { available, created, duration, premium, price } = searchResult;
+
+    results.push({
+      ascii: punycode.toAscii(domain),
+      available,
+      created,
+      duration,
+      hns: __formatHNS(price, hns),
+      name: punycode.toUnicode(domain),
+      premium,
+      price
+    });
 
     /// NO VWLS
     if (removeVowels(query.name).length > 3) {
-      const domainSansVowels = `${removeVowels(query.name)}.${query.tld}`;
-      const searchResult = await __rawSearch(domainSansVowels);
+      const domainSansVowels = `${removeVowels(query.name)}.${query.extension}`;
+      const searchResult = await __findDomain(domainSansVowels);
 
       if (searchResult) {
         const { available, created, duration, premium, price } = searchResult;
 
         results.push({
+          ascii: punycode.toAscii(domainSansVowels),
           available,
           created,
           duration,
           hns: __formatHNS(price, hns),
-          name: punycode.toAscii(domainSansVowels),
+          name: punycode.toUnicode(domainSansVowels),
           premium,
-          price,
-          unicode: punycode.toUnicode(domainSansVowels)
+          price
         });
       }
     }
 
-    const relatedTLDs = await __rawNeighborSearch(query.tld);
+    // const relatedTLDs = await __rawNeighborSearch(query.extension);
 
-    await Promise.all(relatedTLDs.map(async(tld: string) => {
-      if (tld === query.tld)
-        return; /// We do not need to see a duplicate result
+    // await Promise.all(relatedTLDs.map(async(extension: string) => {
+    //   if (extension === query.extension)
+    //     return; /// We do not need to see a duplicate result
 
-      const domain = `${query.name}.${tld}`;
-      const searchResult = await __rawSearch(domain);
+    //   const domain = `${query.ascii}.${extension}`;
+    //   const searchResult = await __findDomain(domain);
 
-      if (!searchResult)
-        return;
+    //   if (!searchResult)
+    //     return;
 
-      const { available, created, duration, premium, price } = searchResult;
+    //   const { available, created, duration, premium, price } = searchResult;
 
-      results.push({
-        available,
-        created,
-        duration,
-        hns: __formatHNS(price, hns),
-        name: punycode.toAscii(domain),
-        premium,
-        price,
-        unicode: punycode.toUnicode(domain)
-      });
-    }));
+    //   results.push({
+    //     ascii: punycode.toAscii(domain),
+    //     available,
+    //     created,
+    //     duration,
+    //     hns: __formatHNS(price, hns),
+    //     name: punycode.toUnicode(domain),
+    //     premium,
+    //     price
+    //   });
+    // }));
 
-    await Promise.all(synonyms.map(async(word: string) => {
-      const domain = `${word}.${query.tld}`;
-      const searchResult = await __rawSearch(domain);
-
-      if (!searchResult)
-        return;
-
-      const { available, created, duration, premium, price } = searchResult;
-
-      results.push({
-        available,
-        created,
-        duration,
-        hns: __formatHNS(price, hns),
-        name: punycode.toAscii(domain),
-        premium,
-        price,
-        unicode: punycode.toUnicode(domain)
-      });
-    }));
-
-    await Promise.all(antonyms.map(async(word: string) => {
-      const domain = `${word}.${query.tld}`;
-      const searchResult = await __rawSearch(domain);
-
-      if (!searchResult)
-        return;
-
-      const { available, created, duration, premium, price } = searchResult;
-
-      results.push({
-        available,
-        created,
-        duration,
-        hns: __formatHNS(price, hns),
-        name: punycode.toAscii(domain),
-        premium,
-        price,
-        unicode: punycode.toUnicode(domain)
-      });
-    }));
+    const antonymsArray: SearchResult[] = await __findNames(antonyms, query.extension, hns);
+    const synonymsArray: SearchResult[] = await __findNames(synonyms, query.extension, hns);
 
     return {
-      detail: {
-        results
-      },
-      httpCode: 200,
-      message: "Found some domain options for you.",
-      success: true
+      detail: [
+        ...new Set([
+          ...results,
+          ...synonymsArray,
+          ...antonymsArray
+        ])
+      ]
+      // pageInfo: {
+      //   // cursor
+      //   // hasNextPage
+      //   // hasPreviousPage
+      // },
+      // viewer: "" // customer object, only ID
     };
   } catch(error) {
-    console.info("Error retrieving domain search results.");
-    console.error(error);
+    console.group("Error retrieving domain search results");
+    console.error(String(error) + "\n");
+    console.groupEnd();
+
+    /// rate limiting?
 
     return {
-      detail: {
-        results
-      },
-      httpCode: 500,
-      message: "Error retrieving domain search results.",
-      success: false
+      detail: results
     };
   }
 }
 
 ///  H E L P E R
-
+/*
 async function __rawNeighborSearch(suppliedTLD: string): Promise<string[]> {
   const databaseConnection = await r.connect(databaseOptions);
   let relatedTLDs: string[] = [];
@@ -293,7 +288,14 @@ async function __rawNeighborSearch(suppliedTLD: string): Promise<string[]> {
     return relatedTLDs;
   }
 
-  let baseQuery: LooseObjectInterface = await r.table(tldDatabase)
+  // TODO
+  // : search registry API for `collection`
+
+  // gotql.query('mygraphqlendpoint.com.br/api', query, options)
+  //   .then(response => console.log(response.data))
+  //   .catch(console.error)
+
+  let baseQuery: LooseObject = await r.table(tldDatabase)
     .filter({ name: suppliedTLD })
     .run(databaseConnection);
 
@@ -305,9 +307,9 @@ async function __rawNeighborSearch(suppliedTLD: string): Promise<string[]> {
 
   const { collection } = baseQuery;
 
-  const tldQuery: LooseObjectInterface = await r.table(tldDatabase)
+  const tldQuery: LooseObject = await r.table(tldDatabase)
     .orderBy({ index: r.asc("name") })
-    .filter((row: any) => {
+    .filter((row: RDatum) => {
       return row("collection")
         .contains(collection[0])
         .or(row("collection").contains(collection[1]))
@@ -318,105 +320,146 @@ async function __rawNeighborSearch(suppliedTLD: string): Promise<string[]> {
     .pluck("name")
     .run(databaseConnection);
 
-  tldQuery.map((tld: LooseObjectInterface) => {
-    relatedTLDs.push(tld.name);
+  tldQuery.map((tld: LooseObject) => {
+    relatedTLDs.push(tld.name); /// or ascii?
   });
 
   relatedTLDs = [...new Set(relatedTLDs)]; /// remove possible duplicates
 
   return relatedTLDs;
 }
+*/
 
-async function __rawSearch(suppliedDomain: string): Promise<RawSearchResponse | void> {
-  const databaseConnection = await r.connect(databaseOptions);
+async function __findNames(suppliedArray: string[], suppliedExtension: string, hnsPrice: number) {
+  const names: SearchResult[] = [];
+
+  await Promise.all(suppliedArray.map(async(word: string) => {
+    const domain = `${word}.${suppliedExtension}`;
+    const searchResult = await __findDomain(domain);
+
+    if (!searchResult)
+      return;
+
+    const { available, created, duration, premium, price } = searchResult;
+
+    names.push({
+      ascii: punycode.toAscii(domain),
+      available,
+      created,
+      duration,
+      hns: __formatHNS(price, hnsPrice),
+      name: punycode.toUnicode(domain),
+      premium,
+      price
+    });
+  }));
+
+  return names;
+}
+
+async function __findDomain(suppliedDomain: string) {
+  const ascii = suppliedDomain.split(".")[0];
+  const extension = suppliedDomain.split(".")[1];
   let basePrice = 0;
-  let creationDate = null;
+  let creationDate = "";
   let isAvailable = true;
   let isPremium = false;
   let premiumPrice = 0;
 
-  /// We expect a domain name to be supplied
-  if (!suppliedDomain || !suppliedDomain.includes(".")) {
-    databaseConnection.close();
-    return;
+  const query = gql`
+    query GetDomain($options: DomainQuery) {
+      domain(options: $options) {
+        detail {
+          ascii
+          extension {
+            collection
+            id
+            name
+            premium
+            price
+            pricePremium
+          }
+          id
+          name
+          registrant {
+            location
+            name
+          }
+          registrar {
+            id
+            name
+          }
+        }
+      }
+    }
+  `;
+
+  const variables = {
+    options: {
+      name: suppliedDomain
+    }
   }
 
-  /// We expect only ONE dot
-  if (suppliedDomain.split(".").length > 2) {
-    databaseConnection.close();
+  const internalDomainSearch = await getDomain({ options: { name: suppliedDomain }});
+  const internalExtensionSearch = await getExtension({ options: { ascii: extension }});
+  const { data: registrySearch } = await registryClient.query(query, variables).toPromise();
+
+  if (!registrySearch)
     return;
+
+  // if (internalDomainSearch.detail.id.length === 0) {
+  //   console.log("Domain is not registered with beachfront/");
+  // }
+
+  if (internalExtensionSearch.detail.id.length === 0) {
+    console.group("Extension does not exist");
+    console.log(suppliedDomain);
+    console.groupEnd();
+    return false;
   }
 
-  /// IGNORE FUCK-ASS SHIT
-  if (regexZeroWidth(suppliedDomain)) {
-    databaseConnection.close();
-    return;
-  }
-
-  const cleanDomain = __stringCleaner(suppliedDomain);
-  // @ts-ignore | TS2345
-  const name = punycode.toAscii(cleanDomain.split(".")[0]);
-  // @ts-ignore | TS2345
-  const extension = punycode.toAscii(cleanDomain.split(".")[1]);
-
-  let tldQuery: LooseObjectInterface = await r.table(tldDatabase)
-    .filter({ name: extension })
-    .run(databaseConnection);
-
-  tldQuery = tldQuery[0];
-
-  /// TLD does not exist
-  if (!tldQuery)
-    return;
-
-  let sldQuery: LooseObjectInterface = await r.table(sldDatabase)
-    .filter({ name, tld: extension })
-    .run(databaseConnection);
-
-  sldQuery = sldQuery[0];
-  databaseConnection.close();
-
-  if (sldQuery) {
-    creationDate = sldQuery.created;
+  if (registrySearch.domain.detail.id.length !== 0)
     isAvailable = false;
-  }
 
-  const { collection, premium } = tldQuery;
+  const {
+    premium,
+    price: extensionBasePrice,
+    pricePremium: extensionPremiumPrice
+  } = registrySearch.domain.detail.extension;
 
   /// Check to see if desired name is considered premium
-  premium.map((premiumSLD: { name: string; unicode: string; }) => {
-    if (premiumSLD.name === name)
+  premium.map((premiumSLD: { ascii: string; }) => {
+    if (premiumSLD.ascii === ascii)
       isPremium = true;
   });
 
   /// Grab TLD pricing
-  basePrice = tldQuery.price;
-  premiumPrice = tldQuery.pricePremium;
-
   const { price } = await getPricing({
     extension,
-    name,
+    name: punycode.toUnicode(ascii),
     premium: isPremium,
-    priceBase: basePrice,
-    pricePremium: premiumPrice
+    priceBase: extensionBasePrice,
+    pricePremium: extensionPremiumPrice
   });
 
   return {
     available: isAvailable,
-    created: creationDate,
-    domain: `${name}.${extension}`,
+    created: creationDate, /// if name is taken, populate this
+    domain: suppliedDomain,
     duration: 2,
     premium: isPremium,
+    // price: String(10),
     price
   };
 }
 
-function __formatHNS(priceInUSD: string, hns: number) {
-  return (parseInt(priceInUSD) / hns).toFixed(2);
+function __formatHNS(priceInUSD: number|string, hns: number|string) {
+  return new Big(priceInUSD).div(new Big(hns)).toFixed(2);
 }
 
 function __stringCleaner(suppliedString: string) {
-  // TODO
-  // : account for nothing being supplied
-  return String(suppliedString).replace(/\s/g, "").trim();
+  if (!suppliedString)
+    return "";
+
+  return punycode.toAscii(String(suppliedString).replace(/\s/g, "").trim());
 }
