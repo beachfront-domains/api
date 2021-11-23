@@ -15,9 +15,9 @@ type Session {
   cart: [String]
   customer: Customer
   #
-  created: DateTime!
+  created: DateTime
   id: ID!
-  updated: DateTime!
+  updated: DateTime
 }
 
 type SessionResponse {

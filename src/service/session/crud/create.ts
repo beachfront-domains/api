@@ -28,12 +28,11 @@ export default async(input: SessionCreate) => {
   Object.entries(options).forEach(([key, value]) => {
     switch(key) {
       case "customer":
-      case "id":
         query[key] = String(value);
         break;
 
       case "cart":
-        query[key] = value;
+        query[key] = [...new Set(value)]; // eliminate duplicates
         break;
 
       default:
@@ -41,17 +40,14 @@ export default async(input: SessionCreate) => {
     }
   });
 
-  if (query.id) {
-    const doesDocumentExist = await get({ options: { id: query.id }});
+  /// NOTE
+  /// We do not check the `customer` ID for validity, as this is
+  /// supposed to be a quick and easy way to have a persistent
+  /// cart. We do not care at this point in time.
 
-    if (Object.keys(doesDocumentExist.detail).length !== 0) {
-      databaseConnection.close();
-      return doesDocumentExist; /// document exists, return it
-    }
-
-    /// if document does not exist, delete `id` key
-    delete query.id;
-  }
+  // TODO
+  // : revisit above note...why have `customer` parameter
+  // : if it is not being used?
 
   try {
     const createDocument = await r

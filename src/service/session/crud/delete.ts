@@ -38,7 +38,7 @@ export default async(input: SessionRequest) => {
     }
   });
 
-  const doesDocumentExist = await getSession({ options: { ...query }});
+  const doesDocumentExist = await getSession({ options: { id: query.id }});
 
   if (Object.keys(doesDocumentExist.detail).length === 0) {
     databaseConnection.close();

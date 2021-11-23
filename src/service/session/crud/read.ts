@@ -41,7 +41,8 @@ export async function get(input: SessionRequest): Promise<{ detail: Session }> {
   });
 
   let response: any = await r.table(databaseName)
-    .get(query.id)
+    .filter({ id: query.id })
+    .limit(1)
     .run(databaseConnection);
 
   databaseConnection.close();
@@ -57,6 +58,12 @@ export async function get(input: SessionRequest): Promise<{ detail: Session }> {
 }
 
 export async function getMore(input: Partial<SessionsRequest>) {
+  // TODO
+  // : add modifiers/filters for `created` and `updated` fields
+  //   : < || > ? (before or after a date?)
+  // : add support for searching via `customer` ID
+  //   : would make it easy to delete all sessions for a user
+
   const databaseConnection = await r.connect(databaseOptions);
   const { options, pagination } = input;
 

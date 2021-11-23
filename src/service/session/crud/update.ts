@@ -3,6 +3,7 @@
 
 ///  I M P O R T
 
+import { diff as test, jsonPatchPathConverter } from "just-diff";
 import { r } from "rethinkdb-ts";
 import type { WriteResult } from "rethinkdb-ts";
 
@@ -27,17 +28,17 @@ export default async(input: SessionUpdate) => {
     return emptyResponse;
 
   const databaseConnection = await r.connect(databaseOptions);
+  const dataSet: LooseObject = {};
   const locateQuery: LooseObject = {};
   const query: LooseObject = {};
 
-  const dataPull = {}; /// for arrays
-  const dataPush = {}; /// also for arrays
-  const dataSet = {};
+  // const dataPull = {}; /// for arrays
+  // const dataPush = {}; /// also for arrays
 
   Object.entries(changes).forEach(([key, value]) => {
     switch(key) {
       case "cart":
-        query[key] = value;
+        query[key] = [...new Set(value)]; // eliminate duplicates
         break;
 
       default:
@@ -56,7 +57,7 @@ export default async(input: SessionUpdate) => {
     }
   });
 
-  const documentExistenceQuery = await get({ options: locateQuery });
+  const documentExistenceQuery = await get({ options: { id: locateQuery.id }});
 
   if (Object.keys(documentExistenceQuery.detail).length === 0) {
     databaseConnection.close();
@@ -65,22 +66,46 @@ export default async(input: SessionUpdate) => {
   }
 
   const documentToUpdate = documentExistenceQuery.detail;
-  const diff = objectCompare(query, documentToUpdate); // new data compared to existing data
-  const changedParameters = Object.keys(diff); // returns an array
+  const newParams = test(documentToUpdate, query, jsonPatchPathConverter);
 
-  changedParameters.forEach(parameter => {
-    // dataSet[parameter] // dataPush[parameter] // dataPull[parameter]
-    dataSet[parameter] = query[parameter];
+  // const diff = objectCompare(query, documentToUpdate); // new data compared to existing data
+  // const changedParameters = Object.keys(diff); // returns an array
+
+  // changedParameters.forEach(parameter => {
+  //   // dataSet[parameter] // dataPush[parameter] // dataPull[parameter]
+  //   dataSet[parameter] = query[parameter];
+  // });
+
+  newParams.map(param => {
+    const { op, value } = param;
+    let { path } = param;
+
+    // if (op === "remove") {
+    //   path = String(path.split("/").pop());
+    //   delete documentToUpdate[path];
+    // }
+
+    if (op === "replace") {
+      const ii = Number(path.split("/").pop());
+
+      // TODO
+      // : do not hard code `cart`
+
+      if (!dataSet.cart)
+        dataSet.cart = [];
+
+      dataSet.cart[ii] = value;
+    }
   });
 
   await dataSet;
-  await dataPull;
-  await dataPush;
+  // await dataPull;
+  // await dataPush;
 
   const finalObject = {
     ...dataSet,
-    ...dataPull,
-    ...dataPush,
+    // ...dataPull,
+    // ...dataPush,
     updated: new Date()
   };
 

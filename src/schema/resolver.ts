@@ -35,6 +35,14 @@ import {
 
 import { search } from "~service/search/index";
 
+import {
+  create as createSession,
+  del as deleteSession,
+  getSession as session,
+  getSessions as sessions,
+  update as updateSession
+} from "~service/session/index";
+
 
 
 ///  E X P O R T
@@ -65,5 +73,12 @@ export default {
   updateExtension,
 
   /// search
-  search
+  search,
+
+  /// session
+  createSession,
+  deleteSession,
+  session,
+  sessions,
+  updateSession
 };
