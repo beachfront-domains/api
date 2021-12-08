@@ -42,7 +42,7 @@ export type Domain = {
     location: string;
     name: string;
   };
-  status: DomainStatus; /// enum
+  status: DomainStatusCode; /// enum
   ///
   created: string;
   id: string;

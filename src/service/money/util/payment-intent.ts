@@ -7,8 +7,8 @@ import Stripe from "stripe";
 
 ///  U T I L
 
-import { searchDomains } from "~service/search";
-const stripe = new Stripe("sk_test_...");
+// import { SearchRequest } from "~service/search";
+// const stripe = new Stripe("sk_test_...");
 
 
 
@@ -28,12 +28,12 @@ export default async(suppliedData) => {
   console.log(payment);
   console.log("");
 
-  cart.map(async(cartItem) => {
-    const domainDetails = await calculate(cartItem.name, cartItem.duration);
+  // cart.map(async(cartItem) => {
+  //   const domainDetails = await calculate(cartItem.name, cartItem.duration);
 
-    if (!domainDetails.available)
-      return;
-  });
+  //   if (!domainDetails.available)
+  //     return;
+  // });
 
   // try {} catch(error) {}
 

@@ -3,7 +3,7 @@
 
 ///  U T I L
 
-import { DomainStatusCode } from "./type";
+import type { DomainStatusCode } from "./type";
 import type { PaginationArgument } from "../pagination/index";
 
 interface __DomainsRequestOptions {
