@@ -8,11 +8,17 @@
 # Type
 ######
 
+type Cart {
+  duration: Int
+  name: String
+  price: String
+}
+
 type Session {
   """
   Array of domain names
   """
-  cart: [String]
+  cart: [Cart]
   customer: Customer
   #
   created: DateTime
@@ -35,8 +41,14 @@ type SessionsResponse {
 # Input
 #######
 
+input CartInput {
+  duration: Int
+  name: String
+  price: String
+}
+
 input SessionInput {
-  cart: [String]
+  cart: [CartInput]
   customer: ID
   # no created
   # no id

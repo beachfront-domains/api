@@ -3,6 +3,7 @@
 
 ///  I M P O R T
 
+import dif from "microdiff";
 import { diff as test, jsonPatchPathConverter } from "just-diff";
 import { r } from "rethinkdb-ts";
 import type { WriteResult } from "rethinkdb-ts";
@@ -32,13 +33,11 @@ export default async(input: SessionUpdate) => {
   const locateQuery: LooseObject = {};
   const query: LooseObject = {};
 
-  // const dataPull = {}; /// for arrays
-  // const dataPush = {}; /// also for arrays
-
   Object.entries(changes).forEach(([key, value]) => {
     switch(key) {
       case "cart":
-        query[key] = [...new Set(value)]; // eliminate duplicates
+        // query[key] = [...new Set(value)]; // TODO: focus on `name` to better eliminate duplicates
+        query[key] = value; // TS2769: No overload matches this call.
         break;
 
       default:
@@ -66,48 +65,15 @@ export default async(input: SessionUpdate) => {
   }
 
   const documentToUpdate = documentExistenceQuery.detail;
-  const newParams = test(documentToUpdate, query, jsonPatchPathConverter);
-
-  // const diff = objectCompare(query, documentToUpdate); // new data compared to existing data
-  // const changedParameters = Object.keys(diff); // returns an array
-
-  // changedParameters.forEach(parameter => {
-  //   // dataSet[parameter] // dataPush[parameter] // dataPull[parameter]
-  //   dataSet[parameter] = query[parameter];
-  // });
-
-  newParams.map(param => {
-    const { op, value } = param;
-    let { path } = param;
-
-    // if (op === "remove") {
-    //   path = String(path.split("/").pop());
-    //   delete documentToUpdate[path];
-    // }
-
-    if (op === "replace") {
-      const ii = Number(path.split("/").pop());
-
-      // TODO
-      // : do not hard code `cart`
-
-      if (!dataSet.cart)
-        dataSet.cart = [];
-
-      dataSet.cart[ii] = value;
-    }
-  });
-
-  await dataSet;
-  // await dataPull;
-  // await dataPush;
+  dataSet.cart = query.cart; // all we care about is the cart
 
   const finalObject = {
     ...dataSet,
-    // ...dataPull,
-    // ...dataPush,
     updated: new Date()
   };
+
+  // console.log(finalObject);
+  // console.log(">>> finalObject");
 
   try {
     const documentUpdate = await r

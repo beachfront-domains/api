@@ -32,7 +32,10 @@ export default async(input: SessionCreate) => {
         break;
 
       case "cart":
-        query[key] = [...new Set(value)]; // eliminate duplicates
+        // TODO
+        // : ensure unique object arrays
+        // query[key] = [...new Set(value)]; // eliminate duplicates
+        query[key] = value; // TS2769: No overload matches this call.
         break;
 
       default:

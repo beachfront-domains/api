@@ -5,7 +5,11 @@
 
 import type { PaginationArgument } from "../pagination/index";
 
-
+interface __CartItem {
+  duration: number;
+  name: string;
+  price: string;
+}
 
 interface __SessionsRequestOptions {
   created: string;
@@ -19,7 +23,7 @@ interface __SessionsRequestOptions {
 
 export interface SessionCreate {
   options: {
-    cart: string[];
+    cart?: __CartItem[];
     customer?: string; /// ID
   }
 }
@@ -32,7 +36,7 @@ export interface SessionRequest {
 
 export interface SessionUpdate {
   changes: {
-    cart: string[];
+    cart: __CartItem[];
   }
   options: {
     id: string;
