@@ -36,6 +36,7 @@ type Customer {
   Default value is `false`.
   """
   staff: Boolean
+  stripeId: ID
   timezone: String
   username: String
   verified: Boolean

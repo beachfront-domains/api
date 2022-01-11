@@ -37,6 +37,14 @@ import type {
 } from "./extension/index";
 
 import type {
+  Order,
+  OrderCreate,
+  OrderRequest,
+  OrderUpdate,
+  OrdersRequest
+} from "./order/index";
+
+import type {
   PaginationArgument,
   PaginationResponse
 } from "./pagination/type";
@@ -78,6 +86,11 @@ export type {
   ExtensionRequest,
   ExtensionUpdate,
   ExtensionsRequest,
+  Order,
+  OrderCreate,
+  OrderRequest,
+  OrderUpdate,
+  OrdersRequest,
   PaginationArgument,
   PaginationResponse,
   SearchRequest,

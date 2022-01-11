@@ -33,6 +33,14 @@ import {
   update as updateExtension
 } from "~service/extension/index";
 
+import {
+  create as createOrder,
+  del as deleteOrder,
+  getOrder as order,
+  getOrders as orders,
+  update as updateOrder
+} from "~service/order/index";
+
 import { search } from "~service/search/index";
 
 import {
@@ -43,6 +51,8 @@ import {
   update as updateSession
 } from "~service/session/index";
 
+import { welcome as login } from "~service/access/index";
+
 
 
 ///  E X P O R T
@@ -50,6 +60,9 @@ import {
 export default {
   ...resolvers,
   DecimalScalar,
+
+  /// access
+  login,
 
   /// customer
   createCustomer,
@@ -71,6 +84,13 @@ export default {
   extension,
   extensions,
   updateExtension,
+
+  /// order
+  createOrder,
+  deleteOrder,
+  order,
+  orders,
+  updateOrder,
 
   /// search
   search,

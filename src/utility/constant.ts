@@ -34,11 +34,13 @@ export const databaseOptions = {
   max: 5, // TODO: check if this should be more in production
   password: database.password,
   port: port.database,
-  silent: true, // TODO: check if this should be false in production
-  user: "admin"
+  silent: !isDevelopment,
+  // silent: true, // TODO: check if this should be false in production
+  user: "admin" // supposed to be beachfrontAdmin
 };
 
 export const environment = isDevelopment ? "development" : "production";
+export const keyOpenNode = isDevelopment ? dev.opennode : prod.opennode;
 export const registryAPI = isDevelopment ? "http://localhost:5454" : "https://api.neuenet";
 export const siteEmail = site.email;
 export const siteName = site.name;

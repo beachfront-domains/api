@@ -90,8 +90,10 @@ const registryClient = createClient({
 export default async(suppliedData: SearchRequest) => {
   const { options } = suppliedData;
 
-  // console.log(options);
-  // console.log(">>> vowels");
+  if (!options.name || options.name === "null") {
+    // console.log("TODO: beachfront app autosends a blank response");
+    return { detail: [] };
+  }
 
   /// NOTE
   /// > homoglyph detection and removal happens on the API side
@@ -141,16 +143,16 @@ export default async(suppliedData: SearchRequest) => {
 
   // TODO
   // : get query.name as well, punycode transitional
+  // : prevent blank calls
 
-  if (desiredName.split(".").length !== 2) {
-    console.group("Query missing extension");
-    console.info(query);
-    console.info("\n");
-    console.groupEnd();
+  switch(true) {
+    case desiredName.length === 0:
+    case desiredName.split(".").length !== 2:
+      console.log("TODO: no extension");
+      return { detail: [] };
 
-    return {
-      detail: []
-    };
+    default:
+      break;
   }
 
   /// Excessive periods are silently ignored

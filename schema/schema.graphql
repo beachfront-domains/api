@@ -20,6 +20,17 @@ scalar Decimal
 # import ExtensionsQuery from "extension.graphql"
 # import ExtensionsResponse from "extension.graphql"
 
+# import LoginInput from "access.graphql"
+# import LoginResponse from "access.graphql"
+# import TokenInput from "access.graphql"
+# import TokenResponse from "access.graphql"
+
+# import OrderInput from "order.graphql"
+# import OrderQuery from "order.graphql"
+# import OrderResponse from "order.graphql"
+# import OrdersQuery from "order.graphql"
+# import OrdersResponse from "order.graphql"
+
 # import PaginationOptions from "pagination.graphql"
 
 # import SearchQuery from "search.graphql"
@@ -35,8 +46,8 @@ scalar Decimal
 All the queries that enable the registrar API to function
 """
 
-type DeleteResponse {
-  "Was the deletion successful?"
+type BooleanResponse {
+  "Was the operation successful?"
   success: Boolean
 }
 
@@ -57,6 +68,11 @@ type Query {
   extension(options: ExtensionQuery): ExtensionResponse
   extensions(options: ExtensionsQuery, pagination: PaginationOptions): ExtensionsResponse
   """
+  Order queries
+  """
+  order(options: OrderQuery): OrderResponse
+  orders(options: OrdersQuery, pagination: PaginationOptions): OrdersResponse
+  """
   Search queries
   """
   search(options: SearchQuery, pagination: PaginationOptions): SearchResponse
@@ -69,27 +85,38 @@ type Query {
 
 type Mutation {
   """
+  Authentication mutations
+  """
+  login(options: LoginInput): LoginResponse
+  # refreshToken(options: TokenInput): TokenResponse
+  """
   Customer mutations
   """
   createCustomer(options: CustomerInput): CustomerResponse
-  deleteCustomer(options: CustomerQuery): DeleteResponse
+  deleteCustomer(options: CustomerQuery): BooleanResponse
   updateCustomer(changes: CustomerInput, options: CustomerQuery): CustomerResponse
   """
   Domain mutations
   """
   createDomain(options: DomainInput): DomainResponse
-  deleteDomain(options: DomainQuery): DeleteResponse
+  deleteDomain(options: DomainQuery): BooleanResponse
   updateDomain(changes: DomainInput, options: DomainQuery): DomainResponse
   """
   Extension mutations
   """
   createExtension(options: ExtensionInput): ExtensionResponse
-  deleteExtension(options: ExtensionQuery): DeleteResponse
+  deleteExtension(options: ExtensionQuery): BooleanResponse
   updateExtension(changes: ExtensionInput, options: ExtensionQuery): ExtensionResponse
+  """
+  Order mutations
+  """
+  createOrder(options: OrderInput): OrderResponse
+  deleteOrder(options: OrderQuery): BooleanResponse
+  updateOrder(changes: OrderInput, options: OrderQuery): OrderResponse
   """
   Session mutations
   """
   createSession(options: SessionInput): SessionResponse
-  deleteSession(options: SessionQuery): DeleteResponse
+  deleteSession(options: SessionQuery): BooleanResponse
   updateSession(changes: SessionInput, options: SessionQuery): SessionResponse
 }

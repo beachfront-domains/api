@@ -3,7 +3,9 @@
 
 ///  I M P O R T
 
+import env from "vne";
 import { r } from "rethinkdb-ts";
+import Stripe from "stripe";
 import validateEmail from "@webb/validate-email";
 
 ///  U T I L
@@ -14,6 +16,8 @@ import type { CustomerCreate } from "~schema/index";
 import type { LooseObject } from "~util/index";
 
 const databaseName = "customer";
+const { stripe: stripeKey } = env();
+const stripe = new Stripe(stripeKey.secret, { apiVersion: "2020-08-27" });
 
 const documentDefaults = {
   /// email
@@ -71,11 +75,14 @@ export default async(suppliedData: CustomerCreate) => {
     query.username = createUsername(email);
 
   try {
+    const { id: stripeId } = await stripe.customers.create({ email });
+
     const createDocument = await r
       .table(databaseName)
       .insert({
         ...documentDefaults,
         ...query,
+        stripeId,
         created: new Date(),
         updated: new Date()
       })

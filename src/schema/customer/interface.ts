@@ -36,6 +36,7 @@ export interface CustomerRequest {
   options: {
     email?: string;
     id?: string;
+    stripeId?: string;
     username?: string;
   }
 }

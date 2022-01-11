@@ -11,6 +11,7 @@ import {
   coinmarketcapKey,
   databaseOptions,
   environment,
+  keyOpenNode,
   registryAPI,
   siteEmail,
   siteName,
@@ -18,6 +19,7 @@ import {
   thesaurusKey
 } from "./constant";
 
+import eddsa from "./eddsa";
 import errorLogger from "./error-logger";
 import generateGuid from "./generate-guid";
 import hent from "./hent";
@@ -38,10 +40,12 @@ export {
   appVersion,
   coinmarketcapKey,
   databaseOptions,
+  eddsa,
   environment,
   errorLogger,
   generateGuid,
   hent,
+  keyOpenNode,
   objectCompare,
   regexZeroWidth,
   registryAPI,

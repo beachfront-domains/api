@@ -8,30 +8,24 @@ import { r } from "rethinkdb-ts";
 ///  U T I L
 
 import { databaseOptions } from "~util/index";
-import { get as getCustomer } from "./read";
-import type { CustomerRequest } from "~schema/index";
+import { get as getOrder } from "./read";
+import type { OrderRequest } from "~schema/index";
 import type { LooseObject } from "~util/index";
 
-const databaseName = "customer";
+const databaseName = "order";
 
 
 
 ///  E X P O R T
 
-export default async(suppliedData: CustomerRequest) => {
+export default async(suppliedData: OrderRequest) => {
   const databaseConnection = await r.connect(databaseOptions);
   const { options } = suppliedData;
   const query: LooseObject = {};
 
-  // TODO
-  // : ensure that customer does not own any domains before deletion
-  // : return false/abort otherwise
-
   Object.entries(options).forEach(([key, value]) => {
     switch(key) {
-      case "email":
       case "id":
-      case "username":
         query[key] = String(value);
         break;
 
@@ -40,21 +34,18 @@ export default async(suppliedData: CustomerRequest) => {
     }
   });
 
-  const doesDocumentExist = await getCustomer({ options: { ...query }});
+  const doesDocumentExist = await getOrder({ options: { id: query.id }});
 
-  if (Object.keys(doesDocumentExist.detail).length === 0) {
+  if (doesDocumentExist.detail.id.length === 0) {
     databaseConnection.close();
     /// document does not exist so technically, the desired result is true
     return { success: true };
   }
 
   /// document exists, so grab ID to locate for deletion
-  const documentId = doesDocumentExist?.detail?.id;
+  const documentId = doesDocumentExist.detail.id;
 
   try {
-    // const deleted = await stripe.customers.del(doesDocumentExist.detail.stripeId);
-    // if (!deleted.deleted) return false; /// expects deleted boolean
-
     const deleteDocument = await r
       .table(databaseName)
       .get(documentId)
@@ -64,7 +55,7 @@ export default async(suppliedData: CustomerRequest) => {
     if (deleteDocument.errors !== 0) {
       databaseConnection.close();
 
-      console.group("Customer deletion failed");
+      console.group("Order deletion failed");
       console.error(query);
       console.groupEnd();
 
@@ -76,7 +67,7 @@ export default async(suppliedData: CustomerRequest) => {
   } catch(error) {
     databaseConnection.close();
 
-    console.group("Exception caught while deleting customer");
+    console.group("Exception caught while deleting order");
     console.error(error);
     console.groupEnd();
 
