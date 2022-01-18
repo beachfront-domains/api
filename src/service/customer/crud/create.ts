@@ -5,19 +5,20 @@
 
 import env from "vne";
 import { r } from "rethinkdb-ts";
-import Stripe from "stripe";
-import validateEmail from "@webb/validate-email";
+// import Stripe from "stripe";
+// import validateEmail from "@webb/validate-email";
 
 ///  U T I L
 
-import { databaseOptions } from "~util/index";
+import { databaseOptions, errorLogger } from "~util/index";
 import { get } from "./read";
-import type { CustomerCreate } from "~schema/index";
+import type { Customer, CustomerCreate } from "~schema/index";
 import type { LooseObject } from "~util/index";
 
 const databaseName = "customer";
-const { stripe: stripeKey } = env();
-const stripe = new Stripe(stripeKey.secret, { apiVersion: "2020-08-27" });
+const emptyResponse = { detail: { id: "" }};
+// const { stripe: stripeKey } = env();
+// const stripe = new Stripe(stripeKey.secret, { apiVersion: "2020-08-27" });
 
 const documentDefaults = {
   /// email
@@ -35,7 +36,7 @@ const documentDefaults = {
 
 ///  E X P O R T
 
-export default async(suppliedData: CustomerCreate) => {
+export default async(suppliedData: CustomerCreate): Promise<{ detail: Customer|LooseObject }> => {
   const databaseConnection = await r.connect(databaseOptions);
   const { options } = suppliedData;
   const query: LooseObject = {};
@@ -60,29 +61,25 @@ export default async(suppliedData: CustomerCreate) => {
     }
   });
 
-  if (!validateEmail(query.email))
-    return { detail: {}};
+  const doesDocumentExist = await get({ options: { email: query.email }});
 
-  const email = String(query.email).toLowerCase();
-  const doesDocumentExist = await get({ options: { email }});
-
-  if (Object.keys(doesDocumentExist.detail).length !== 0) {
+  if (doesDocumentExist.detail.id.length !== 0) {
     databaseConnection.close();
     return doesDocumentExist; /// document exists, return it
   }
 
   if (!query.username)
-    query.username = createUsername(email);
+    query.username = createUsername(query.email);
 
   try {
-    const { id: stripeId } = await stripe.customers.create({ email });
+    // const { id: stripeId } = await stripe.customers.create({ email });
 
     const createDocument = await r
       .table(databaseName)
       .insert({
         ...documentDefaults,
         ...query,
-        stripeId,
+        // stripeId,
         created: new Date(),
         updated: new Date()
       })
@@ -90,12 +87,8 @@ export default async(suppliedData: CustomerCreate) => {
 
     if (createDocument.inserted !== 1) {
       databaseConnection.close();
-
-      console.group("Error creating customer");
-      console.error(query);
-      console.groupEnd();
-
-      return { detail: {}};
+      errorLogger(query, "Error creating customer");
+      return emptyResponse;
     }
 
     let createdDocument = await r.table(databaseName)
@@ -108,12 +101,8 @@ export default async(suppliedData: CustomerCreate) => {
     return { detail: createdDocument };
   } catch(error) {
     databaseConnection.close();
-
-    console.group("Exception caught while creating customer");
-    console.error(error);
-    console.groupEnd();
-
-    return { detail: {}};
+    errorLogger(query, "Error creating customer");
+    return emptyResponse;
   }
 };
 

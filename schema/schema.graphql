@@ -23,7 +23,6 @@ scalar Decimal
 # import LoginInput from "access.graphql"
 # import LoginResponse from "access.graphql"
 # import TokenInput from "access.graphql"
-# import TokenResponse from "access.graphql"
 
 # import OrderInput from "order.graphql"
 # import OrderQuery from "order.graphql"
@@ -88,7 +87,7 @@ type Mutation {
   Authentication mutations
   """
   login(options: LoginInput): LoginResponse
-  # refreshToken(options: TokenInput): TokenResponse
+  verify(options: TokenInput): SessionResponse
   """
   Customer mutations
   """

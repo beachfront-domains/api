@@ -26,22 +26,11 @@ const databaseName = "session";
 
 export async function get(input: SessionRequest): Promise<{ detail: Session }> {
   const databaseConnection = await r.connect(databaseOptions);
-  const { options } = input;
+  const { options: { id }} = input;
   const query: LooseObject = {};
 
-  Object.entries(options).forEach(([key, value]) => {
-    switch(key) {
-      case "id":
-        query[key] = String(value);
-        break;
-
-      default:
-        break;
-    }
-  });
-
   let response: any = await r.table(databaseName)
-    .filter({ id: query.id })
+    .filter({ id: String(id) })
     .limit(1)
     .run(databaseConnection);
 

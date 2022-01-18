@@ -37,6 +37,7 @@ export interface SessionRequest {
 export interface SessionUpdate {
   changes: {
     cart: __CartItem[];
+    customer?: string; /// ID
   }
   options: {
     id: string;

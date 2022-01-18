@@ -94,8 +94,14 @@ server
     if (type === "mutation" && !token) {
       console.error("No token");
 
-      if (name && name.toLowerCase() !== "login")
-        return send(res, 200, null);
+      switch(true) {
+        case name && name.toLowerCase() === "login":
+        case name && name.toLowerCase() === "verify":
+          break;
+
+        default:
+          return send(res, 200, {});
+      }
     }
 
     console.log(">>> query");

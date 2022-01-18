@@ -88,6 +88,9 @@ const registryClient = createClient({
 ///  E X P O R T
 
 export default async(suppliedData: SearchRequest) => {
+  console.log(">>> suppliedData");
+  console.log(suppliedData);
+
   const { options } = suppliedData;
 
   if (!options.name || options.name === "null") {

@@ -51,7 +51,10 @@ import {
   update as updateSession
 } from "~service/session/index";
 
-import { welcome as login } from "~service/access/index";
+import {
+  welcome as login,
+  verify
+} from "~service/access/index";
 
 
 
@@ -63,6 +66,7 @@ export default {
 
   /// access
   login,
+  verify,
 
   /// customer
   createCustomer,

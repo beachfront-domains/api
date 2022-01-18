@@ -3,33 +3,20 @@
 
 ///  I M P O R T
 
-import * as crypto from "crypto";
-import * as jose from "jose";
 import env from "vne";
 import mail from "@sendgrid/mail";
-
-import base64url from "base64url";
-import ed25519 from "ed25519";
+import validateEmail from "@webb/validate-email";
 
 ///  U T I L
 
 import { getCustomer } from "~service/customer/index";
-import { eddsa, environment, LooseObject } from "~util/index";
-const { dev, key, prod, sendgrid } = env();
+import { /*eddsa,*/ environment, LooseObject } from "~util/index";
+import { sign } from "~util/jsonwebtoken/index";
+const { dev, key: { encryption }, prod, sendgrid } = env();
 
 type LoginRequest = {
   options: {
     email: string;
-  }
-};
-
-type SendGridError = {
-  code: number;
-  response: {
-    headers: LooseObject;
-    body: {
-      errors: string[]
-    }
   }
 };
 
@@ -40,20 +27,19 @@ type SendGridError = {
 export default async(input: LoginRequest, context: LooseObject|null) => {
   const api = environment === "development" ? dev.api : prod.api;
   const app = environment === "development" ? dev.app : prod.app;
-  const { options : { email } = { email: "" }} = input;
-  const secretKey = key.encryption;
+  const { options: { email }} = input;
   let newCustomer = false;
 
-  if (email.length === 0)
+  if (!validateEmail(email))
     return {};
 
   const payload = {
     aud: app, /// audience
-    exp: new Date(new Date().getTime() + 30 * 60000), /// expires 30 minutes from now
+    exp: new Date().getTime() + 30 * 60000, /// expires 30 minutes from now
     iat: new Date().getTime(), /// issued at
     iss: api, /// issuer
-    nbf: new Date().getTime(), /// not before
-    sub: email /// subject
+    // nbf: new Date().getTime(), /// not before /// TODO: what did i do wrong?
+    sub: email.toLowerCase() /// subject
   };
 
   const doesDocumentExist = await getCustomer({ options: { email }});
@@ -63,7 +49,8 @@ export default async(input: LoginRequest, context: LooseObject|null) => {
     newCustomer = true;
   }
 
-  const jwt = btoa(eddsa(payload, secretKey));
+  const jwt = btoa(sign(payload, encryption));
+  // const jwt = btoa(eddsa(payload, encryption));
   /// $beachfront/type/token / type enums: access | verify
   const link = `${app}/access/${jwt}`;
 

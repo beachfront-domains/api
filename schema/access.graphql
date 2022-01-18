@@ -5,21 +5,13 @@
 # Type
 ######
 
-type TokenInput {
-  token: String
-}
-
 type LoginLink {
   link: String
+  newCustomer: Boolean
 }
 
 type LoginResponse {
   detail: LoginLink
-  newCustomer: Boolean
-}
-
-type TokenResponse {
-  detail: TokenInput
 }
 
 
@@ -31,4 +23,8 @@ type TokenResponse {
 input LoginInput {
   email: String!
   totp: String
+}
+
+input TokenInput {
+  token: String!
 }

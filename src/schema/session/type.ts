@@ -1,11 +1,17 @@
 
 
 
+///  U T I L
+
+import type { Customer } from "../customer";
+
+
+
 ///  E X P O R T
 
 export type Session = {
   cart: string[];
-  customer: string; /// ID of customer
+  customer: Customer;
   ///
   created: string;
   id: string;

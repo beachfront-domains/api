@@ -20,25 +20,14 @@ const databaseName = "session";
 
 export default async(input: SessionRequest) => {
   const databaseConnection = await r.connect(databaseOptions);
-  const { options } = input;
+  const { options: { id }} = input;
   const query: LooseObject = {};
 
   // TODO
   // : ensure that customer does not own any domains before deletion
   // : return false/abort otherwise
 
-  Object.entries(options).forEach(([key, value]) => {
-    switch(key) {
-      case "id":
-        query[key] = String(value);
-        break;
-
-      default:
-        break;
-    }
-  });
-
-  const doesDocumentExist = await getSession({ options: { id: query.id }});
+  const doesDocumentExist = await getSession({ options: { id: String(id) }});
 
   if (Object.keys(doesDocumentExist.detail).length === 0) {
     databaseConnection.close();

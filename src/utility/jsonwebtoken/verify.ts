@@ -10,15 +10,17 @@ import jws from "jws";
 import decode from "./decode";
 import { timespan } from "./utility";
 
+const HS_ALGS = ["HS256", "HS384", "HS512"];
 const PUB_KEY_ALGS = ["RS256", "RS384", "RS512", "ES256", "ES384", "ES512"];
 const RSA_KEY_ALGS = ["RS256", "RS384", "RS512"];
-const HS_ALGS = ["HS256", "HS384", "HS512"];
 
 
 
 ///  E X P O R T
 
 export default (jwtString, secretOrPublicKey, options?, callback?) => {
+  let debug = true;
+
   if ((typeof options === "function") && !callback) {
     callback = options;
     options = {};
@@ -43,38 +45,47 @@ export default (jwtString, secretOrPublicKey, options?, callback?) => {
     };
   }
 
-  if (options.clockTimestamp && typeof options.clockTimestamp !== "number")
-    return done(console.error(`"clockTimestamp" must be a number`));
+  if (options.nonce !== undefined && (typeof options.nonce !== "string" || options.nonce.trim() === "")) {
+    debug && console.error("Nonce must be a non-empty string");
+    return done(false);
+  }
 
-  if (options.nonce !== undefined && (typeof options.nonce !== "string" || options.nonce.trim() === ""))
-    return done(console.error("Nonce must be a non-empty string"));
+  if (!jwtString) {
+    debug && console.error("JWT must be provided");
+    return done(false);
+  }
 
-  if (!jwtString)
-    return done(console.error("JWT must be provided"));
-
-  if (typeof jwtString !== "string")
-    return done(console.error("JWT must be a string"));
+  if (typeof jwtString !== "string") {
+    debug && console.error("JWT must be a string");
+    return done(false);
+  }
 
   const parts = jwtString.split(".");
 
-  if (parts.length !== 3)
-    return done(console.error("JWT malformed"));
+  if (parts.length !== 3) {
+    debug && console.error("JWT malformed");
+    return done(false);
+  }
 
-  const clockTimestamp = options.clockTimestamp || Math.floor(Date.now() / 1000);
+  // const clockTimestamp = options.clockTimestamp || Math.floor(Date.now() / 1000);
+  const clockTimestamp = Date.now();
   let decodedToken;
 
   try {
     decodedToken = decode(jwtString, { complete: true });
   } catch(error) {
-    return done(console.error("Invalid token"));
+    debug && console.error("Invalid token");
+    return done(false);
   }
 
   const { header, payload, signature } = decodedToken;
   let getSecret;
 
   if (typeof secretOrPublicKey === "function") {
-    if (!callback)
-      return done(console.error(`"verify" must be called asynchronously if secret/public key is provided as a callback`));
+    if (!callback) {
+      debug && console.error(`"verify" must be called asynchronously if secret/public key is provided as a callback`);
+      return done(false);
+    }
 
     getSecret = secretOrPublicKey;
   } else {
@@ -82,16 +93,22 @@ export default (jwtString, secretOrPublicKey, options?, callback?) => {
   }
 
   return getSecret(header, (err, secretOrPublicKey) => {
-    if (err)
-      return done(console.error(`Error in secret/public key callback: ${err.message}`));
+    if (err) {
+      debug && console.error(`Error in secret/public key callback: ${err.message}`);
+      return done(false);
+    }
 
     const hasSignature = parts[2].trim() !== "";
 
-    if (!hasSignature && secretOrPublicKey)
-      return done(console.error("JWT signature is required"));
+    if (!hasSignature && secretOrPublicKey) {
+      debug && console.error("JWT signature is required");
+      return done(false);
+    }
 
-    if (hasSignature && !secretOrPublicKey)
-      return done(console.error("Missing secret/public key"));
+    if (hasSignature && !secretOrPublicKey) {
+      debug && console.error("Missing secret/public key");
+      return done(false);
+    }
 
     if (!hasSignature && !options.algorithms)
       options.algorithms = ["none"];
@@ -102,34 +119,47 @@ export default (jwtString, secretOrPublicKey, options?, callback?) => {
         secretOrPublicKey.toString().includes("BEGIN RSA PUBLIC KEY") ? RSA_KEY_ALGS : HS_ALGS;
     }
 
-    if (!~options.algorithms.indexOf(header.alg))
-      return done(console.error("Invalid algorithm"));
+    if (!~options.algorithms.indexOf(header.alg)) {
+      debug && console.error("Invalid algorithm");
+      return done(false);
+    }
 
     let valid;
 
     try {
       valid = jws.verify(jwtString, header.alg, secretOrPublicKey);
     } catch(error) {
-      return done(console.error("Invalid signature"));
+      debug && console.error("Invalid signature");
+      return done(false);
     } finally {
-      if (!valid)
-        return done(console.error("Invalid signature"));
+      if (!valid) {
+        debug && console.error("Invalid signature");
+        return done(false);
+      }
     }
 
     if (typeof payload.nbf !== "undefined" && !options.ignoreNotBefore) {
-      if (typeof payload.nbf !== "number")
-        return done(console.error(`Invalid "nbf" value`));
+      if (typeof payload.nbf !== "number") {
+        debug && console.error(`Invalid "nbf" value`);
+        return done(false);
+      }
 
-      if (payload.nbf > clockTimestamp + (options.clockTolerance || 0))
-        return done(console.error("JWT not active", new Date(payload.nbf * 1000)));
+      if (payload.nbf > clockTimestamp + (options.clockTolerance || 0)) {
+        debug && console.error("JWT not active", new Date(payload.nbf * 1000));
+        return done(false);
+      }
     }
 
     if (typeof payload.exp !== "undefined" && !options.ignoreExpiration) {
-      if (typeof payload.exp !== "number")
-        return done(console.error(`Invalid "exp" value`));
+      if (typeof payload.exp !== "number") {
+        debug && console.error(`Invalid "exp" value`);
+        return done(false);
+      }
 
-      if (clockTimestamp >= payload.exp + (options.clockTolerance || 0))
-        return done(console.error("JWT expired", new Date(payload.exp * 1000)));
+      if (clockTimestamp >= payload.exp + (options.clockTolerance || 0)) {
+        debug && console.error("JWT expired", new Date(payload.exp * 1000));
+        return done(false);
+      }
     }
 
     if (options.audience) {
@@ -142,8 +172,10 @@ export default (jwtString, secretOrPublicKey, options?, callback?) => {
         });
       });
 
-      if (!match)
-        return done(console.error(`JWT "audience" invalid. Expected: ${audiences.join(" or ")}`));
+      if (!match) {
+        debug && console.error(`JWT "audience" invalid. Expected: ${audiences.join(" or ")}`);
+        return done(false);
+      }
     }
 
     if (options.issuer) {
@@ -151,36 +183,50 @@ export default (jwtString, secretOrPublicKey, options?, callback?) => {
         (typeof options.issuer === "string" && payload.iss !== options.issuer) ||
         (Array.isArray(options.issuer) && options.issuer.indexOf(payload.iss) === -1);
 
-      if (invalidIssuer)
-        return done(console.error(`JWT "issuer" invalid. Expected: ${options.issuer}`));
+      if (invalidIssuer) {
+        debug && console.error(`JWT "issuer" invalid. Expected: ${options.issuer}`);
+        return done(false);
+      }
     }
 
     if (options.subject) {
-      if (payload.sub !== options.subject)
-        return done(console.error(`JWT "subject" invalid. Expected: ${options.subject}`));
+      if (payload.sub !== options.subject) {
+        debug && console.error(`JWT "subject" invalid. Expected: ${options.subject}`);
+        return done(false);
+      }
     }
 
     if (options.jwtid) {
-      if (payload.jti !== options.jwtid)
-        return done(console.error(`JWT "jwtid" invalid. Expected: ${options.jwtid}`));
+      if (payload.jti !== options.jwtid) {
+        debug && console.error(`JWT "jwtid" invalid. Expected: ${options.jwtid}`);
+        return done(false);
+      }
     }
 
     if (options.nonce) {
-      if (payload.nonce !== options.nonce)
-        return done(console.error(`JWT "nonce" invalid. Expected: ${options.nonce}`));
+      if (payload.nonce !== options.nonce) {
+        debug && console.error(`JWT "nonce" invalid. Expected: ${options.nonce}`);
+        return done(false);
+      }
     }
 
     if (options.maxAge) {
-      if (typeof payload.iat !== "number")
-        return done(console.error(`"iat" required when "maxAge" is specified`));
+      if (typeof payload.iat !== "number") {
+        debug && console.error(`"iat" required when "maxAge" is specified`);
+        return done(false);
+      }
 
       const maxAgeTimestamp = timespan(options.maxAge, payload.iat);
 
-      if (typeof maxAgeTimestamp === "undefined")
-        return done(console.error(`"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60`));
+      if (typeof maxAgeTimestamp === "undefined") {
+        debug && console.error(`"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60`);
+        return done(false);
+      }
 
-      if (clockTimestamp >= maxAgeTimestamp + (options.clockTolerance || 0))
-        return done(console.error(`"maxAge" exceeded ${new Date(maxAgeTimestamp * 1000)}`));
+      if (clockTimestamp >= maxAgeTimestamp + (options.clockTolerance || 0)) {
+        debug && console.error(`"maxAge" exceeded ${new Date(maxAgeTimestamp * 1000)}`);
+        return done(false);
+      }
     }
 
     if (options.complete === true) {

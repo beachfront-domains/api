@@ -23,21 +23,19 @@ const emptyResponse = { detail: { id: "" }};
 ///  E X P O R T
 
 export default async(input: SessionUpdate) => {
-  const { changes, options } = input;
-
-  if (!changes || !options)
-    return emptyResponse;
-
+  const { changes, options: { id }} = input;
   const databaseConnection = await r.connect(databaseOptions);
   const dataSet: LooseObject = {};
-  const locateQuery: LooseObject = {};
   const query: LooseObject = {};
 
   Object.entries(changes).forEach(([key, value]) => {
     switch(key) {
       case "cart":
-        // query[key] = [...new Set(value)]; // TODO: focus on `name` to better eliminate duplicates
-        query[key] = value; // TS2769: No overload matches this call.
+        query[key] = [...new Set(value as any[])]; /// eliminate duplicates
+        break;
+
+      case "customer":
+        query[key] = String(value);
         break;
 
       default:
@@ -45,18 +43,10 @@ export default async(input: SessionUpdate) => {
     }
   });
 
-  Object.entries(options).forEach(([key, value]) => {
-    switch(key) {
-      case "id":
-        locateQuery[key] = String(value);
-        break;
+  // TODO
+  // : check customer key for validity? or perform check(s) at auth layer?
 
-      default:
-        break;
-    }
-  });
-
-  const documentExistenceQuery = await get({ options: { id: locateQuery.id }});
+  const documentExistenceQuery = await get({ options: { id: String(id) }});
 
   if (Object.keys(documentExistenceQuery.detail).length === 0) {
     databaseConnection.close();
@@ -65,7 +55,15 @@ export default async(input: SessionUpdate) => {
   }
 
   const documentToUpdate = documentExistenceQuery.detail;
-  dataSet.cart = query.cart; // all we care about is the cart
+
+  if (!documentToUpdate.customer && query.customer) {
+    /// We only update with the customer parameter if this session
+    /// did not already have one. Case: someone adds domains to
+    /// cart but is not logged in until later.
+    dataSet.customer = query.customer;
+  }
+
+  dataSet.cart = query.cart;
 
   const finalObject = {
     ...dataSet,
