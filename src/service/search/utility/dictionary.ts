@@ -3,8 +3,8 @@
 
 ///  I M P O R T
 
+import axios from "axios";
 import cheerio from "cheerio";
-import got from "got";
 
 
 
@@ -14,12 +14,12 @@ export default async(suppliedWord: string): Promise<boolean> => {
   let isWord: boolean = false;
 
   try {
-    const response = await got(`https://www.dictionary.com/browse/${encodeURIComponent(String(suppliedWord))}`);
+    const response = await axios.get(`https://www.dictionary.com/browse/${encodeURIComponent(String(suppliedWord))}`);
 
-    if (response.statusCode !== 200)
+    if (response.status !== 200)
       return false;
 
-    const $ = cheerio.load(response.body, { normalizeWhitespace: true });
+    const $ = cheerio.load(response.data, { normalizeWhitespace: true });
     const word = $("body #top-definitions-section").find("h1").text().trim();
 
     if (word)

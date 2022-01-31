@@ -88,9 +88,6 @@ const registryClient = createClient({
 ///  E X P O R T
 
 export default async(suppliedData: SearchRequest) => {
-  console.log(">>> suppliedData");
-  console.log(suppliedData);
-
   const { options } = suppliedData;
 
   if (!options.name || options.name === "null") {
@@ -125,6 +122,7 @@ export default async(suppliedData: SearchRequest) => {
   // : test for "pagination" and "variables" existence
   // : maybe only look for "name" since we punycode the input _anyway_...no need for "unicode"
   // : if domain is reserved, require code to purchase
+  // : ignore invalid punycode (do this on Neuenet's API)
 
   // const { variables } = suppliedData;
 
@@ -206,21 +204,25 @@ export default async(suppliedData: SearchRequest) => {
     /// NO VWLS
     if (removeVowels(query.name).length > 3) {
       const domainSansVowels = `${removeVowels(query.name)}.${query.extension}`;
-      const searchResult = await __findDomain(domainSansVowels);
 
-      if (searchResult) {
-        const { available, created, duration, premium, price } = searchResult;
+      /// Customer search may already lack vowels...no need to run this function if so
+      if (punycode.toUnicode(domainSansVowels) !== punycode.toUnicode(domain)) {
+        const searchResult = await __findDomain(domainSansVowels);
 
-        results.push({
-          ascii: punycode.toAscii(domainSansVowels),
-          available,
-          created,
-          duration,
-          hns: __formatHNS(price, hns),
-          name: punycode.toUnicode(domainSansVowels),
-          premium,
-          price
-        });
+        if (searchResult) {
+          const { available, created, duration, premium, price } = searchResult;
+
+          results.push({
+            ascii: punycode.toAscii(domainSansVowels),
+            available,
+            created,
+            duration,
+            hns: __formatHNS(price, hns),
+            name: punycode.toUnicode(domainSansVowels),
+            premium,
+            price
+          });
+        }
       }
     }
 

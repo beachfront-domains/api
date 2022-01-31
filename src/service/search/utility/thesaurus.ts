@@ -3,7 +3,7 @@
 
 ///  I M P O R T
 
-import got from "got";
+import axios from "axios";
 
 ///  U T I L
 
@@ -12,26 +12,6 @@ import { LooseObject, thesaurusKey } from "~util/index";
 interface FunctionResponse {
   antonyms: string[];
   synonyms: string[];
-}
-
-interface APIResponse {
-  def: Array<LooseObject[]>,
-  fl: string,
-  hwi: {
-    hw: string
-  },
-  meta: {
-    ants: string[],
-    id: string,
-    offensive: boolean,
-    section: string,
-    src: string,
-    stems: string[],
-    syns: string[],
-    target: LooseObject[],
-    uuid: string
-  },
-  shortdef: string[]
 }
 
 
@@ -44,16 +24,16 @@ export default async(suppliedWord: string): Promise<FunctionResponse> => {
   let synonyms: any = [];
 
   try {
-    let response: APIResponse[] = await got(`https://www.dictionaryapi.com/api/v3/references/thesaurus/json/${encodeURIComponent(String(suppliedWord))}?key=${thesaurusKey}`).json();
+    const { data } = await axios.get(`https://www.dictionaryapi.com/api/v3/references/thesaurus/json/${encodeURIComponent(String(suppliedWord))}?key=${thesaurusKey}`);
 
-    if (!response || !response[0] || !response[0].meta) {
+    if (!data || !data[0] || !data[0].meta) {
       return {
         antonyms,
         synonyms
       };
     }
 
-    const words = response[0].meta;
+    const words = data[0].meta;
     const { ants, syns } = words;
 
     antonyms = [...new Set(ants.flat())].sort();

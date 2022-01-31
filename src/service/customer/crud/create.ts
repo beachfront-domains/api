@@ -27,7 +27,7 @@ const documentDefaults = {
   name: "Anon Mous",
   role: "customer",
   staff: false,
-  timezone: "GMT-06:00",
+  timezone: "-08:00",
   /// username
   verified: false
 };

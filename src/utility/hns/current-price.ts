@@ -3,7 +3,7 @@
 
 ///  I M P O R T
 
-import got from "got";
+import axios from "axios";
 
 ///  U T I L
 
@@ -18,14 +18,15 @@ export default async(): Promise<number> => {
   let value = 0;
 
   try {
-    const body: LooseObject = await got("https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=HNS&convert=USD", {
+    const { data } = await axios.get("https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=HNS&convert=USD", {
       headers: { "X-CMC_PRO_API_KEY": coinmarketcapKey }
-    }).json();
+    });
 
-    value = body?.data?.HNS?.quote?.USD?.price || 0;
+    value = data?.data?.HNS?.quote?.USD?.price || 0;
   } catch(error) {
-    // console.error(error.toString());
-    // console.error("<<<");
+    console.group("[module] utility/hns/current-price");
+    console.error((error as any).toString());
+    console.groupEnd();
     value = 0;
   } finally {
     return value;
