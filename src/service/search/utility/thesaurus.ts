@@ -19,7 +19,7 @@ interface FunctionResponse {
 ///  E X P O R T
 
 export default async(suppliedWord: string): Promise<FunctionResponse> => {
-  const unwantedCharactersRegex = /\s|-|\./g;
+  const unwantedCharactersRegex = /[^\s-\.]/g;
   let antonyms: any = [];
   let synonyms: any = [];
 
@@ -51,7 +51,7 @@ export default async(suppliedWord: string): Promise<FunctionResponse> => {
         return word;
       else
         return "";
-    }).filter((word: string) => word); /// Remove empty string
+    }).filter((word: string) => word); /// Remove empty strings
   } catch(error) {
     /// IGNORE
     /// Probably not a dictionary word

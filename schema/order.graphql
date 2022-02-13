@@ -14,8 +14,14 @@ enum OrderType {
 }
 
 enum PaymentType {
+  """
+  Change to WIRE or BANK"
+  """
   ACH
   BTC
+  """
+  Change to FIAT or CREDITCARD
+  """
   CC
   HNS
 }
@@ -34,6 +40,10 @@ type Order {
   promo: String
   success: Boolean
   type: OrderType
+  """
+  Normalize to all caps (OPENNODE, SQUARE, &c)
+  """
+  vendor: String
   #
   created: DateTime!
   id: ID!
