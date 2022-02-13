@@ -3,6 +3,7 @@
 
 ///  I M P O R T
 
+import dedent from "dedent";
 import env from "vne";
 import mail from "@sendgrid/mail";
 import validateEmail from "@webb/validate-email";
@@ -54,10 +55,25 @@ export default async(input: LoginRequest, context: LooseObject|null) => {
   /// $beachfront/type/token / type enums: access | verify
   const link = `${app}/access/${jwt}`;
 
+  const body = dedent`
+    <p>Here is your login token, conveniently in <a href="${link}" title="login link for beachfront/">link form</a> for beachfront/.</p>
+
+    <p>If you prefer to copy/paste the link instead:<br/>
+      <code>
+        <pre>${link.replace("http://", "").replace("https://", "")}</pre>
+      </code>
+    </p>
+
+    <p>Your link will expire 30 minutes from now.</p>
+  `;
+
   const message = {
-    from: "info@beachfront.domains",
-    html: `<h1>Welcome</h1><p>Here is your <a href="${link}" title="login link for beachfront/">login link</a> for beachfront/.<br/><code>${link}</code></p>`,
-    subject: "Your beachfront/ login token",
+    from: {
+      email: "info@beachfront.domains",
+      name: "beachfront / auth"
+    },
+    html: richEmail({ body, title: "「 beachfront/ 」Your login token" }),
+    subject: "「 beachfront/ 」Your login token",
     text: `Welcome!\n\nHere is your login link for beachfront/.\n${link}`,
     to: email
   };
@@ -81,6 +97,89 @@ export default async(input: LoginRequest, context: LooseObject|null) => {
     };
   }
 };
+
+
+
+///  H E L P E R
+
+function richEmail(input) {
+  const { body, title } = input;
+
+  return dedent`
+    <html lang="en">
+      <head>
+        <title>${title}</title>
+        <style type="text/css">
+          *, *::before, *::after {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+          }
+
+          html {
+            font-family: -system-ui, system-ui, sans-serif;
+            font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "cv10" 1;
+            font-size: 12px;
+            font-variant-ligatures: contextual common-ligatures;
+            letter-spacing: -0.01rem;
+            line-height: 1.33;
+          }
+
+          body {
+            padding: 2rem;
+          }
+
+          h1 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+          }
+
+          p {
+            font-size: 1.25rem;
+          }
+
+          p:not(:last-of-type) {
+            margin-bottom: 1rem;
+          }
+
+          a {
+            color: #4dabf7;
+          }
+
+          a:visited {
+            color: #9775fa;
+          }
+
+          code,
+          pre {
+            font-family: monospace;
+            font-variant-numeric: slashed-zero;
+            font-weight: 430;
+            white-space: normal;
+            word-wrap: normal;
+            /* white-space: pre-wrap; */
+            /* word-wrap: break-word; */
+          }
+
+          code a {
+            color: #228be6;
+          }
+
+          pre {
+            background-color: #eee;
+            display: block;
+            padding: 0.5rem 0.75rem;
+            /* overflow-x: auto; */
+            /* white-space: pre; */
+          }
+        </style>
+      </head>
+
+      <body>
+        ${body}
+      </body>
+    </html>
+  `;
+}
 
 /*
   TODO
