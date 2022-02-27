@@ -1,0 +1,101 @@
+# import Customer from "customer.graphql"
+# import CustomerInput from "customer.graphql"
+# import Pagination from "pagination.graphql"
+
+
+
+######
+# Enum
+######
+
+enum PaymentMethodSymbol {
+  BTC
+  HNS
+}
+
+enum PaymentMethodKind {
+  CRYPTOCURRENCY
+  FIAT
+}
+
+enum PaymentMethodVendor {
+  OPENNODE
+  SQUARE
+}
+
+
+
+######
+# Type
+######
+
+type PaymentMethod {
+  """
+  Wallet address
+  """
+  address: String
+  customer: Customer
+  kind: PaymentMethodKind
+
+  """
+  Last four digits of credit card
+  """
+  suffix: Number
+
+  """
+  Cryptocurrency abbreviation
+  """
+  symbol: PaymentMethodSymbol
+  vendor: PaymentMethodVendor
+
+  """
+  ID of payment method in vendor system
+  """
+  vendorId: string
+  #
+  created: DateTime!
+  id: ID!
+  updated: DateTime!
+}
+
+type PaymentMethodResponse {
+  detail: PaymentMethod
+}
+
+type PaymentMethodsResponse {
+  detail: [PaymentMethod]
+  pageInfo: Pagination
+}
+
+
+
+#######
+# Input
+#######
+
+input PaymentMethodInput {
+  address: String
+  customer: CustomerInput
+  kind: PaymentMethodKind
+  suffix: Number
+  symbol: PaymentMethodSymbol
+  vendor: PaymentMethodVendor
+  vendorId: string
+  # no created
+  # no id
+  # no updated
+}
+
+input PaymentMethodQuery {
+  customer: CustomerInput
+  id: ID
+}
+
+input OrdersQuery {
+  customer: CustomerInput
+  kind: PaymentMethodKind
+}
+
+ 
+
+### be sure to keep this file in sync with `src/schema/payment/type.ts`
