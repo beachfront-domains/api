@@ -106,5 +106,5 @@
     "--test:coverage": "nyc npm run test:assert",
     "--watch": "tsc --watch"
   },
-  "version": "2022.02.27"
+  "version": "2022.03.06"
 }

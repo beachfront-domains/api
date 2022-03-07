@@ -34,6 +34,7 @@ import {
 import type {
   // Domain,
   // Extension,
+  Customer,
   PaginationArgument,
   SearchRequest,
   SearchResult
@@ -87,8 +88,12 @@ const registryClient = createClient({
 
 ///  E X P O R T
 
-export default async(suppliedData: SearchRequest) => {
-  const { options } = suppliedData;
+export default async(data: SearchRequest, context: Customer|void) => {
+  console.log(">>> data");
+  console.log(data);
+  console.log(context);
+
+  const { options } = data;
 
   if (!options.name || options.name === "null") {
     // console.log("TODO: beachfront app autosends a blank response");
@@ -101,8 +106,8 @@ export default async(suppliedData: SearchRequest) => {
   // if (domainQuery.match(regexDomain))
   //   searchQueryStore.set(domainQuery);
 
-  // console.log(">>> suppliedData");
-  // console.log(suppliedData);
+  // console.log(">>> data");
+  // console.log(data);
 
   // TODO
   // : clean input
@@ -124,7 +129,7 @@ export default async(suppliedData: SearchRequest) => {
   // : if domain is reserved, require code to purchase
   // : ignore invalid punycode (do this on Neuenet's API)
 
-  // const { variables } = suppliedData;
+  // const { variables } = data;
 
   Object.entries(options).forEach(([key, value]) => {
     query[key] = value;

@@ -41,6 +41,14 @@ import {
   update as updateOrder
 } from "~service/order/index";
 
+import {
+  create as createPaymentMethod,
+  del as deletePaymentMethod,
+  getPaymentMethod as paymentMethod,
+  getPaymentMethods as paymentMethods,
+  update as updatePaymentMethod
+} from "~service/payment/index";
+
 import { search } from "~service/search/index";
 
 import {
@@ -95,6 +103,13 @@ export default {
   order,
   orders,
   updateOrder,
+
+  /// payment method
+  createPaymentMethod,
+  deletePaymentMethod,
+  paymentMethod,
+  paymentMethods,
+  updatePaymentMethod,
 
   /// search
   search,

@@ -8,32 +8,34 @@ import type { RDatum } from "rethinkdb-ts";
 
 ///  U T I L
 
+import { databaseName, emptyResponse } from "../utility/constant";
 import { databaseOptions } from "~util/index";
 
 import type {
   Customer,
-  CustomerRequest,
-  CustomersRequest
+  PaymentMethod,
+  PaymentMethodRequest,
+  PaymentMethodsRequest
 } from "~schema/index";
 
 import type { LooseObject } from "~util/index";
-
-const databaseName = "customer";
 
 
 
 ///  E X P O R T
 
-export async function get(data: CustomerRequest): Promise<{ detail: Customer }> {
+export async function get(data: PaymentMethodRequest, context: Customer): Promise<{ detail: PaymentMethod }> {
+  if (!context || !context.id)
+    return emptyResponse;
+
   const databaseConnection = await r.connect(databaseOptions);
   const { options } = data;
   const query: LooseObject = {};
 
   Object.entries(options).forEach(([key, value]) => {
     switch(key) {
-      case "email":
       case "id":
-      case "username":
+      case "vendorId":
         query[key] = String(value);
         break;
 
@@ -42,29 +44,32 @@ export async function get(data: CustomerRequest): Promise<{ detail: Customer }> 
     }
   });
 
-  let response: any = await r.table(databaseName)
-    .filter((document: RDatum) => {
-      if (query.username)
-        return document("username").match(`(?i)^${query.username}$`);
-
-      return query;
-    })
+  const arrayResponse: PaymentMethod[] = await r.table(databaseName)
+    .filter(query)
     .limit(1)
     .run(databaseConnection);
 
+  let response: PaymentMethod;
+
   databaseConnection.close();
 
-  if (response && response[0])
-    response = response[0];
-  else
-    response = { id: "" };
+  // console.log(">>> response");
+  // console.log(arrayResponse);
 
-  return {
-    detail: response
-  };
+  if (arrayResponse && arrayResponse[0]) {
+    response = arrayResponse[0];
+
+    /// Ensure payment method customer ID matches context ID
+    if (response.customer !== context.id)
+      return emptyResponse;
+  } else {
+    return emptyResponse;
+  }
+
+  return { detail: response };
 }
 
-export async function getMore(data: Partial<CustomersRequest>) {
+export async function getMore(data: Partial<PaymentMethodsRequest>) {
   const databaseConnection = await r.connect(databaseOptions);
   const { options, pagination } = data;
 
@@ -99,16 +104,24 @@ export async function getMore(data: Partial<CustomersRequest>) {
     new Date(pageInfo.after);
   //
 
+  // TODO
+  // : the above pagination is based on posts and dates...not applicable to what we are doing here
+  // : ignore pagination for now, get options working
+
+  // customer: string; /// customer ID
+  // kind: PaymentMethodKind;
+  // vendor: PaymentMethodVendor;
+
   const response = await r.table(databaseName)
     .filter(options)
-    .orderBy(r.asc("created"))
+    .orderBy(r.asc("updated"))
     .limit(limit)
     .run(databaseConnection);
 
   databaseConnection.close();
 
   const cursor = response.length > 0 ?
-    response.slice(-1)[0].created :
+    response.slice(-1)[0].name :
     null;
 
   return {

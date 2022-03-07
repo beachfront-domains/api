@@ -22,6 +22,11 @@ enum Role {
 # Type
 ######
 
+type IDs {
+  opennode: ID
+  square: ID
+}
+
 type Customer {
   email: String
   loginMethod: LoginMethod
@@ -36,8 +41,11 @@ type Customer {
   Default value is `false`.
   """
   staff: Boolean
-  stripeId: ID
   timezone: String
+  """
+  IDs of this customer within third-party services
+  """
+  tps: IDs
   username: String
   verified: Boolean
   #

@@ -21,11 +21,9 @@ const header = {
 
 export default (payload: LooseObject|string, privateKey: string) => {
   const privateKeySignature = ed25519.MakeKeypair(Buffer.from(privateKey, "base64"));
-  const body = base64url.encode(
-    JSON.stringify(header)) +
+  const body = base64url.encode(JSON.stringify(header)) +
     "." +
-    base64url.encode(JSON.stringify(payload)
-  );
+    base64url.encode(JSON.stringify(payload));
   const signature = ed25519.Sign(Buffer.from(body), privateKeySignature);
 
   return `${body}.${base64url.encode(signature)}`;

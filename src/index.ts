@@ -18,8 +18,9 @@ import send from "@polka/send-type";
 ///  U T I L
 
 import { apiPort, databaseOptions, environment } from "~util/index";
-import { getCustomers } from "~service/customer";
+import { getCustomer, getCustomers } from "~service/customer";
 import { getExtensions } from "~service/extension";
+import { getSession } from "~service/session";
 import { name, version } from "~root/package.json";
 import resolvers from "~schema/resolver";
 import schema from "~schema/index";
@@ -49,30 +50,33 @@ server
   })
   // @ts-ignore | TS2345
   .post("/", async(req: any, res: any) => {
-    const { headers, session: sess } = req;
-    const { operationName, query, variables } = req.body;
+    const { headers } = req;
+    const { /*operationName,*/ query, variables } = req.body;
 
-    // Auth check on every POST request
+    /// Auth check on every POST request
     const { name, type } = operationStats(query);
     const token = headers.authorization;
+    let customerContext;
 
     if (type === "mutation" && !token) {
-      console.error("No token");
-
       switch(true) {
         case name && name.toLowerCase() === "login":
         case name && name.toLowerCase() === "verify":
           break;
 
         default:
+          console.error("No token");
           return send(res, 200, {});
       }
     }
 
-    console.log(">>> query");
-    console.log(`${type}/${name}\n`);
-    console.log(">>> token");
-    console.log(`${token}\n`);
+    // TODO
+    // : create debug function
+
+    // console.log(">>> query");
+    // console.log(`${type}/${name}\n`);
+    // console.log(">>> token");
+    // console.log(`${token}\n`);
 
     /// REFERENCE
     /// export interface GraphQLArgs {
@@ -86,8 +90,23 @@ server
     ///   typeResolver?: Maybe<GraphQLTypeResolver<any, any>>;
     /// }
 
+    if (token) {
+      const cleanedToken = String(token).split(" ")[1].trim();
+      const sessionId = atob(cleanedToken);
+
+      // TODO
+      // : add "expires" parameter to sessions
+      // : add expiration check to this function
+
+      const { detail: { customer }} = await getSession({ options: { id: sessionId }});
+      const { detail } = await getCustomer({ options: { id: String(customer) }});
+
+      if (customer && Object.keys(detail).length > 1)
+        customerContext = detail;
+    }
+
     const data = await graphql({
-      contextValue: {}, /// adds customer to context
+      contextValue: customerContext,
       rootValue: resolvers,
       schema: buildSchema(schema()),
       source: query,
@@ -142,6 +161,7 @@ async function preFlightChecks() {
     await ensureTable({ name: "domain", index: ["ascii", "extension", "name"], options: databaseOptions });
     await ensureTable({ name: "extension", index: ["ascii", "name"], options: databaseOptions });
     await ensureTable({ name: "order", options: databaseOptions });
+    await ensureTable({ name: "payment", options: databaseOptions });
     await ensureTable({ name: "session", options: databaseOptions });
 
     const adminExists = await getCustomers({ options: { role: "admin" }});

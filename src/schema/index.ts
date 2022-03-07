@@ -16,24 +16,24 @@ import type {
   Customer,
   CustomerCreate,
   CustomerRequest,
-  CustomerUpdate,
-  CustomersRequest
+  CustomersRequest,
+  CustomerUpdate
 } from "./customer/index";
 
 import type {
   Domain,
   DomainCreate,
   DomainRequest,
-  DomainUpdate,
-  DomainsRequest
+  DomainsRequest,
+  DomainUpdate
 } from "./domain/index";
 
 import type {
   Extension,
   ExtensionCreate,
   ExtensionRequest,
-  ExtensionUpdate,
-  ExtensionsRequest
+  ExtensionsRequest,
+  ExtensionUpdate
 } from "./extension/index";
 
 import type {
@@ -50,6 +50,14 @@ import type {
 } from "./pagination/type";
 
 import type {
+  PaymentMethod,
+  PaymentMethodCreate,
+  PaymentMethodRequest,
+  PaymentMethodsRequest,
+  PaymentMethodUpdate
+} from "./payment/index";
+
+import type {
   SearchRequest,
   SearchResult
 } from "./search/index";
@@ -58,8 +66,8 @@ import type {
   Session,
   SessionCreate,
   SessionRequest,
-  SessionUpdate,
-  SessionsRequest
+  SessionsRequest,
+  SessionUpdate
 } from "./session/index";
 
 const theSchema = importSchema(join(process.cwd(), join("schema", "schema.graphql")));
@@ -74,30 +82,35 @@ export type {
   Customer,
   CustomerCreate,
   CustomerRequest,
-  CustomerUpdate,
   CustomersRequest,
+  CustomerUpdate,
   Domain,
   DomainCreate,
   DomainRequest,
-  DomainUpdate,
   DomainsRequest,
+  DomainUpdate,
   Extension,
   ExtensionCreate,
   ExtensionRequest,
-  ExtensionUpdate,
   ExtensionsRequest,
+  ExtensionUpdate,
   Order,
   OrderCreate,
   OrderRequest,
-  OrderUpdate,
   OrdersRequest,
+  OrderUpdate,
   PaginationArgument,
   PaginationResponse,
+  PaymentMethod,
+  PaymentMethodCreate,
+  PaymentMethodRequest,
+  PaymentMethodsRequest,
+  PaymentMethodUpdate,
   SearchRequest,
   SearchResult,
   Session,
   SessionCreate,
   SessionRequest,
-  SessionUpdate,
-  SessionsRequest
+  SessionsRequest,
+  SessionUpdate
 };

@@ -8,11 +8,6 @@
 # Enum
 ######
 
-enum PaymentMethodSymbol {
-  BTC
-  HNS
-}
-
 enum PaymentMethodKind {
   CRYPTOCURRENCY
   FIAT
@@ -30,28 +25,14 @@ enum PaymentMethodVendor {
 ######
 
 type PaymentMethod {
-  """
-  Wallet address
-  """
-  address: String
   customer: Customer
   kind: PaymentMethodKind
-
-  """
-  Last four digits of credit card
-  """
-  suffix: Number
-
-  """
-  Cryptocurrency abbreviation
-  """
-  symbol: PaymentMethodSymbol
+  mask: String
   vendor: PaymentMethodVendor
-
   """
   ID of payment method in vendor system
   """
-  vendorId: string
+  vendorId: ID
   #
   created: DateTime!
   id: ID!
@@ -74,28 +55,27 @@ type PaymentMethodsResponse {
 #######
 
 input PaymentMethodInput {
-  address: String
   customer: CustomerInput
   kind: PaymentMethodKind
-  suffix: Number
-  symbol: PaymentMethodSymbol
+  mask: String
   vendor: PaymentMethodVendor
-  vendorId: string
+  vendorId: ID
   # no created
   # no id
   # no updated
 }
 
 input PaymentMethodQuery {
-  customer: CustomerInput
   id: ID
+  vendorId: ID
 }
 
-input OrdersQuery {
+input PaymentMethodsQuery {
   customer: CustomerInput
   kind: PaymentMethodKind
+  vendor: PaymentMethodVendor
 }
 
- 
+
 
 ### be sure to keep this file in sync with `src/schema/payment/type.ts`

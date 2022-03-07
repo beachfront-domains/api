@@ -32,6 +32,12 @@ scalar Decimal
 
 # import PaginationOptions from "pagination.graphql"
 
+# import PaymentMethodInput from "payment.graphql"
+# import PaymentMethodQuery from "payment.graphql"
+# import PaymentMethodResponse from "payment.graphql"
+# import PaymentMethodsQuery from "payment.graphql"
+# import PaymentMethodsResponse from "payment.graphql"
+
 # import SearchQuery from "search.graphql"
 # import SearchResponse from "search.graphql"
 
@@ -71,6 +77,11 @@ type Query {
   """
   order(options: OrderQuery): OrderResponse
   orders(options: OrdersQuery, pagination: PaginationOptions): OrdersResponse
+  """
+  Payment method queries
+  """
+  paymentMethod(options: PaymentMethodQuery): PaymentMethodResponse
+  paymentMethods(options: PaymentMethodsQuery, pagination: PaginationOptions): PaymentMethodsResponse
   """
   Search queries
   """
@@ -112,6 +123,12 @@ type Mutation {
   createOrder(options: OrderInput): OrderResponse
   deleteOrder(options: OrderQuery): BooleanResponse
   updateOrder(changes: OrderInput, options: OrderQuery): OrderResponse
+  """
+  Payment method mutations
+  """
+  createPaymentMethod(options: PaymentMethodInput): PaymentMethodResponse
+  deletePaymentMethod(options: PaymentMethodQuery): BooleanResponse
+  updatePaymentMethod(changes: PaymentMethodInput, options: PaymentMethodQuery): PaymentMethodResponse
   """
   Session mutations
   """
