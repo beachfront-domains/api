@@ -4,13 +4,14 @@
 ///  I M P O R T
 
 import cwd from "cwd";
-import env from "vne";
+import { Environment } from "square";
+import { vne } from "vne";
 
 ///  U T I L
 
 import { name, version } from "~root/package.json";
 
-const { database, port, server, service, site } = env();
+const { database, port, server, service, site } = vne();
 const isDevelopment = process.env.NODE_ENV && process.env.NODE_ENV === "development";
 
 
@@ -45,4 +46,7 @@ export const registryAPI = isDevelopment ? "http://localhost:5454" : "https://ap
 export const siteEmail = site.email;
 export const siteName = site.name;
 export const siteURL = isDevelopment ? server.dev.app : server.prod.app;
+export const squareApp = isDevelopment ? service.square.sandbox.app : service.square.production.app;
+export const squareEnvironment = isDevelopment ? Environment.Sandbox : Environment.Production;
+export const squareToken = isDevelopment ? service.square.sandbox.token : service.square.production.token;
 export const thesaurusKey = service.thesaurus;

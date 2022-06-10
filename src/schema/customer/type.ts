@@ -9,8 +9,8 @@ export type Customer = {
   name: string;
   role: "admin" | "customer";
   staff: boolean;
-  stripeId: string;
   timezone: string;
+  tps: [];
   username: string;
   verified: boolean;
   ///

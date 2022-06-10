@@ -125,13 +125,13 @@ preFlightChecks();
 function logPrompt() {
   return [
     "\n",
-    `${print.gray(":::")} `,
-    `${print.green("⚡")} `,
-    `${print.bold(print.white(apiPort))} `,
-    `${print.gray("|")} `,
-    `${print.bold(print.white(name))} `,
-    `${print.gray("|")} `,
-    `${print.bold(print.white(environment))}`,
+    print.dim("::: "),
+    "⚡ ",
+    print.bold(apiPort),
+    print.dim(" | "),
+    print.bold(name),
+    print.dim(" | "),
+    print.bold(environment),
     "\n\n"
   ].join("");
 }
@@ -178,3 +178,20 @@ async function preFlightChecks() {
     server.listen(apiPort, process.stdout.write(logPrompt()));
   }
 }
+
+
+
+// https://developer.squareup.com/reference/square/customers-api/create-customer
+// https://developer.squareup.com/explorer/square/customers-api/create-customer
+// https://developer.squareup.com/reference/sdks/web/payments/card-payments
+
+// https://github.com/square/square-nodejs-sdk/blob/master/README.md
+// https://github.com/square/square-nodejs-sdk/blob/master/doc/models/create-customer-request.md
+// https://github.com/square/connect-api-examples/tree/master/connect-examples/v2/node_orders-payments
+// https://github.com/square/connect-api-examples/tree/master/connect-examples/v2/node_payment
+
+// https://developers.opennode.com/docs/creating-a-charge
+// https://developers.opennode.com/docs/charges-webhooks
+
+// https://github.com/opennodedev/opennode-node
+// https://github.com/opennodedev/opennode-node/blob/master/examples/example.js
