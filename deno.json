@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false
+  },
+  "lint": {
+    "files": {
+      "exclude": ["dbschema/"]
+    },
+    "rules": {
+      "exclude": ["no-explicit-any"]
+    }
+  }
+}

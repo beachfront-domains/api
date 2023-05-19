@@ -1,13 +1,7 @@
 
 
 
-///  I M P O R T
-
-import { resolvers } from "graphql-scalars";
-
-///  U T I L
-
-import DecimalScalar from "../graphql/scalar/decimal";
+/// util
 
 import {
   create as createCustomer,
@@ -15,7 +9,7 @@ import {
   getCustomer as customer,
   getCustomers as customers,
   update as updateCustomer
-} from "~service/customer/index";
+} from "../component/customer/index.ts";
 
 import {
   create as createDomain,
@@ -23,7 +17,7 @@ import {
   getDomain as domain,
   getDomains as domains,
   update as updateDomain
-} from "~service/domain/index";
+} from "../component/domain/index.ts";
 
 import {
   create as createExtension,
@@ -31,15 +25,15 @@ import {
   getExtension as extension,
   getExtensions as extensions,
   update as updateExtension
-} from "~service/extension/index";
+} from "../component/extension/index.ts";
 
 import {
-  create as createOrder,
-  del as deleteOrder,
-  getOrder as order,
-  getOrders as orders,
-  update as updateOrder
-} from "~service/order/index";
+  create as createInvoice,
+  del as deleteInvoice,
+  getInvoice as invoice,
+  getInvoices as invoices,
+  update as updateInvoice
+} from "../component/invoice/index.ts";
 
 import {
   create as createPaymentMethod,
@@ -47,9 +41,9 @@ import {
   getPaymentMethod as paymentMethod,
   getPaymentMethods as paymentMethods,
   update as updatePaymentMethod
-} from "~service/payment/index";
+} from "../component/payment/index.ts";
 
-import { search } from "~service/search/index";
+import { search } from "../component/search/index.ts";
 
 import {
   create as createSession,
@@ -57,67 +51,52 @@ import {
   getSession as session,
   getSessions as sessions,
   update as updateSession
-} from "~service/session/index";
+} from "../component/session/index.ts";
 
 import {
   welcome as login,
   verify
-} from "~service/access/index";
+} from "../component/access/index.ts";
 
 
 
-///  E X P O R T
+/// export
 
-export default {
-  ...resolvers,
-  DecimalScalar,
-
-  /// access
-  login,
-  verify,
-
-  /// customer
-  createCustomer,
+export const Query = {
   customer,
   customers,
-  deleteCustomer,
-  updateCustomer,
-
-  /// domain
-  createDomain,
-  deleteDomain,
   domain,
   domains,
-  updateDomain,
-
-  /// extension
-  createExtension,
-  deleteExtension,
   extension,
   extensions,
-  updateExtension,
-
-  /// order
-  createOrder,
-  deleteOrder,
-  order,
-  orders,
-  updateOrder,
-
-  /// payment method
-  createPaymentMethod,
-  deletePaymentMethod,
+  invoice,
+  invoices,
+  login,
   paymentMethod,
   paymentMethods,
-  updatePaymentMethod,
-
-  /// search
   search,
-
-  /// session
-  createSession,
-  deleteSession,
   session,
   sessions,
+  verify
+};
+
+export const Mutation = {
+  createCustomer,
+  createDomain,
+  createExtension,
+  createInvoice,
+  createPaymentMethod,
+  createSession,
+  deleteCustomer,
+  deleteDomain,
+  deleteExtension,
+  deleteInvoice,
+  deletePaymentMethod,
+  deleteSession,
+  updateCustomer,
+  updateDomain,
+  updateExtension,
+  updateInvoice,
+  updatePaymentMethod,
   updateSession
 };

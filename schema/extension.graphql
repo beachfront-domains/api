@@ -10,10 +10,6 @@ type Extension {
   """
   ASCII representation of extension
   """
-  ascii: String
-  """
-  Unicode representation of extension
-  """
   name: String
   """
   Name of registry this extension comes from
@@ -58,11 +54,12 @@ input ExtensionsQuery {
   emoji: Boolean
   idn: Boolean
   length: Int
-  number: Boolean
+  "Boolean | 0: false, 1: true"
+  number: Int
   registry: String
   startsWith: String
 }
 
 
 
-### be sure to keep this file in sync with `src/schema/extension/type.ts`
+### be sure to keep this file in sync with `src/component/extension/schema.ts`

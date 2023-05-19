@@ -1,0 +1,45 @@
+
+
+
+/// import
+
+import { createClient } from "edgedb";
+import e from "dbschema";
+
+/// util
+
+import { databaseOptions } from "./constant.ts";
+
+
+
+/// export
+
+export async function accessControl(ctx) {
+  if (!ctx || !ctx["x-session"])
+    return false;
+
+  const bearerTokenParts = ctx["x-session"].split(" ");
+  let sessionToken = "";
+
+  if (bearerTokenParts.length === 2 && bearerTokenParts[0].toLowerCase() === "bearer")
+    sessionToken = String(bearerTokenParts[1]);
+  else
+    return false;
+
+  const client = createClient(databaseOptions);
+
+  const doesDocumentExist = e.select(e.Key, key => ({
+    ...e.Key["*"],
+    filter_single: e.op(key.id, "=", e.uuid(sessionToken))
+  }));
+
+  const existenceResult = await doesDocumentExist.run(client);
+
+  // TODO
+  // : check `existenceResult.url` to compare/match with `ctx` host/origin/referer
+
+  if (!existenceResult)
+    return false; /// key is nonexistent
+
+  return true;
+}

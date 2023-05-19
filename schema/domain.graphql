@@ -50,9 +50,12 @@ enum DomainStatusCode {
 ######
 
 type Domain {
-  ascii: String
   expiry: DateTime
   extension: String
+  """
+  ASCII representation of domain
+  `sld.extension` format
+  """
   name: String
   owner: Customer
   status: DomainStatusCode
@@ -62,11 +65,11 @@ type Domain {
   updated: DateTime!
 }
 
-type AvailableDomain {
-  premium: Boolean
-  price: Decimal
-  sld: SLD
-}
+# type AvailableDomain {
+#   premium: Boolean
+#   price: Decimal
+#   sld: SLD
+# }
 
 type DomainResponse {
   detail: Domain
@@ -84,7 +87,6 @@ type DomainsResponse {
 #######
 
 input DomainInput {
-  ascii: String
   expiry: DateTime
   extension: ID
   name: String
@@ -105,14 +107,17 @@ input DomainQuery {
 }
 
 input DomainsQuery {
-  emoji: Boolean
-  idn: Boolean
+  "Boolean | 0: false, 1: true"
+  emoji: Int
+  "Boolean | 0: false, 1: true"
+  idn: Int
   length: Int
-  number: Boolean
+  "Boolean | 0: false, 1: true"
+  number: Int
   owner: ID
   startsWith: String
 }
 
 
 
-### be sure to keep this file in sync with `src/schema/domain/type.ts`
+### be sure to keep this file in sync with `src/component/domain/schema.ts`

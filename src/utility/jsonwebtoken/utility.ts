@@ -1,13 +1,13 @@
 
 
 
-///  I M P O R T
+/// import
 
 import ms from "ms";
 
 
 
-///  E X P O R T
+/// export
 
 export function timespan(time, iat) {
   const timestamp = iat || Math.floor(Date.now() / 1000);

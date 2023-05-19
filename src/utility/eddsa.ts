@@ -1,12 +1,12 @@
 
 
 
-///  I M P O R T
+/// import
 
 import base64url from "base64url";
 import ed25519 from "ed25519";
 
-///  U T I L
+/// util
 
 import type { LooseObject } from "./interface";
 
@@ -17,7 +17,7 @@ const header = {
 
 
 
-///  E X P O R T
+/// export
 
 export default (payload: LooseObject|string, privateKey: string) => {
   const privateKeySignature = ed25519.MakeKeypair(Buffer.from(privateKey, "base64"));

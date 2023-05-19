@@ -8,14 +8,9 @@
 # Enum
 ######
 
-enum PaymentMethodKind {
+enum PaymentKind {
   CRYPTOCURRENCY
   FIAT
-}
-
-enum PaymentMethodVendor {
-  OPENNODE
-  SQUARE
 }
 
 
@@ -26,11 +21,15 @@ enum PaymentMethodVendor {
 
 type PaymentMethod {
   customer: Customer
-  kind: PaymentMethodKind
-  mask: String
-  vendor: PaymentMethodVendor
+  kind: PaymentKind
   """
-  ID of payment method in vendor system
+  - if `kind` is FIAT, last 4/5 digits are shown, rest is replaced with `*`
+  - if `kind` is CRYPTOCURRENCY, first/last 5 characters are shown, rest is replaced with `*`
+  """
+  mask: String
+  """
+  Vendor IDs could potentially conflict so the ID should be saved as
+  `<VENDOR>|<UUID>`
   """
   vendorId: ID
   #
@@ -56,9 +55,8 @@ type PaymentMethodsResponse {
 
 input PaymentMethodInput {
   customer: CustomerInput
-  kind: PaymentMethodKind
+  kind: PaymentKind
   mask: String
-  vendor: PaymentMethodVendor
   vendorId: ID
   # no created
   # no id
@@ -72,10 +70,9 @@ input PaymentMethodQuery {
 
 input PaymentMethodsQuery {
   customer: CustomerInput
-  kind: PaymentMethodKind
-  vendor: PaymentMethodVendor
+  kind: PaymentKind
 }
 
 
 
-### be sure to keep this file in sync with `src/schema/payment/type.ts`
+### be sure to keep this file in sync with `src/component/payment/schema.ts`

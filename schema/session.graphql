@@ -9,6 +9,9 @@
 ######
 
 type Cart {
+  """
+  During checkout, contents of cart are validated to ensure availability
+  """
   duration: Int
   name: String
   price: String

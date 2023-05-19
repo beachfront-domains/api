@@ -1,14 +1,14 @@
 
 
 
-///  I M P O R T
+/// import
 
 import jws from "jws";
 
-///  U T I L
+/// util
 
-import decode from "./decode";
-import { timespan } from "./utility";
+import decode from "./decode.ts";
+import { timespan } from "./utility.ts";
 
 const HS_ALGS = ["HS256", "HS384", "HS512"];
 const PUB_KEY_ALGS = ["RS256", "RS384", "RS512", "ES256", "ES384", "ES512"];
@@ -16,7 +16,7 @@ const RSA_KEY_ALGS = ["RS256", "RS384", "RS512"];
 
 
 
-///  E X P O R T
+/// export
 
 export default (jwtString, secretOrPublicKey, options?, callback?) => {
   let debug = true;

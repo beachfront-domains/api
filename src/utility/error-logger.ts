@@ -1,7 +1,7 @@
 
 
 
-///  E X P O R T
+/// export
 
 export default (data: any, description?: string) => {
   if (!description)

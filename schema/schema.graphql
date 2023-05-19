@@ -20,15 +20,15 @@ scalar Decimal
 # import ExtensionsQuery from "extension.graphql"
 # import ExtensionsResponse from "extension.graphql"
 
+# import InvoiceInput from "invoice.graphql"
+# import InvoiceQuery from "invoice.graphql"
+# import InvoiceResponse from "invoice.graphql"
+# import InvoicesQuery from "invoice.graphql"
+# import InvoicesResponse from "invoice.graphql"
+
 # import LoginInput from "access.graphql"
 # import LoginResponse from "access.graphql"
 # import TokenInput from "access.graphql"
-
-# import OrderInput from "order.graphql"
-# import OrderQuery from "order.graphql"
-# import OrderResponse from "order.graphql"
-# import OrdersQuery from "order.graphql"
-# import OrdersResponse from "order.graphql"
 
 # import PaginationOptions from "pagination.graphql"
 
@@ -73,10 +73,10 @@ type Query {
   extension(options: ExtensionQuery): ExtensionResponse
   extensions(options: ExtensionsQuery, pagination: PaginationOptions): ExtensionsResponse
   """
-  Order queries
+  Invoice queries
   """
-  order(options: OrderQuery): OrderResponse
-  orders(options: OrdersQuery, pagination: PaginationOptions): OrdersResponse
+  invoice(options: InvoiceQuery): InvoiceResponse
+  invoices(options: InvoicesQuery, pagination: PaginationOptions): InvoicesResponse
   """
   Payment method queries
   """
@@ -118,11 +118,11 @@ type Mutation {
   deleteExtension(options: ExtensionQuery): BooleanResponse
   updateExtension(changes: ExtensionInput, options: ExtensionQuery): ExtensionResponse
   """
-  Order mutations
+  Invoice mutations
   """
-  createOrder(options: OrderInput): OrderResponse
-  deleteOrder(options: OrderQuery): BooleanResponse
-  updateOrder(changes: OrderInput, options: OrderQuery): OrderResponse
+  createInvoice(options: InvoiceInput): InvoiceResponse
+  deleteInvoice(options: InvoiceQuery): BooleanResponse
+  updateInvoice(changes: InvoiceInput, options: InvoiceQuery): InvoiceResponse
   """
   Payment method mutations
   """

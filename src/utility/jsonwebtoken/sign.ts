@@ -1,13 +1,13 @@
 
 
 
-///  I M P O R T
+/// import
 
 import jws from "jws";
 
-///  U T I L
+/// util
 
-import { timespan } from "./utility";
+import { timespan } from "./utility.ts";
 
 const SUPPORTED_ALGS = [
   "ES256",
@@ -41,7 +41,7 @@ const optionsToPayload = {
 
 
 
-///  E X P O R T
+/// export
 
 export default (payload, secretOrPrivateKey, options?, callback?) => {
   if (typeof options === "function") {

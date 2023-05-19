@@ -1,7 +1,7 @@
 
 
 
-///  N A T I V E
+/// native
 
 import { get } from "https";
 import { globalAgent } from "http";
@@ -9,7 +9,7 @@ import { parse } from "url";
 
 
 
-///  E X P O R T
+/// export
 
 export default function download(uri: string, opts: any = {}): Promise<{ buffer: any, res: any }> {
   return new Promise((resolve, reject) => {
@@ -39,5 +39,5 @@ export default function download(uri: string, opts: any = {}): Promise<{ buffer:
 
 
 
-// via https://github.com/terkelg/hent
-// > Tiny utility to fetch remote files into buffers
+/// via https://github.com/terkelg/hent
+/// > Tiny utility to fetch remote files into buffers

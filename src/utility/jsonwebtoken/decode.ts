@@ -1,13 +1,13 @@
 
 
 
-///  I M P O R T
+/// import
 
 import jws from "jws";
 
 
 
-///  E X P O R T
+/// export
 
 export default (jwt, options?) => {
   options = options || {};

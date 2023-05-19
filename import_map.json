@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "dbschema": "./dbschema/edgeql-js/index.ts",
+    "dep/": "./dep/",
+    "edgedb": "https://deno.land/x/edgedb@v1.1.0/mod.ts",
+    "edgedb/": "https://deno.land/x/edgedb@v1.1.0/",
+    "src/": "./src/",
+    "std/": "https://deno.land/std@0.188.0/"
+  }
+}

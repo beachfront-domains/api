@@ -1,116 +1,75 @@
 
 
 
-///  N A T I V E
+/// import
 
-import { join } from "path";
-import process from "process";
+import { importQL } from "dep/x/alpha.ts";
+import { join } from "dep/std.ts";
 
-///  I M P O R T
+/// util
 
-import { importSchema } from "graphql-import";
-
-///  U T I L
-
-import type {
-  Customer,
-  CustomerCreate,
-  CustomerRequest,
-  CustomersRequest,
-  CustomerUpdate
-} from "./customer/index";
-
-import type {
-  Domain,
-  DomainCreate,
-  DomainRequest,
-  DomainsRequest,
-  DomainUpdate
-} from "./domain/index";
-
-import type {
-  Extension,
-  ExtensionCreate,
-  ExtensionRequest,
-  ExtensionsRequest,
-  ExtensionUpdate
-} from "./extension/index";
-
-import type {
-  Order,
-  OrderCreate,
-  OrderRequest,
-  OrderUpdate,
-  OrdersRequest
-} from "./order/index";
-
-import type {
-  PaginationArgument,
-  PaginationResponse
-} from "./pagination/type";
-
-import type {
-  PaymentMethod,
-  PaymentMethodCreate,
-  PaymentMethodRequest,
-  PaymentMethodsRequest,
-  PaymentMethodUpdate
-} from "./payment/index";
-
-import type {
-  SearchRequest,
-  SearchResult
-} from "./search/index";
-
-import type {
-  Session,
-  SessionCreate,
-  SessionRequest,
-  SessionsRequest,
-  SessionUpdate
-} from "./session/index";
-
-const theSchema = importSchema(join(process.cwd(), join("schema", "schema.graphql")));
+const schema = importQL(join("schema", "schema.graphql"));
 
 
 
-///  E X P O R T
+/// export
 
-export default () => theSchema;
+export default () => schema;
 
 export type {
   Customer,
   CustomerCreate,
   CustomerRequest,
   CustomersRequest,
-  CustomerUpdate,
+  CustomerUpdate
+} from "../component/customer/schema.ts";
+
+export type {
   Domain,
   DomainCreate,
   DomainRequest,
   DomainsRequest,
-  DomainUpdate,
+  DomainUpdate
+} from "../component/domain/schema.ts";
+
+export type {
   Extension,
   ExtensionCreate,
   ExtensionRequest,
   ExtensionsRequest,
-  ExtensionUpdate,
-  Order,
-  OrderCreate,
-  OrderRequest,
-  OrdersRequest,
-  OrderUpdate,
-  PaginationArgument,
-  PaginationResponse,
+  ExtensionUpdate
+} from "../component/extension/schema.ts";
+
+export type {
+  Invoice,
+  InvoiceCreate,
+  InvoiceRequest,
+  InvoiceUpdate,
+  InvoicesRequest
+} from "../component/invoice/schema.ts";
+
+// export type {
+//   PaginationArgument,
+//   PaginationResponse
+// } from "../component/pagination/schema.ts";
+
+export type {
   PaymentMethod,
   PaymentMethodCreate,
   PaymentMethodRequest,
   PaymentMethodsRequest,
-  PaymentMethodUpdate,
+  PaymentMethodUpdate
+} from "../component/payment/schema.ts";
+
+export type {
   SearchRequest,
-  SearchResult,
+  SearchResult
+} from "../component/search/schema.ts";
+
+export type {
   Session,
   SessionCreate,
   SessionRequest,
   SessionsRequest,
   SessionUpdate
-};
+} from "../component/session/schema.ts";

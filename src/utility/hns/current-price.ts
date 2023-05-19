@@ -1,18 +1,18 @@
 
 
 
-///  I M P O R T
+/// import
 
 import axios from "axios";
 
-///  U T I L
+/// util
 
-import { coinmarketcapKey } from "~util/index";
-import type { LooseObject } from "~util/index";
+import { coinmarketcapKey } from "src/utility/index.ts";
+import type { LooseObject } from "src/utility/index.ts";
 
 
 
-///  E X P O R T
+/// export
 
 export default async(): Promise<number> => {
   let value = 0;

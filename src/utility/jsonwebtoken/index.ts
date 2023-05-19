@@ -1,15 +1,15 @@
 
 
 
-///  U T I L
+/// util
 
-import decode from "./decode";
-import sign from "./sign";
-import verify from "./verify";
+import decode from "./decode.ts";
+import sign from "./sign.ts";
+import verify from "./verify.ts";
 
 
 
-///  E X P O R T
+/// export
 
 export {
   decode,

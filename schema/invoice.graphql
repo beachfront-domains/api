@@ -1,0 +1,91 @@
+# import Customer from "customer.graphql"
+# import CustomerInput from "customer.graphql"
+# import Pagination from "pagination.graphql"
+
+
+
+######
+# Enum
+######
+
+enum InvoiceType {
+  ACH
+  BTC
+  CREDITCARD
+  ETH
+  HNS
+  WIRE
+}
+
+enum InvoiceVendor {
+  OPENNODE
+  SQUARE
+  STRIPE
+}
+
+
+
+######
+# Type
+######
+
+type Invoice {
+  amount: Decimal
+  contents: [String]
+  customer: Customer
+  invoiceId: Int
+  "Boolean | 0: false, 1: true"
+  paid: Int
+  payment: InvoiceType
+  promo: String
+  vendor: InvoiceVendor
+  #
+  created: DateTime!
+  id: ID!
+  updated: DateTime!
+}
+
+type InvoiceResponse {
+  detail: Invoice
+}
+
+type InvoicesResponse {
+  detail: [Invoice]
+  pageInfo: Pagination
+}
+
+
+
+#######
+# Input
+#######
+
+input InvoiceInput {
+  amount: Decimal
+  contents: [String]
+  customer: CustomerInput
+  paid: Int
+  payment: InvoiceType
+  promo: String
+  vendor: InvoiceVendor
+  # no created
+  # no id
+  # no updated
+}
+
+input InvoiceQuery {
+  id: ID
+  invoiceId: Int
+}
+
+input InvoicesQuery {
+  customer: CustomerInput
+  paid: Int
+  payment: InvoiceType
+  promo: String
+  vendor: InvoiceVendor
+}
+
+
+
+### be sure to keep this file in sync with `src/component/invoice/schema.ts`

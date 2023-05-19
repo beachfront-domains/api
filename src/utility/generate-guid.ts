@@ -1,12 +1,12 @@
 
 
 
-///  I M P O R T
+/// import
 
 import uuid from "uuid-random";
 
 
 
-///  E X P O R T
+/// export
 
 export default (): string => uuid();

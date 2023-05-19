@@ -1,15 +1,15 @@
 
 
 
-///  U T I L
+/// util
 
-import type { LooseObject } from "./interface";
+import type { LooseObject } from "./interface.ts";
 
 type inputOptions = LooseObject | any[];
 
 
 
-///  E X P O R T
+/// export
 
 export const objectCompare = (objectA: inputOptions, objectB: inputOptions): LooseObject => {
   let diffObj: LooseObject = {};
@@ -63,4 +63,4 @@ export const objectCompare = (objectA: inputOptions, objectB: inputOptions): Loo
 
 
 
-// via https://stackoverflow.com/a/44831492
+/// via https://stackoverflow.com/a/44831492

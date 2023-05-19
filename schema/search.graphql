@@ -8,13 +8,15 @@
 ######
 
 type SearchResult {
-  ascii: String
-  available: Boolean
+  "Boolean | 0: false, 1: true"
+  available: Int
   created: DateTime
   duration: Int
   hns: Decimal
+  "ASCII format"
   name: String
-  premium: Boolean
+  "Boolean | 0: false, 1: true"
+  premium: Int
   price: Decimal
 }
 
@@ -31,16 +33,16 @@ type SearchResponse {
 #######
 
 input SearchQuery {
-  ascii: String
   emoji: Boolean
   extension: String
-  idn: Boolean
+  idn: Int
   length: Int
+  "ASCII format"
   name: String
-  number: Boolean
+  number: Int
   startsWith: String
 }
 
 
 
-### be sure to keep this file in sync with `src/schema/search/type.ts`
+### be sure to keep this file in sync with `src/component/search/schema.ts`

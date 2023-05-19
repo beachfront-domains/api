@@ -3,14 +3,10 @@
 Thumbs.db
 
 # Folders
-dist
-exports
-node_modules
+build
+dbschema/edgeql-js
 
 # Files
 .env
-*.css.map
 *.lock
 *.log
-database.conf
-package-lock.json

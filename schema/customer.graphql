@@ -7,13 +7,13 @@
 ######
 
 enum LoginMethod {
-  link
-  token
+  LINK
+  TOKEN
 }
 
 enum Role {
-  admin
-  customer
+  ADMIN
+  CUSTOMER
 }
 
 
@@ -21,11 +21,6 @@ enum Role {
 ######
 # Type
 ######
-
-type IDs {
-  opennode: ID
-  square: ID
-}
 
 type Customer {
   email: String
@@ -38,16 +33,13 @@ type Customer {
   role: Role
   """
   Is this person a registrar employee?
-  Default value is `false`.
+  Default value is `0` (false).
   """
-  staff: Boolean
+  staff: Int
   timezone: String
-  """
-  IDs of this customer within third-party services
-  """
-  tps: IDs
   username: String
-  verified: Boolean
+  "Boolean | 0: false, 1: true"
+  verified: Int
   #
   created: DateTime!
   id: ID!
@@ -71,10 +63,11 @@ type CustomersResponse {
 
 input CustomerInput {
   email: String
+  external: IDs
   loginMethod: LoginMethod
   name: String
   role: Role
-  staff: Boolean
+  staff: Int
   timezone: String
   username: String
   # no verified
@@ -90,13 +83,13 @@ input CustomerQuery {
 }
 
 input CustomersQuery {
-  created: DateTime
-  staff: Boolean
+  # created: DateTime
+  staff: Int
   timezone: String
-  updated: DateTime
-  verified: Boolean
+  # updated: DateTime
+  verified: Int
 }
 
 
 
-### be sure to keep this file in sync with `src/schema/customer/type.ts`
+### be sure to keep this file in sync with `src/component/customer/schema.ts`

@@ -1,21 +1,21 @@
 
 
 
-///  I M P O R T
+/// import
 
 import { ApiError, Client } from "square";
 import { until } from "@open-draft/until";
 import uuid from "uuid-random";
 
-///  U T I L
+/// util
 
-import { squareEnvironment, squareToken } from "../constant";
-import type { Customer } from "~schema/index";
-import type { LooseObject } from "../interface";
+import { squareEnvironment, squareToken } from "../constant.ts";
+import type { Customer } from "src/schema/index.ts";
+import type { LooseObject } from "../interface.ts";
 
 
 
-///  E X P O R T
+/// export
 
 export async function createCard() {}
 export async function getCard() {}

@@ -1,0 +1,16 @@
+
+
+
+/// import
+
+import * as tr46 from "npm:idna-uts46-hx@5.0.7";
+
+
+
+/// export
+
+export const toASCII = (str: string) => tr46.toAscii(
+  String(str).trim(), {
+    processingOption: "transitional"
+  }
+);
