@@ -8,7 +8,7 @@ import { log } from "dep/std.ts";
 
 /// util
 
-import { accessControl, databaseOptions, stringTrim } from "src/utility/index.ts";
+import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
 import { InvoiceType, InvoiceVendor } from "../schema.ts";
 import e from "dbschema";
 
@@ -21,13 +21,14 @@ const thisFilePath = "/src/component/invoice/crud/read.ts";
 
 /// export
 
-export default (async(_root, args: InvoiceRequest, ctx, _info?) => {
+export const get = (async(_root, args: InvoiceRequest, ctx, _info?) => {
   if (!await accessControl(ctx))
     return null;
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   const { params } = args;
   const query: LooseObject = {};
+  let response: DetailObject | null = null;
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
@@ -70,7 +71,7 @@ export const getMore = (async(_root, args: Partial<InvoiceRequests>, ctx, _info?
   if (!await accessControl(ctx))
     return null;
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   const { pagination, params } = args;
   const query: LooseObject = {};
   let allDocuments: Array<any> | null = null; // Array<DetailObject> // TODO: find EdgeDB document type

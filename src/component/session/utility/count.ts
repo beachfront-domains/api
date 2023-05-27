@@ -8,7 +8,7 @@ import { log } from "dep/std.ts";
 
 /// util
 
-import { databaseOptions } from "src/utility/index.ts";
+import { databaseParams } from "src/utility/index.ts";
 import e from "dbschema";
 const thisFilePath = "/src/component/session/utility/count.ts";
 
@@ -17,7 +17,7 @@ const thisFilePath = "/src/component/session/utility/count.ts";
 /// export
 
 export default (async() => {
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   let documentCount = 0;
 
   try {

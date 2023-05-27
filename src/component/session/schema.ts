@@ -3,16 +3,9 @@
 
 /// util
 
-import type { Customer } from "../customer/schema.ts";
 import type { PaginationArgument } from "../pagination/schema.ts";
 
-interface CartItem {
-  duration: number;
-  name: string;
-  price: string;
-}
-
-interface SessionsRequestOptions {
+interface SessionsRequestParams {
   created: string;
   customer: string; /// ID
   updated: string;
@@ -22,9 +15,17 @@ interface SessionsRequestOptions {
 
 /// export
 
-export type Session {
-  cart: string[];
-  customer: Customer;
+export interface CartItem {
+  /// NOTE
+  /// : for products without duration, like merch, duration is `0`
+  duration: number;
+  name: string;
+  price: string;
+}
+
+export interface Session {
+  cart: CartItem[];
+  customer: string; /// ID
   ///
   created: Date;
   id: string;
@@ -33,7 +34,7 @@ export type Session {
 
 export interface SessionCreate {
   params: {
-    cart?: CartItem[];
+    cart: CartItem[];
     customer?: string; /// ID
   }
 }
@@ -50,13 +51,15 @@ export interface SessionUpdate {
   }
   updates: {
     cart: CartItem[];
+    /// NOTE
+    /// : visitor could be anonymous and later login
     customer?: string; /// ID
   }
 }
 
 export interface SessionsRequest {
   pagination: PaginationArgument;
-  params: Partial<SessionsRequestOptions>;
+  params: Partial<SessionsRequestParams>;
 }
 
 

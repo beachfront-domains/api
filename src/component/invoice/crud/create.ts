@@ -8,7 +8,7 @@ import { log } from "dep/std.ts";
 
 /// util
 
-import { accessControl, databaseOptions, stringTrim } from "src/utility/index.ts";
+import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
 import { InvoiceType, InvoiceVendor } from "../schema.ts";
 import e from "dbschema";
 
@@ -25,7 +25,7 @@ export default (async(_root, args: InvoiceCreate, ctx, _info?) => {
   if (!await accessControl(ctx))
     return null;
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   const { params } = args;
   const query: LooseObject = {};
   let response: DetailObject | null = null;

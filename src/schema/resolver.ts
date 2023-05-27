@@ -53,10 +53,10 @@ import {
   update as updateSession
 } from "../component/session/index.ts";
 
-import {
-  welcome as login,
-  verify
-} from "../component/access/index.ts";
+// import {
+//   welcome as login,
+//   verify
+// } from "../component/access/index.ts";
 
 
 
@@ -71,13 +71,13 @@ export const Query = {
   extensions,
   invoice,
   invoices,
-  login,
+  // login,
   paymentMethod,
   paymentMethods,
   search,
   session,
-  sessions,
-  verify
+  sessions
+  // verify
 };
 
 export const Mutation = {

@@ -9,7 +9,7 @@ import { toASCII } from "dep/x/tr46.ts";
 
 /// util
 
-import { accessControl, databaseOptions, stringTrim } from "src/utility/index.ts";
+import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
 import e from "dbschema";
 
 import type { ExtensionRequest } from "../schema.ts";
@@ -25,7 +25,7 @@ export default (async(_root, args: ExtensionRequest, ctx, _info?) => {
   if (!await accessControl(ctx))
     return null;
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   const { params } = args;
   const query: LooseObject = {};
 

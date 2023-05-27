@@ -3,124 +3,119 @@
 
 /// import
 
-import { r } from "rethinkdb-ts";
+import { createClient } from "edgedb";
+import { log } from "dep/std.ts";
 
 /// util
 
-import { databaseName, emptyResponse } from "../utility/constant.ts";
-import { databaseOptions, objectCompare } from "src/utility/index.ts";
-import { get } from "./read.ts";
+import {
+  accessControl,
+  databaseParams,
+  objectIsEmpty,
+  personFromSession,
+  stringTrim
+} from "src/utility/index.ts";
 
-import type {
-  Customer,
-  PaymentMethod,
-  PaymentMethodUpdate
-} from "src/schema/index.ts";
+import { PaymentKind } from "../schema.ts";
+import * as maskPaymentMethod from "../utility/mask.ts";
+import e from "dbschema";
 
-import type { LooseObject } from "src/utility/index.ts";
+import type { PaymentMethodUpdate } from "../schema.ts";
+import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
+
+const thisFilePath = "/src/component/payment/crud/update.ts";
 
 
 
 /// export
 
-export default async(data: PaymentMethodUpdate, context: Customer): Promise<{ detail: PaymentMethod }> => {
-  if (!data.changes || !data.options)
-    return emptyResponse;
+export default (async(_root, args: PaymentMethodUpdate, ctx, _info?) => {
+  if (!await accessControl(ctx))
+    return null;
 
-  if (!context || !context.id)
-    return emptyResponse;
+  const { params, updates } = args;
 
-  const databaseConnection = await r.connect(databaseOptions);
-  const { changes, options } = data;
+  if (objectIsEmpty(params) || objectIsEmpty(updates)) {
+    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    return { detail: null };
+  }
+
+  const client = createClient(databaseParams);
   const query: LooseObject = {};
+  let response: DetailObject | null = null;
 
-  const dataPull = {}; /// for arrays
-  const dataPush = {}; /// also for arrays
-  const dataSet = {};
-
-  Object.entries(changes).forEach(([key, value]) => {
+  Object.entries(updates).forEach(([key, value]) => {
     switch(key) {
-      case "mask":
-        query[key] = String(value);
+      case "mask": {
+        query[key] = stringTrim(value);
         break;
+      }
 
       default:
         break;
     }
   });
 
-  const documentExistenceQuery = await get({ options }, context);
-
-  if (documentExistenceQuery.detail.id.length === 0) {
-    databaseConnection.close();
-    /// document does not exist, return blank
-    return emptyResponse;
+  /// vibe check
+  if (!query.mask) {
+    log.warning(`[${thisFilePath}]› Vibe check failed.`);
+    return { detail: response };
   }
 
-  if (documentExistenceQuery.detail.customer !== context.id) {
-    databaseConnection.close();
-    /// Payment method does not belong to customer passed via `context`, return blank
-    return emptyResponse;
+  const doesDocumentExist = e.select(e.Payment, payment => ({
+    ...e.Payment["*"],
+    customer: payment.customer["*"],
+    // TODO
+    // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
+    filter_single: params.id ?
+      e.op(payment.id, "=", e.uuid(stringTrim(params.id))) :
+      e.op(payment.vendorId, "=", stringTrim(params.vendorId))
+  }));
+
+  const existenceResult = await doesDocumentExist.run(client);
+
+  if (!existenceResult) {
+    log.warning(`[${thisFilePath}]› Cannot update nonexistent document.`);
+    return { detail: response };
   }
 
-  const documentToUpdate = documentExistenceQuery.detail;
-  const diff = objectCompare(query, documentToUpdate); // new data compared to existing data
-  const changedParameters = Object.keys(diff); // returns an array
+  const owner = await personFromSession(ctx);
 
-  changedParameters.forEach((parameter: string) => {
-    // dataSet[parameter] // dataPush[parameter] // dataPull[parameter]
+  if (!owner) {
+    log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
+    return { detail: response, error: [{ code: "TBA", message: error }] };
+  }
 
-    switch(parameter) {
-      case "mask":
-        dataSet[parameter] = query[parameter];
-        break;
+  if (existenceResult.customer.id !== owner.id) {
+    log.warning(`[${thisFilePath}]› Session customer ID doesn't match record's.`);
+    return { detail: response };
+  }
 
-      default:
-        break;
-    }
-  });
+  query.mask = maskPaymentMethod(query.mask);
 
-  await dataSet;
-  await dataPull;
-  await dataPush;
-
-  const updatedDocumentDetails: LooseObject = {
-    ...dataSet,
-    ...dataPull,
-    ...dataPush,
-    updated: new Date()
-  };
+  // TODO
+  // : update/create payment method within third-party service and return ID
+  //   : query.vendorId
 
   try {
-    const documentUpdate = await r
-      .table(databaseName)
-      .get(documentToUpdate.id)
-      .update(updatedDocumentDetails, {
-        returnChanges: true
-      })
-      .run(databaseConnection);
+    const updateQuery = e.update(e.Payment, payment => ({
+      filter_single: e.op(payment.id, "=", e.uuid(existenceResult.id)),
+      set: {
+        ...query,
+        updated: e.datetime_of_transaction()
+      }
+    }));
 
-    if (documentUpdate.errors > 0) {
-      databaseConnection.close();
+    response = await e.select(updateQuery, payment => ({
+      ...e.Payment["*"],
+      customer: payment.customer["*"],
+    })).run(client);
 
-      console.group("Error updating payment method");
-      console.error(updatedDocumentDetails);
-      console.groupEnd();
-
-      return emptyResponse;
-    }
-
-    const updatedDocument: PaymentMethod = documentUpdate?.changes && documentUpdate.changes[0].new_val;
-    databaseConnection.close();
-
-    return { detail: updatedDocument };
-  } catch(error) {
-    databaseConnection.close();
-
-    console.group("Exception caught while updating payment method");
-    console.error(error);
-    console.groupEnd();
-
-    return emptyResponse;
+    return { detail: response };
+  } catch(_) {
+    // TODO
+    // : create error ingest system : https://github.com/neuenet/pastry-api/issues/10
+    log.error(`[${thisFilePath}]› Exception caught while updating document.`);
+    return { detail: response };
   }
-}
+}) satisfies StandardResponse;

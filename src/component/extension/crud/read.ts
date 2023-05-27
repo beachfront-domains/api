@@ -11,7 +11,7 @@ import { toASCII } from "dep/x/tr46.ts";
 
 import {
   accessControl,
-  databaseOptions,
+  databaseParams,
   maxPaginationLimit,
   objectIsEmpty,
   stringTrim
@@ -38,7 +38,7 @@ export const get = (async(_root, args: ExtensionRequest, ctx, _info?) => {
   if (!await accessControl(ctx))
     return null;
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   const { params } = args;
   const query: LooseObject = {};
   let response: DetailObject | null = null;
@@ -83,7 +83,7 @@ export const getMore = (async(_root, args: Partial<ExtensionsRequest>, ctx, _inf
   if (!await accessControl(ctx))
     return null;
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   const { pagination, params } = args;
   const query: LooseObject = {};
   let allDocuments: Array<any> | null = null; // Array<DetailObject> // TODO: find EdgeDB document type

@@ -13,7 +13,7 @@
 // ///  U T I L
 
 // import authenticate from "~service/bouncer/auth";
-// import { databaseOptions } from "~util/index";
+// import { databaseParams } from "~util/index";
 // import { _getCustomerRaw } from "../crud/read";
 
 // const exportDirectory = "";
@@ -23,7 +23,7 @@
 // ///  E X P O R T
 
 // export default async(suppliedData: any) => {
-//   const databaseConnection = await r.connect(databaseOptions);
+//   const databaseConnection = await r.connect(databaseParams);
 //   const errorMessage = "Unauthorized";
 //   const data = suppliedData;
 

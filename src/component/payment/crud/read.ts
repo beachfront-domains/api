@@ -3,133 +3,223 @@
 
 /// import
 
-import { r } from "rethinkdb-ts";
-import type { RDatum } from "rethinkdb-ts";
+import { createClient } from "edgedb";
+import { log } from "dep/std.ts";
 
 /// util
 
-import { databaseName, emptyResponse } from "../utility/constant.ts";
-import { databaseOptions } from "src/utility/index.ts";
+import {
+  accessControl,
+  databaseParams,
+  maxPaginationLimit,
+  stringTrim
+} from "src/utility/index.ts";
 
-import type {
-  Customer,
-  PaymentMethod,
-  PaymentMethodRequest,
-  PaymentMethodsRequest
-} from "src/schema/index.ts";
+import { PaymentKind } from "../schema.ts";
+import e from "dbschema";
 
-import type { LooseObject } from "src/utility/index.ts";
+import type { PaymentMethodRequest, PaymentMethodsRequest } from "../schema.ts";
+import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
+
+const thisFilePath = "/src/component/payment/crud/read.ts";
 
 
 
 /// export
 
-export async function get(data: PaymentMethodRequest, context: Customer): Promise<{ detail: PaymentMethod }> {
-  if (!context || !context.id)
-    return emptyResponse;
+export const get = (async(_root, args: PaymentMethodRequest, ctx, _info?) => {
+  if (!await accessControl(ctx))
+    return null;
 
-  const databaseConnection = await r.connect(databaseOptions);
-  const { options } = data;
+  const client = createClient(databaseParams);
+  const { params } = args;
   const query: LooseObject = {};
+  let response: DetailObject | null = null;
 
-  Object.entries(options).forEach(([key, value]) => {
+  Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "id":
-      case "vendorId":
-        query[key] = String(value);
+      case "vendorId": {
+        query[key] = stringTrim(value);
         break;
+      }
 
       default:
         break;
     }
   });
 
-  const arrayResponse: PaymentMethod[] = await r.table(databaseName)
-    .filter(query)
-    .limit(1)
-    .run(databaseConnection);
+  const doesDocumentExist = e.select(e.Payment, payment => ({
+    ...e.Payment["*"],
+    customer: payment.customer["*"],
+    // TODO
+    // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
+    filter_single: query.id ?
+      e.op(payment.id, "=", e.uuid(query.id)) :
+      e.op(payment.vendorId, "=", query.vendorId)
+  }));
 
-  let response: PaymentMethod;
+  const existenceResult = await doesDocumentExist.run(client);
 
-  databaseConnection.close();
+  if (existenceResult)
+    response = existenceResult;
 
-  // console.log(">>> response");
-  // console.log(arrayResponse);
+  return {
+    detail: response
+  };
+}) satisfies StandardResponse;
 
-  if (arrayResponse && arrayResponse[0]) {
-    response = arrayResponse[0];
+export const getMore = (async(_root, args: Partial<PaymentMethodsRequest>, ctx, _info?) => {
+  if (!await accessControl(ctx))
+    return null;
 
-    /// Ensure payment method customer ID matches context ID
-    if (response.customer !== context.id)
-      return emptyResponse;
-  } else {
-    return emptyResponse;
+  const client = createClient(databaseParams);
+  const { pagination, params } = args;
+  const query: LooseObject = {};
+  let allDocuments: Array<any> | null = null; // Array<DetailObject> // TODO: find EdgeDB document type
+  let hasNextPage = false;
+  let hasPreviousPage = false;
+  let response: Array<any> | null = null; // Array<DetailObject>
+
+  if (objectIsEmpty(params)) {
+    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+
+    return {
+      detail: response,
+      pageInfo: {
+        cursor: null,
+        hasNextPage,
+        hasPreviousPage
+      }
+    };
   }
 
-  return { detail: response };
-}
-
-export async function getMore(data: Partial<PaymentMethodsRequest>) {
-  const databaseConnection = await r.connect(databaseOptions);
-  const { options, pagination } = data;
-
-  // TODO
-  // : pagination
-  const pageInfo: LooseObject = {};
-  let hasPreviousPage = true;
-  let query: LooseObject = {};
-
-  pagination && Object.entries(pagination).forEach(([key, value]) => (pageInfo[key] = value));
-
-  if (!pagination) {
-    pageInfo.after = new Date(await r.now().toISO8601().run(databaseConnection));
-    pageInfo.first = 0;
-    hasPreviousPage = false;
-  }
-
-  if (pagination && !pagination.after) {
-    pageInfo.after = new Date(await r.now().toISO8601().run(databaseConnection));
-    hasPreviousPage = false;
-  }
-
-  if (pagination && !pagination.first)
-    pageInfo.first = 0;
-
-  const limit = !pageInfo.first || isNaN(pageInfo.first) ?
+  const limit = !pagination || (!pagination.first || isNaN(pagination.first)) ?
     20 :
-    pageInfo.first;
+    pagination.first;
 
-  const offset = !pageInfo.after ?
-    new Date(await r.now().toEpochTime().run(databaseConnection)) :
-    new Date(pageInfo.after);
-  //
+  if (limit > maxPaginationLimit) {
+    return {
+      detail: response,
+      pageInfo: {
+        cursor: null,
+        hasNextPage,
+        hasPreviousPage
+      }
+    };
+  }
+
+  let cursor = pagination && pagination.after && String(pagination.after) || null;
+  let cursorId;
+  let offset = 0;
 
   // TODO
-  // : the above pagination is based on posts and dates...not applicable to what we are doing here
-  // : ignore pagination for now, get options working
+  // : `created` and `updated` should be a range
 
-  // customer: string; /// customer ID
-  // kind: PaymentMethodKind;
-  // vendor: PaymentMethodVendor;
+  Object.entries(params).forEach(([key, value]) => {
+    switch(key) {
+      case "customer": {
+        query[key] = stringTrim(value);
+        break;
+      }
 
-  const response = await r.table(databaseName)
-    .filter(options)
-    .orderBy(r.asc("updated"))
-    .limit(limit)
-    .run(databaseConnection);
+      case "kind": {
+        query[key] = PaymentKind[stringTrim(value).toUpperCase()] === stringTrim(value).toUpperCase() ?
+          stringTrim(value).toUpperCase() :
+          null;
+        break;
+      }
 
-  databaseConnection.close();
+      default: {
+        break;
+      }
+    }
+  });
 
-  const cursor = response.length > 0 ?
-    response.slice(-1)[0].name :
+  const baseShape = e.shape(e.Payment, document => ({
+    ...e.Payment["*"],
+    order_by: document.created
+  }));
+
+  if (query.wildcard) {
+    allDocuments = await e.select(e.Payment, document => ({
+      ...baseShape(document)
+    })).run(client);
+  } else {
+    allDocuments = await e.select(e.Payment, document => ({
+      ...baseShape(document),
+      // TODO
+      // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
+      filter: query.customer ?
+        e.op(document.customer, "=", e.uuid(query.customer)) :
+          query.kind ?
+            e.op(document.kind, "=", query.kind) :
+              null
+    })).run(client);
+  }
+
+  const totalDocuments = allDocuments.length;
+
+  if (cursor) {
+    try {
+      cursorId = atob(cursor);
+    } catch(_) {
+      cursorId = null;
+    }
+
+    allDocuments.find((document, index) => {
+      if (document.id === cursorId)
+        offset = index + 1;
+    });
+  }
+
+  if (query.wildcard) {
+    response = await e.select(e.Payment, document => ({
+      ...baseShape(document),
+      limit,
+      offset
+    })).run(client);
+  } else {
+    response = await e.select(e.Payment, document => ({
+      ...baseShape(document),
+      // TODO
+      // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
+      filter: query.customer ?
+        e.op(document.customer, "=", e.uuid(query.customer)) :
+          query.kind ?
+            e.op(document.kind, "=", query.kind) :
+              null,
+      limit,
+      offset
+    })).run(client);
+  }
+
+  /// inspired by https://stackoverflow.com/a/62565528
+  cursor = response && response.length > 0 ?
+    btoa(response.slice(-1)[0].id) :
     null;
+
+  if (response && response.length > 0) {
+    if (offset + limit >= totalDocuments)
+      hasNextPage = false;
+    else
+      hasNextPage = true;
+
+    if (offset > 0)
+      hasPreviousPage = true;
+    else
+      hasPreviousPage = false;
+  }
+
+  // TODO
+  // : unknown if full linked documents are returned
 
   return {
     detail: response,
     pageInfo: {
       cursor,
-      hasNextPage: cursor ? true : false, /// ehh~
+      hasNextPage,
       hasPreviousPage
     }
   };
-}
+}) satisfies StandardPlentyResponse;

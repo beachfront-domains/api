@@ -3,13 +3,15 @@
 
 /// import
 
-import { join, shellBold, shellRed } from "dep/std.ts";
+import { join } from "dep/std.ts";
+import * as colors from "dep/std.ts";
 
 /// util
 
 import e from "dbschema";
 
 const fileConfig = join(Deno.cwd(), "api.json");
+const { shellBold, shellRed } = colors;
 
 
 

@@ -12,12 +12,12 @@ type SearchResult {
   available: Int
   created: DateTime
   duration: Int
-  hns: Decimal
   "ASCII format"
   name: String
   "Boolean | 0: false, 1: true"
   premium: Int
-  price: Decimal
+  priceHNS: Decimal
+  priceUSD: Decimal
 }
 
 type SearchResponse {
@@ -33,7 +33,7 @@ type SearchResponse {
 #######
 
 input SearchQuery {
-  emoji: Boolean
+  emoji: Int
   extension: String
   idn: Int
   length: Int

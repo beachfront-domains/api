@@ -3,108 +3,191 @@
 
 /// import
 
-import { r } from "rethinkdb-ts";
-import type { RDatum } from "rethinkdb-ts";
+import { createClient } from "edgedb";
+import { log } from "dep/std.ts";
 
 /// util
 
-import { databaseOptions } from "src/utility/index.ts";
+import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
+import e from "dbschema";
 
-import type {
-  Session,
-  SessionRequest,
-  SessionsRequest
-} from "src/schema/index.ts";
+import type { SessionRequest, SessionsRequest } from "../schema.ts";
+import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
 
-import type { LooseObject } from "src/utility/index.ts";
-
-const databaseName = "session";
+const thisFilePath = "/src/component/session/crud/read.ts";
 
 
 
 /// export
 
-export async function get(input: SessionRequest): Promise<{ detail: Session }> {
-  const databaseConnection = await r.connect(databaseOptions);
-  const { options: { id }} = input;
+export const get = (async(_root, args: SessionRequest, ctx, _info?) => {
+  /// NOTE
+  /// : this function doesn't need to be auth-gated
+
+  const client = createClient(databaseParams);
+  const { params } = args;
   const query: LooseObject = {};
 
-  let response: any = await r.table(databaseName)
-    .filter({ id: String(id) })
-    .limit(1)
-    .run(databaseConnection);
+  Object.entries(params).forEach(([key, value]) => {
+    switch(key) {
+      case "id": {
+        query[key] = stringTrim(value);
+        break;
+      }
 
-  databaseConnection.close();
+      default:
+        break;
+    }
+  });
 
-  if (response && response[0])
-    response = response[0];
-  else
-    response = { id: "" };
+  const doesDocumentExist = e.select(e.Session, session => ({
+    ...e.Session["*"],
+    customer: session.customer["*"],
+    filter_single: e.op(session.id, "=", e.uuid(query.id))
+  }));
+
+  const existenceResult = await doesDocumentExist.run(client);
+
+  if (existenceResult)
+    response = existenceResult;
 
   return {
     detail: response
   };
-}
+}) satisfies StandardResponse;
 
-export async function getMore(input: Partial<SessionsRequest>) {
-  // TODO
-  // : add modifiers/filters for `created` and `updated` fields
-  //   : < || > ? (before or after a date?)
-  // : add support for searching via `customer` ID
-  //   : would make it easy to delete all sessions for a user
+export const getMore = (async(_root, args: Partial<SessionsRequest>, ctx, _info?) => {
+  if (!await accessControl(ctx))
+    return null;
 
-  const databaseConnection = await r.connect(databaseOptions);
-  const { options, pagination } = input;
+  const client = createClient(databaseParams);
+  const { pagination, params } = args;
+  const query: LooseObject = {};
+  let allDocuments: Array<any> | null = null; // Array<DetailObject> // TODO: find EdgeDB document type
+  let hasNextPage = false;
+  let hasPreviousPage = false;
+  let response: Array<any> | null = null; // Array<DetailObject>
 
-  // TODO
-  // : pagination
-  const pageInfo: LooseObject = {};
-  let hasPreviousPage = true;
-  let query: LooseObject = {};
+  if (objectIsEmpty(params)) {
+    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
 
-  pagination && Object.entries(pagination).forEach(([key, value]) => (pageInfo[key] = value));
-
-  if (!pagination) {
-    pageInfo.after = new Date(await r.now().toISO8601().run(databaseConnection));
-    pageInfo.first = 0;
-    hasPreviousPage = false;
+    return {
+      detail: response,
+      pageInfo: {
+        cursor: null,
+        hasNextPage,
+        hasPreviousPage
+      }
+    };
   }
 
-  if (pagination && !pagination.after) {
-    pageInfo.after = new Date(await r.now().toISO8601().run(databaseConnection));
-    hasPreviousPage = false;
-  }
-
-  if (pagination && !pagination.first)
-    pageInfo.first = 0;
-
-  const limit = !pageInfo.first || isNaN(pageInfo.first) ?
+  const limit = !pagination || (!pagination.first || isNaN(pagination.first)) ?
     20 :
-    pageInfo.first;
+    pagination.first;
 
-  const offset = !pageInfo.after ?
-    new Date(await r.now().toEpochTime().run(databaseConnection)) :
-    new Date(pageInfo.after);
-  //
+  if (limit > maxPaginationLimit) {
+    return {
+      detail: response,
+      pageInfo: {
+        cursor: null,
+        hasNextPage,
+        hasPreviousPage
+      }
+    };
+  }
 
-  const response = await r.table(databaseName)
-    .filter(options)
-    .orderBy(r.asc("created"))
-    .limit(limit)
-    .run(databaseConnection);
+  let cursor = pagination && pagination.after && String(pagination.after) || null;
+  let cursorId;
+  let offset = 0;
 
-  databaseConnection.close();
+  // TODO
+  // : `created` and `updated` should be a range
 
-  const cursor = response.length > 0 ?
-    response.slice(-1)[0].created :
+  Object.entries(params).forEach(([key, value]) => {
+    switch(key) {
+      case "customer": {
+        query[key] = stringTrim(value);
+        break;
+      }
+
+      default: {
+        break;
+      }
+    }
+  });
+
+  const baseShape = e.shape(e.Session, document => ({
+    ...e.Session["*"],
+    order_by: document.created
+  }));
+
+  if (query.wildcard) {
+    allDocuments = await e.select(e.Session, document => ({
+      ...baseShape(document)
+    })).run(client);
+  } else {
+    allDocuments = await e.select(e.Session, document => ({
+      ...baseShape(document),
+      filter: e.op(document.customer, "=", e.uuid(query.customer))
+    })).run(client);
+  }
+
+  const totalDocuments = allDocuments.length;
+
+  if (cursor) {
+    try {
+      cursorId = atob(cursor);
+    } catch(_) {
+      cursorId = null;
+    }
+
+    allDocuments.find((document, index) => {
+      if (document.id === cursorId)
+        offset = index + 1;
+    });
+  }
+
+  if (query.wildcard) {
+    response = await e.select(e.Session, document => ({
+      ...baseShape(document),
+      limit,
+      offset
+    })).run(client);
+  } else {
+    response = await e.select(e.Session, document => ({
+      ...baseShape(document),
+      filter: e.op(document.customer, "=", e.uuid(query.customer)),
+      limit,
+      offset
+    })).run(client);
+  }
+
+  /// inspired by https://stackoverflow.com/a/62565528
+  cursor = response && response.length > 0 ?
+    btoa(response.slice(-1)[0].id) :
     null;
+
+  if (response && response.length > 0) {
+    if (offset + limit >= totalDocuments)
+      hasNextPage = false;
+    else
+      hasNextPage = true;
+
+    if (offset > 0)
+      hasPreviousPage = true;
+    else
+      hasPreviousPage = false;
+  }
+
+  // TODO
+  // : unknown if full linked documents are returned
 
   return {
     detail: response,
     pageInfo: {
       cursor,
-      hasNextPage: cursor ? true : false, /// ehh~
+      hasNextPage,
       hasPreviousPage
     }
   };
-}
+}) satisfies StandardPlentyResponse;

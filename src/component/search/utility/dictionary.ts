@@ -3,18 +3,17 @@
 
 /// import
 
-import axios from "axios";
-import cheerio from "cheerio";
+import { cheerio } from "dep/x/cheerio.ts";
 
 
 
 /// export
 
-export default async(suppliedWord: string): Promise<boolean> => {
+export default (async(suppliedWord: string) => {
   let isWord: boolean = false;
 
   try {
-    const response = await axios.get(`https://www.dictionary.com/browse/${encodeURIComponent(String(suppliedWord))}`);
+    const response = await fetch(`https://www.dictionary.com/browse/${encodeURIComponent(suppliedWord)}`);
 
     if (response.status !== 200)
       return false;
@@ -24,13 +23,13 @@ export default async(suppliedWord: string): Promise<boolean> => {
 
     if (word)
       isWord = true;
-  } catch(error) {
+  } catch(_) {
     /// IGNORE
     /// Probably not a dictionary word
-  } finally {
-    return isWord;
   }
-}
+
+  return isWord;
+}) satisfies Promise<boolean>;
 
 
 

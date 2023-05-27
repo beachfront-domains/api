@@ -5,7 +5,13 @@
 
 import { GraphQLHTTP } from "dep/x/alpha.ts";
 import { makeExecutableSchema } from "dep/x/graphql-tools.ts";
-import { Server } from "dep/std.ts";
+
+import {
+  Server,
+  green as shellGreen,
+  magenta as shellMagenta,
+  underline as shellUnderline
+} from "dep/std.ts";
 
 /// util
 
@@ -59,19 +65,12 @@ api.listenAndServe();
 
 console.log(
   `
-
-   __                __   ___              __
-  / /  ___ ___ _____/ /  / _/______  ___  / /_
- / _ \\/ -_) _ \`/ __/ _ \\/ _/ __/ _ \\/ _ \\/ __/
-/_.__/\\__/\\_,_/\\__/_//_/_//_/  \\___/_//_\\__/\n,
-
-                   __
-                  / / ${shellGreen(packageVersion)}
-   ___  ___  ___ / /_______ __
-  / _ \\/ _ \`(_-</ __/ __/ // /
- / .__/\\_,_/___/\\__/_/  \\_, /
-/_/             SERVER /___/\n`,
-  `\n${shellMagenta(`[✦] [API] ${shellUnderline(`::1:${port}`)}`)}\n`
+ ┌${repeatCharacter("─", 32)}┐
+ │ ${pad("BEACHFRONT API", 30)} │
+ │ ${shellGreen(pad(packageVersion, 30))} │
+ └${repeatCharacter("─", 32)}┘
+  LOCAL ${shellMagenta(`${shellUnderline(`::1:${port}`)}`)}
+  `
 );
 
 
@@ -84,8 +83,25 @@ async function getVersion() {
   try {
     version = await Deno.readTextFileSync("./version.txt");
   } catch(_) {
-    // ignore
+    /// ignore
   }
 
   return version;
+}
+
+function pad(input: string, paddingAmount: number): string {
+  if (!paddingAmount || paddingAmount <= 0)
+    return input;
+
+  const paddingLeft = paddingAmount - input.length;
+  const padding = " ".repeat(paddingLeft);
+
+  return `${input}${padding}`;
+}
+
+function repeatCharacter(input: string, repeatAmount: number): string {
+  if (!repeatAmount || repeatAmount <= 0)
+    return input;
+
+  return input.repeat(repeatAmount);
 }

@@ -91,7 +91,7 @@ module default {
     required property amount -> int16;
     required property contents -> array<str>;
     required link customer -> Customer;
-    property orderId -> InvoiceNumber {
+    property invoiceId -> InvoiceNumber {
       constraint exclusive;
     }
     property paid -> int16 {
@@ -118,11 +118,11 @@ module default {
   }
 
   type Session extending BaseRecord {
-    property cart -> tuple<
+    required property cart -> tuple<
       duration: int16,
       name: str,
       price: int16
     >;
-    required link customer -> Customer;
+    link customer -> Customer;
   }
 }

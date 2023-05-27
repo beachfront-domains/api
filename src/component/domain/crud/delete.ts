@@ -8,7 +8,7 @@ import { log } from "dep/std.ts";
 
 /// util
 
-import { accessControl, databaseOptions } from "src/utility/index.ts";
+import { accessControl, databaseParams } from "src/utility/index.ts";
 import e from "dbschema";
 
 import type { CustomerRequest } from "../schema.ts";
@@ -24,7 +24,7 @@ export default (async(_root, args: DomainRequest, ctx, _info?) => {
   if (!await accessControl(ctx))
     return null;
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   const { params } = args;
   const query: LooseObject = {};
 

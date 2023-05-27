@@ -3,121 +3,102 @@
 
 /// import
 
-import { r } from "rethinkdb-ts";
-import { toASCII } from "tr46";
+import { createClient } from "edgedb";
+import { log } from "dep/std.ts";
 
 /// util
 
-import { databaseName, emptyResponse } from "../utility/constant.ts";
-import { databaseOptions } from "src/utility/index.ts";
-import { get } from "./read.ts";
+import {
+  accessControl,
+  databaseParams,
+  personFromSession,
+  stringTrim
+} from "src/utility/index.ts";
 
-import type {
-  Customer,
-  PaymentMethod,
-  PaymentMethodCreate
-} from "src/schema/index.ts";
+import { PaymentKind } from "../schema.ts";
+import * as maskPaymentMethod from "../utility/mask.ts";
+import e from "dbschema";
 
-import type { LooseObject } from "src/utility/index.ts";
+import type { PaymentMethodCreate } from "../schema.ts";
+import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
+
+const thisFilePath = "/src/component/payment/crud/create.ts";
 
 
 
 /// export
 
-export default async(data: PaymentMethodCreate, context: Customer): Promise<{ detail: PaymentMethod }> => {
-  if (!data.options.customer && (!context || !context.id))
-    return emptyResponse;
+export default (async(_root, args: InvoiceCreate, ctx, _info?) => {
+  if (!await accessControl(ctx))
+    return null;
 
-  const databaseConnection = await r.connect(databaseOptions);
-  const { options } = data;
+  const client = createClient(databaseParams);
+  const { params } = args;
   const query: LooseObject = {};
+  let response: DetailObject | null = null;
 
-  console.log(">>> data");
-  console.log(data);
-  console.log(context);
-
-  query.customer = context.id;
-
-  Object.entries(options).forEach(([key, value]) => {
+  Object.entries(params).forEach(([key, value]) => {
     switch(key) {
-      case "kind":
-      case "mask":
-      case "vendor":
-        query[key] = String(value);
+      case "kind": {
+        query[key] = PaymentKind[stringTrim(value).toUpperCase()] === stringTrim(value).toUpperCase() ?
+          stringTrim(value).toUpperCase() :
+          null;
         break;
+      }
 
-      // TODO
-      // : ensure `kind` value matches `PaymentMethodKind` enum options
-      // : ensure `vendor` value matches `PaymentMethodVendor` enum options
+      case "mask": {
+        query[key] = stringTrim(value);
+        break;
+      }
 
       default:
-        /// Ignore extra params
         break;
     }
   });
 
-  // if (!options.ascii)
-  //   query.ascii = toASCII(options.name, { processingOption: "transitional" });
-
-  // const doesExtensionExist = await getExtension({ options: { id: query.extension }});
-
-  // if (doesExtensionExist.detail.id.length === 0) {
-  //   databaseConnection.close();
-
-  //   console.group("Error creating domain, extension does not exist.");
-  //   console.error(query);
-  //   console.groupEnd();
-
-  //   return { detail: { id: "" }};
-  // }
-
-  const doesDocumentExist = await get({ options: { ...query }}, context);
-
-  if (doesDocumentExist.detail.id.length !== 0) {
-    databaseConnection.close();
-    return doesDocumentExist; /// document exists, return it
+  if (!query.kind || !query.mask) {
+    const error = "Missing required parameter(s).";
+    log.warning(`[${thisFilePath}]› ${error}`);
+    return { detail: response, error: [{ code: "TBA", message: error }] };
   }
+
+  if (query.mask.length < 12) { /// credit card numbers have at least 12 digits
+    const error = "Invalid length for mask.";
+    log.warning(`[${thisFilePath}]› ${error}`);
+    return { detail: response, error: [{ code: "TBA", message: error }] };
+  }
+
+  const owner = await personFromSession(ctx);
+
+  if (!owner) {
+    log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
+    return { detail: response, error: [{ code: "TBA", message: error }] };
+  }
+
+  query.customer = owner.id;
+  query.mask = maskPaymentMethod(query.mask);
 
   // TODO
+  // : should we check for existing document?
+  //   : use customer id and mask?
   // : create payment method within third-party service and return ID
-  // : query.vendorId
+  //   : query.vendorId
 
   try {
-    const createDocument = await r
-      .table(databaseName)
-      .insert({
-        ...query,
-        created: new Date(),
-        updated: new Date()
-      })
-      .run(databaseConnection);
+    const newDocument = e.insert(e.Payment, { ...query });
 
-    if (createDocument.inserted !== 1) {
-      databaseConnection.close();
+    const databaseQuery = e.select(newDocument, payment => ({
+      ...e.Payment["*"],
+      customer: payment.customer["*"]
+    }));
 
-      console.group("Error creating payment method");
-      console.error(query);
-      console.groupEnd();
-
-      return emptyResponse;
-    }
-
-    const createdDocument = await r.table(databaseName)
-      .filter({ id: createDocument!.generated_keys![0] })
-      .run(databaseConnection);
-
-    const response: PaymentMethod = createdDocument[0];
-
-    databaseConnection.close();
+    response = await databaseQuery.run(client);
 
     return { detail: response };
-  } catch(error) {
-    databaseConnection.close();
-
-    console.group("Exception caught while creating payment method");
-    console.error(error);
-    console.groupEnd();
-
-    return emptyResponse;
+  } catch(_) {
+    // TODO
+    // : create error ingest system : https://github.com/neuenet/pastry-api/issues/10
+    log.error(`[${thisFilePath}]› Exception caught while creating document.`);
+    return { detail: response };
   }
-}
+}) satisfies StandardResponse;

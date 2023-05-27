@@ -1,15 +1,11 @@
 
 
 
-/// import
-
-import axios from "axios";
-
 /// util
 
 import { LooseObject, thesaurusKey } from "src/utility/index.ts";
 
-interface FunctionResponse {
+interface ThesaurusResponse {
   antonyms: string[];
   synonyms: string[];
 }
@@ -18,19 +14,26 @@ interface FunctionResponse {
 
 /// export
 
-export default async(suppliedWord: string): Promise<FunctionResponse> => {
+export default (async(suppliedWord: string) => {
   const unwantedCharactersRegex = /[^\s-\.]/g;
   let antonyms: any = [];
   let synonyms: any = [];
 
   try {
-    const { data } = await axios.get(`https://www.dictionaryapi.com/api/v3/references/thesaurus/json/${encodeURIComponent(String(suppliedWord))}?key=${thesaurusKey}`);
+    const { data } = await fetch(`https://www.dictionaryapi.com/api/v3/references/thesaurus/json/${encodeURIComponent(suppliedWord)}?key=${thesaurusKey}`);
 
-    if (!data || !data[0] || !data[0].meta) {
-      return {
-        antonyms,
-        synonyms
-      };
+    switch(true) {
+      case !data:
+      case !data[0]:
+      case !data[0].meta: {
+        return {
+          antonyms,
+          synonyms
+        };
+      }
+
+      default:
+        break;
     }
 
     const words = data[0].meta;
@@ -52,16 +55,16 @@ export default async(suppliedWord: string): Promise<FunctionResponse> => {
       else
         return "";
     }).filter((word: string) => word); /// Remove empty strings
-  } catch(error) {
+  } catch(_) {
     /// IGNORE
     /// Probably not a dictionary word
-  } finally {
-    return {
-      antonyms,
-      synonyms
-    };
   }
-}
+
+  return {
+    antonyms,
+    synonyms
+  };
+}) satisfies ThesaurusResponse;
 
 
 

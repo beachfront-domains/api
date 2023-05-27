@@ -5,7 +5,7 @@
 
 import type { PaginationArgument } from "../pagination/schema.ts";
 
-interface CustomersRequestOptions {
+interface CustomersRequestParams {
   staff: number;
   timezone: string;
   verified: number;
@@ -67,7 +67,7 @@ export interface CustomerRequest {
 
 export interface CustomersRequest {
   pagination: PaginationArgument;
-  params: Partial<CustomersRequestOptions>;
+  params: Partial<CustomersRequestParams>;
 }
 
 export interface CustomerUpdate {

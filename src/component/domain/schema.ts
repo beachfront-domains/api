@@ -5,7 +5,7 @@
 
 import type { PaginationArgument } from "../pagination/schema.ts";
 
-interface DomainsRequestOptions {
+interface DomainsRequestParams {
   extension: string;  /// get all domains under an extension / extension ID
   // emoji: number;      /// boolean / 0 = false, 1 = true
   // idn: number;        /// boolean / 0 = false, 1 = true
@@ -90,7 +90,7 @@ export interface DomainRequest {
 
 export interface DomainsRequest {
   pagination: PaginationArgument;
-  params: Partial<DomainsRequestOptions>;
+  params: Partial<DomainsRequestParams>;
 }
 
 export interface DomainUpdate {

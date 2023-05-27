@@ -5,12 +5,13 @@
 
 import type { PaginationArgument } from "../pagination/schema.ts";
 
-interface ExtensionsRequestOptions {
+interface ExtensionsRequestParams {
   // emoji: number;      /// boolean / 0 = false, 1 = true
   // idn: number;        /// boolean / 0 = false, 1 = true
   // length: number;
   // numeric: number;    /// boolean / 0 = false, 1 = true
-  registry: string; // TODO: save as lowercase ASCII?
+  // registry: string; // TODO: save as lowercase ASCII?
+  tier: DEFAULT | COMMON | RARE | EPIC | LEGENDARY;
   // startsWith: string;
 
   // NOTE
@@ -22,9 +23,20 @@ interface ExtensionsRequestOptions {
 
 /// export
 
+export enum ExtensionTier {
+  DEFAULT = "DEFAULT",
+  COMMON = "COMMON",
+  RARE = "RARE",
+  EPIC = "EPIC",
+  LEGENDARY = "LEGENDARY"
+}
+
 export interface Extension {
-  name: string; /// ASCII
-  registry: string;
+  name: string;
+  pairs: string[];    // related extension names
+  premium: string[];  // high-quality SLDs
+  registry: string;   // TODO | should be an ID in the future
+  tier: ExtensionTier;
   ///
   created: Date;
   id: string;
@@ -56,7 +68,7 @@ export interface ExtensionUpdate {
 
 export interface ExtensionsRequest {
   pagination: PaginationArgument;
-  params: Partial<ExtensionsRequestOptions>;
+  params: Partial<ExtensionsRequestParams>;
 }
 
 

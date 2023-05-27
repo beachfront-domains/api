@@ -1,6 +1,12 @@
 
 
 
+/// util
+
+import type { Customer } from "src/component/customer/schema.ts";
+
+
+
 /// export
 
 export interface DetailObject {
@@ -13,6 +19,16 @@ export interface DetailObject {
 export interface LooseObject {
   [key: string]: any;
 }
+
+export type SearchResponse = Promise<{
+  detail: Array<DetailObject> | null,
+  pageInfo: {
+    cursor: string | null,
+    hasNextPage: boolean,
+    hasPreviousPage: boolean
+  },
+  viewer: Customer | null
+}>;
 
 export type StandardBooleanResponse = Promise<{ success: boolean }>;
 export type StandardResponse = Promise<{ detail: DetailObject | null }>;

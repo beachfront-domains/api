@@ -9,7 +9,7 @@ import { toASCII } from "dep/x/tr46.ts";
 
 /// util
 
-import { accessControl, databaseOptions, stringTrim } from "src/utility/index.ts";
+import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
 import e from "dbschema";
 
 import type { InvoiceRequest } from "../schema.ts";
@@ -25,7 +25,7 @@ export default (async(_root, args: InvoiceRequest, ctx, _info?) => {
   if (!await accessControl(ctx))
     return null;
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   const { params } = args;
   const query: LooseObject = {};
 
@@ -48,7 +48,7 @@ export default (async(_root, args: InvoiceRequest, ctx, _info?) => {
 
   const doesDocumentExist = e.select(e.Invoice, invoice => ({
     filter_single: query.id ?
-      e.op(invoice.id, "=", e.uuid(invoice.id)) :
+      e.op(invoice.id, "=", e.uuid(query.id)) :
       e.op(invoice.invoiceId, "=", query.invoiceId)
   }));
 

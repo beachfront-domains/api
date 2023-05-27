@@ -11,7 +11,7 @@ import { toASCII } from "dep/x/tr46.ts";
 
 import {
   accessControl,
-  databaseOptions,
+  databaseParams,
   stringTrim,
   validateDate
 } from "src/utility/index.ts";
@@ -40,7 +40,7 @@ export default (async(_root, args: DomainUpdate, ctx, _info?) => {
     return { detail: null };
   }
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   const query: LooseObject = {};
   let response: DetailObject | null = null;
 

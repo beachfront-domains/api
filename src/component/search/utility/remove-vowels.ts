@@ -3,9 +3,7 @@
 
 /// export
 
-export default (suppliedString: string): string => {
-  return String(suppliedString).replace(/[aeiou]/gi, "");
-}
+export default (suppliedString: string): string => String(suppliedString).replace(/[aeiou]/gi, "");
 
 
 

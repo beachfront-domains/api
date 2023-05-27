@@ -29,7 +29,7 @@ type PaymentMethod {
   mask: String
   """
   Vendor IDs could potentially conflict so the ID should be saved as
-  `<VENDOR>|<UUID>`
+  `<VENDOR>|<UUID>` (vendor is lowercase)
   """
   vendorId: ID
   #

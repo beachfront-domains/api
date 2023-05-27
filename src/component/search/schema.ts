@@ -5,32 +5,33 @@
 
 import type { PaginationArgument } from "../pagination/schema.ts";
 
+interface SearchRequestParams {
+  emoji: number;
+  extension: string;
+  idn: number;
+  length: number;
+  name: string;
+  number: number;
+  startsWith: string;
+}
+
 
 
 /// export
 
 export interface SearchRequest {
-  options: {
-    ascii?: string;
-    emoji?: boolean;
-    extension?: string;
-    idn?: boolean;
-    length?: number;
-    name?: string;
-    number?: boolean;
-    startsWith?: string;
-  }
+  pagination: PaginationArgument;
+  params: Partial<SearchRequestParams>;
 }
 
 export interface SearchResult {
-  ascii: string;
-  available: boolean;
+  available: number;
   created: string;
   duration: number;
-  hns: string;
   name: string;
-  premium: boolean;
-  price: string;
+  premium: number;
+  priceHNS: string;
+  priceUSD: string;
 }
 
 

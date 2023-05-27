@@ -3,59 +3,69 @@
 
 /// import
 
-import { r } from "rethinkdb-ts";
+import { createClient } from "edgedb";
+import { log } from "dep/std.ts";
 
 /// util
 
-import { databaseOptions, errorLogger } from "src/utility/index.ts";
-import { get as getSession } from "./read.ts";
-import type { LooseObject } from "src/utility/index.ts";
-import type { SessionRequest } from "src/schema/index.ts";
+import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
+import e from "dbschema";
 
-const databaseName = "session";
+import type { LooseObject, StandardBooleanResponse } from "src/utility/index.ts";
+import type { SessionRequest } from "../schema.ts";
+
+const thisFilePath = "/src/component/session/crud/delete.ts";
 
 
 
 /// export
 
-export default async(input: SessionRequest) => {
-  const databaseConnection = await r.connect(databaseOptions);
-  const { options: { id }} = input;
+export default (async(_root, args: SessionRequest, ctx, _info?) => {
+  if (!await accessControl(ctx))
+    return null;
+
+  const client = createClient(databaseParams);
+  const { params } = args;
   const query: LooseObject = {};
 
-  // TODO
-  // : ensure that customer does not own any domains before deletion
-  // : return false/abort otherwise
+  Object.entries(params).forEach(([key, value]) => {
+    switch(key) {
+      case "id": {
+        query[key] = stringTrim(value);
+        break;
+      }
 
-  const doesDocumentExist = await getSession({ options: { id: String(id) }});
+      default:
+        break;
+    }
+  });
 
-  if (Object.keys(doesDocumentExist.detail).length === 0) {
-    databaseConnection.close();
-    /// document does not exist so technically, the desired result is true
+  const doesDocumentExist = e.select(e.Session, session => ({
+    filter_single: e.op(session.id, "=", e.uuid(query.id))
+  }));
+
+  const existenceResult = await doesDocumentExist.run(client);
+
+  if (!existenceResult) {
+    log.warning(`[${thisFilePath}]› Cannot delete nonexistent document.`);
     return { success: true };
   }
 
   /// document exists, so grab ID to locate for deletion
-  const documentId = doesDocumentExist?.detail?.id;
+  const documentId = e.uuid(existenceResult.id);
 
   try {
-    const deleteDocument = await r
-      .table(databaseName)
-      .get(documentId)
-      .delete({ returnChanges: true })
-      .run(databaseConnection);
+    const deleteQuery = e.delete(e.Session, session => ({
+      filter_single: e.op(session.id, "=", documentId)
+    }));
 
-    if (deleteDocument.errors !== 0) {
-      databaseConnection.close();
-      errorLogger(query, "Session deletion failed.");
-      return { success: false };
-    }
+    await deleteQuery.run(client);
 
-    databaseConnection.close();
     return { success: true };
-  } catch(error) {
-    databaseConnection.close();
-    errorLogger(error, "Exception caught while deleting session.");
+  } catch(_) {
+    // TODO
+    // : create error ingest system : https://github.com/neuenet/pastry-api/issues/10
+    log.error(`[${thisFilePath}]› Exception caught while deleting document.`);
     return { success: false };
   }
-}
+}) satisfies StandardBooleanResponse;

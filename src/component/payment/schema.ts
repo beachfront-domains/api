@@ -5,7 +5,7 @@
 
 import type { PaginationArgument } from "../pagination/schema.ts";
 
-interface PaymentMethodRequestOptions {
+interface PaymentMethodRequestParams {
   customer: string; /// customer ID
   kind: PaymentKind;
 }
@@ -23,7 +23,7 @@ export interface PaymentMethod {
   customer?: string; /// ID of customer
   kind?: PaymentKind;
   mask?: string;
-  vendorId?: string; /// format: `<vendor>|<uuid in vendor system>`
+  vendorId?: string; /// format: `<vendor>|<uuid in vendor system>` (vendor is lowercase)
   ///
   created: Date;
   id: string;
@@ -38,7 +38,7 @@ export interface PaymentMethodCreate {
     /// or the first half of a cryptocurrency wallet address
     mask: string;
     // Won't exist until created
-    // vendorId: string; /// ID of payment method in vendor system
+    // vendorId: string; /// ID of payment method in vendor system (vendor is lowercase)
   }
 }
 
@@ -52,7 +52,7 @@ export interface PaymentMethodRequest {
 export interface PaymentMethodUpdate {
   params: {
     id?: string;
-    vendorId?: string; /// format: `<vendor>|<uuid in vendor system>`
+    vendorId?: string; /// format: `<vendor>|<uuid in vendor system>` (vendor is lowercase)
   }
   updates: {
     mask?: string;
@@ -61,7 +61,7 @@ export interface PaymentMethodUpdate {
 
 export interface PaymentMethodsRequest {
   pagination: PaginationArgument;
-  params: Partial<PaymentMethodRequestOptions>;
+  params: Partial<PaymentMethodRequestParams>;
 }
 
 

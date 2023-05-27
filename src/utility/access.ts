@@ -8,7 +8,7 @@ import e from "dbschema";
 
 /// util
 
-import { databaseOptions } from "./constant.ts";
+import { databaseParams } from "./constant.ts";
 
 
 
@@ -26,7 +26,7 @@ export async function accessControl(ctx) {
   else
     return false;
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
 
   const doesDocumentExist = e.select(e.Key, key => ({
     ...e.Key["*"],

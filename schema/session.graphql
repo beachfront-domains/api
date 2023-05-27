@@ -1,5 +1,4 @@
 # import Customer from "customer.graphql"
-# import CustomerInput from "customer.graphql"
 # import Pagination from "pagination.graphql"
 
 
@@ -70,4 +69,4 @@ input SessionsQuery {
 
 
 
-### be sure to keep this file in sync with `src/schema/session/type.ts`
+### be sure to keep this file in sync with `src/component/session/schema.ts`

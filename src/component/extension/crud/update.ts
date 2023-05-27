@@ -9,7 +9,7 @@ import { toASCII } from "dep/x/tr46.ts";
 
 /// util
 
-import { accessControl, databaseOptions, stringTrim } from "src/utility/index.ts";
+import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
 import { DomainStatusCode } from "../schema.ts";
 import e from "dbschema";
 
@@ -33,7 +33,7 @@ export default (async(_root, args: ExtensionUpdate, ctx, _info?) => {
     return { detail: null };
   }
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   const query: LooseObject = {};
   let response: DetailObject | null = null;
 

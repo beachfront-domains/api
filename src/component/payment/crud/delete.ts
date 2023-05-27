@@ -3,80 +3,72 @@
 
 /// import
 
-import { r } from "rethinkdb-ts";
+import { createClient } from "edgedb";
+import { log } from "dep/std.ts";
 
 /// util
 
-import { databaseName } from "../utility/constant.ts";
-import { databaseOptions } from "src/utility/index.ts";
-import { get as getPaymentMethod } from "./read.ts";
-import type { Customer, PaymentMethodRequest } from "src/schema/index.ts";
-import type { LooseObject } from "src/utility/index.ts";
+import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
+import e from "dbschema";
 
-const failedResponse = { success: false };
-const successResponse = { success: true };
+import type { PaymentMethodRequest } from "../schema.ts";
+import type { LooseObject, StandardBooleanResponse } from "src/utility/index.ts";
+
+const thisFilePath = "/src/component/payment/crud/delete.ts";
 
 
 
 /// export
 
-export default async(data: PaymentMethodRequest, context: Customer): Promise<{ success: Boolean }> => {
-  if (!context || !context.id)
-    return failedResponse;
+export default (async(_root, args: PaymentMethodRequest, ctx, _info?) => {
+  if (!await accessControl(ctx))
+    return null;
 
-  const databaseConnection = await r.connect(databaseOptions);
-  const { options } = data;
+  const client = createClient(databaseParams);
+  const { params } = args;
   const query: LooseObject = {};
 
-  Object.entries(options).forEach(([key, value]) => {
+  Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "id":
-      case "vendorId":
-        query[key] = String(value);
+      case "vendorId": {
+        query[key] = stringTrim(value);
         break;
+      }
 
       default:
         break;
     }
   });
 
-  const doesDocumentExist = await getPaymentMethod({ options: { ...query }}, context);
+  const doesDocumentExist = e.select(e.Payment, payment => ({
+    filter_single: query.id ?
+      e.op(payment.id, "=", e.uuid(payment.id)) :
+      e.op(payment.vendorId, "=", query.vendorId)
+  }));
 
-  if (doesDocumentExist.detail.id.length === 0) {
-    databaseConnection.close();
-    /// document does not exist so technically, the desired result is true
-    return successResponse;
+  const existenceResult = await doesDocumentExist.run(client);
+
+  if (!existenceResult) {
+    log.warning(`[${thisFilePath}]› Cannot delete nonexistent document.`);
+    return { success: true };
   }
 
   /// document exists, so grab ID to locate for deletion
-  const documentId = doesDocumentExist.detail.id;
+  const documentId = e.uuid(existenceResult.id);
 
   try {
-    const deleteDocument = await r
-      .table(databaseName)
-      .get(documentId)
-      .delete({ returnChanges: true })
-      .run(databaseConnection);
+    const deleteQuery = e.delete(e.Payment, payment => ({
+      filter_single: e.op(payment.id, "=", documentId)
+    }));
 
-    if (deleteDocument.errors !== 0) {
-      databaseConnection.close();
+    await deleteQuery.run(client);
 
-      console.group("Payment method deletion failed");
-      console.error(query);
-      console.groupEnd();
-
-      return failedResponse;
-    }
-
-    databaseConnection.close();
-    return successResponse;
-  } catch(error) {
-    databaseConnection.close();
-
-    console.group("Exception caught while deleting payment method");
-    console.error(error);
-    console.groupEnd();
-
-    return failedResponse;
+    return { success: true };
+  } catch(_) {
+    // TODO
+    // : create error ingest system : https://github.com/neuenet/pastry-api/issues/10
+    log.error(`[${thisFilePath}]› Exception caught while deleting document.`);
+    return { success: false };
   }
-}
+}) satisfies StandardBooleanResponse;

@@ -10,7 +10,7 @@ import { log } from "dep/std.ts";
 
 import {
   accessControl,
-  databaseOptions,
+  databaseParams,
   stringTrim,
   validateEmail
 } from "src/utility/index.ts";
@@ -31,7 +31,7 @@ export default (async(_root, args: CustomerCreate, ctx, _info?) => {
   if (!await accessControl(ctx))
     return null;
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   const { params } = args;
   const query: LooseObject = {};
   let response: DetailObject | null = null;

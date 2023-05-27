@@ -5,7 +5,7 @@
 
 import type { PaginationArgument } from "../pagination/schema.ts";
 
-interface InvoicesRequestOptions {
+interface InvoicesRequestParams {
   customer: string; /// customer ID
   paid: number;
   // payment: InvoiceType;
@@ -86,7 +86,7 @@ export interface InvoiceUpdate {
 
 export interface InvoicesRequest {
   pagination: PaginationArgument;
-  params: Partial<InvoicesRequestOptions>;
+  params: Partial<InvoicesRequestParams>;
 }
 
 

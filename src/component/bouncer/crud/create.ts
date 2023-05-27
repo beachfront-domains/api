@@ -8,7 +8,7 @@ import { nanoid } from "nanoid";
 
 /// util
 
-import { apiURL, databaseOptions, siteURL } from "src/utility/index.ts";
+import { apiURL, databaseParams, siteURL } from "src/utility/index.ts";
 import { sign } from "src/utility/jsonwebtoken/index.ts";
 
 const { key } = env();
@@ -38,7 +38,7 @@ export function createLinkII(baseURL: string, token: string, email: string): str
 //     subject: email
 //   };
 
-//   const databaseConnection = await r.connect(databaseOptions);
+//   const databaseConnection = await r.connect(databaseParams);
 //   const pass = createToken(nanoid(), options);
 //   const hash = bcrypt.hashSync(pass, 5)
 //     .replace(/([$|/])/g, "")

@@ -3,98 +3,95 @@
 
 /// import
 
-import dif from "microdiff";
-import { diff as test, jsonPatchPathConverter } from "just-diff";
-import { r } from "rethinkdb-ts";
-import type { WriteResult } from "rethinkdb-ts";
+import { createClient } from "edgedb";
+import { log } from "dep/std.ts";
 
 /// util
 
-import { databaseOptions, errorLogger, objectCompare } from "src/utility/index.ts";
-import { get } from "./read.ts";
-import type { LooseObject } from "src/utility/index.ts";
-import type { SessionUpdate } from "src/schema/index.ts";
+import { databaseParams, personFromSession, stringTrim } from "src/utility/index.ts";
+import { CartItem } from "../schema.ts";
+import e from "dbschema";
 
-const databaseName = "session";
-const emptyResponse = { detail: { id: "" }};
+import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
+import type { SessionUpdate } from "../schema.ts";
+
+const thisFilePath = "/src/component/session/crud/update.ts";
 
 
 
 /// export
 
-export default async(input: SessionUpdate) => {
-  const { changes, options: { id }} = input;
-  const databaseConnection = await r.connect(databaseOptions);
-  const dataSet: LooseObject = {};
+export default (async(_root, args: SessionUpdate, ctx, _info?) => {
+  /// NOTE
+  /// : this function doesn't need to be auth-gated
+
+  const { params, updates } = args;
+
+  if (objectIsEmpty(params) || objectIsEmpty(updates)) {
+    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    return { detail: null };
+  }
+
+  const client = createClient(databaseParams);
   const query: LooseObject = {};
+  let response: DetailObject | null = null;
 
-  Object.entries(changes).forEach(([key, value]) => {
+  Object.entries(updates).forEach(([key, value]) => {
     switch(key) {
-      case "cart":
-        query[key] = [...new Set(value as any[])]; /// eliminate duplicates
+      case "cart": {
+        query[key] = [...new Set(value as CartItem[])] || null; /// eliminate duplicates
         break;
+      }
 
-      case "customer":
-        query[key] = String(value);
+      case "customer": {
+        query[key] = stringTrim(value);
         break;
+      }
 
       default:
         break;
     }
   });
 
-  // TODO
-  // : check customer key for validity? or perform check(s) at auth layer?
+  /// NOTE
+  /// We do not check the `customer` ID for validity, as this is
+  /// supposed to be a quick and easy way to have a persistent
+  /// cart. We do not care at this point in time.
+  ///
+  /// When checkout occurs, we will validate `customer` ID.
 
-  const documentExistenceQuery = await get({ options: { id: String(id) }});
+  const doesDocumentExist = e.select(e.Session, session => ({
+    ...e.Session["*"],
+    customer: session.customer["*"],
+    filter_single: e.op(session.id, "=", e.uuid(stringTrim(params.id)))
+  }));
 
-  if (Object.keys(documentExistenceQuery.detail).length === 0) {
-    databaseConnection.close();
-    /// document does not exist, return blank
-    return emptyResponse;
+  const existenceResult = await doesDocumentExist.run(client);
+
+  if (!existenceResult) {
+    log.warning(`[${thisFilePath}]› Cannot update nonexistent document.`);
+    return { detail: response };
   }
-
-  const documentToUpdate = documentExistenceQuery.detail;
-
-  if (!documentToUpdate.customer && query.customer) {
-    /// We only update with the customer parameter if this session
-    /// did not already have one. Case: someone adds domains to
-    /// cart but is not logged in until later.
-    dataSet.customer = query.customer;
-  }
-
-  dataSet.cart = query.cart;
-
-  const finalObject = {
-    ...dataSet,
-    updated: new Date()
-  };
-
-  // console.log(finalObject);
-  // console.log(">>> finalObject");
 
   try {
-    const documentUpdate = await r
-      .table(databaseName)
-      .get(documentToUpdate.id)
-      .update(finalObject, {
-        returnChanges: true
-      })
-      .run(databaseConnection);
+    const updateQuery = e.update(e.Session, session => ({
+      filter_single: e.op(session.id, "=", e.uuid(existenceResult.id)),
+      set: {
+        ...query,
+        updated: e.datetime_of_transaction()
+      }
+    }));
 
-    if (documentUpdate.errors > 0) {
-      databaseConnection.close();
-      errorLogger(finalObject, "Error updating session.");
-      return emptyResponse;
-    }
+    response = await e.select(updateQuery, session => ({
+      ...e.Session["*"],
+      customer: session.customer["*"],
+    })).run(client);
 
-    const updatedDocument: WriteResult = documentUpdate?.changes && documentUpdate.changes[0].new_val;
-    databaseConnection.close();
-
-    return { detail: updatedDocument };
-  } catch(error) {
-    databaseConnection.close();
-    errorLogger(error, "Exception caught while updating session.");
-    return emptyResponse;
+    return { detail: response };
+  } catch(_) {
+    // TODO
+    // : create error ingest system : https://github.com/neuenet/pastry-api/issues/10
+    log.error(`[${thisFilePath}]› Exception caught while updating document.`);
+    return { detail: response };
   }
-};
+}) satisfies StandardResponse;

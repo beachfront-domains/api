@@ -9,7 +9,7 @@ import { toASCII } from "dep/x/tr46.ts";
 
 /// util
 
-import { accessControl, databaseOptions } from "src/utility/index.ts";
+import { accessControl, databaseParams, personFromSession } from "src/utility/index.ts";
 import { DomainStatusCode } from "../schema.ts";
 import dotCheck from "../utility/check-dot.ts";
 import e from "dbschema";
@@ -27,7 +27,7 @@ export default (async(_root, args: DomainCreate, ctx, _info?) => {
   if (!await accessControl(ctx))
     return null;
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   const { params } = args;
   const query: LooseObject = {};
   let response: DetailObject | null = null;
@@ -101,7 +101,12 @@ export default (async(_root, args: DomainCreate, ctx, _info?) => {
   }
 
   try {
-    const owner = await getOwner(ctx);
+    const owner = await personFromSession(ctx);
+
+    if (!owner) {
+      log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
+      return { detail: response, error: [{ code: "TBA", message: error }] };
+    }
 
     const newDocument = e.insert(e.Domain, {
       ...query,
@@ -127,31 +132,3 @@ export default (async(_root, args: DomainCreate, ctx, _info?) => {
     return { detail: response };
   }
 }) satisfies StandardResponse;
-
-
-
-/// helper
-
-async function getOwner(ctx) {
-  const bearerTokenParts = ctx["x-session"].split(" ");
-  let sessionToken = "";
-
-  if (bearerTokenParts.length === 2 && bearerTokenParts[0].toLowerCase() === "bearer")
-    sessionToken = String(bearerTokenParts[1]);
-  else
-    return false;
-
-  const client = createClient(databaseOptions);
-
-  const doesDocumentExist = e.select(e.Key, key => ({
-    ...e.Key["*"],
-    filter_single: e.op(key.id, "=", e.uuid(sessionToken)),
-    owner: key.owner["*"]
-  }));
-
-  const existenceResult = await doesDocumentExist.run(client);
-
-  return {
-    ...existenceResult.owner
-  };
-}

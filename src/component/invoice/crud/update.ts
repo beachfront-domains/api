@@ -8,7 +8,7 @@ import { log } from "dep/std.ts";
 
 /// util
 
-import { accessControl, databaseOptions, stringTrim } from "src/utility/index.ts";
+import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
 import { InvoiceType, InvoiceVendor } from "../schema.ts";
 import e from "dbschema";
 
@@ -32,7 +32,7 @@ export default (async(_root, args: InvoiceUpdate, ctx, _info?) => {
     return { detail: null };
   }
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
   const query: LooseObject = {};
   let response: DetailObject | null = null;
 
@@ -91,7 +91,7 @@ export default (async(_root, args: InvoiceUpdate, ctx, _info?) => {
     }));
 
     response = await e.select(updateQuery, () => ({
-      ...e.Extension["*"]
+      ...e.Invoice["*"]
     })).run(client);
 
     return { detail: response };
