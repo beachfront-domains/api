@@ -5,19 +5,18 @@
 
 import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
-import { toASCII } from "dep/x/tr46.ts";
 
 /// util
 
 import {
   accessControl,
   databaseParams,
+  objectIsEmpty,
   stringTrim,
   validateDate
 } from "src/utility/index.ts";
 
 import { DomainStatusCode } from "../schema.ts";
-import dotCheck from "../utility/check-dot.ts";
 import e from "dbschema";
 
 import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
@@ -29,9 +28,9 @@ const thisFilePath = "/src/component/domain/crud/update.ts";
 
 /// export
 
-export default (async(_root, args: DomainUpdate, ctx, _info?) => {
+export default async(_root, args: DomainUpdate, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const { params, updates } = args;
 
@@ -41,27 +40,27 @@ export default (async(_root, args: DomainUpdate, ctx, _info?) => {
   }
 
   const client = createClient(databaseParams);
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
   let response: DetailObject | null = null;
 
   Object.entries(updates).forEach(([key, value]) => {
     switch(key) {
       case "expiry": {
-        query[key] = validateDate(stringTrim(value)) ?
-          String(value) :
+        query[key] = validateDate(stringTrim(String(value))) ?
+          new Date(stringTrim(String(value))) :
           null;
 
         break;
       }
 
       case "owner": {
-        query[key] = stringTrim(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
       case "status": {
-        query[key] = Object.values(DomainStatusCode).includes(stringTrim(value).toUpperCase()) ?
-          stringTrim(value).toUpperCase() :
+        query[key] = DomainStatusCode[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          DomainStatusCode[stringTrim(String(value).toUpperCase())] :
           null;
         break;
       }
@@ -127,4 +126,4 @@ export default (async(_root, args: DomainUpdate, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while updating document.`);
     return { detail: response };
   }
-}) satisfies StandardResponse;
+}

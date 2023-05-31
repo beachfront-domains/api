@@ -20,13 +20,13 @@ const thisFilePath = "/src/component/session/crud/delete.ts";
 
 /// export
 
-export default (async(_root, args: SessionRequest, ctx, _info?) => {
+export default async(_root, args: SessionRequest, ctx, _info?): StandardBooleanResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { success: false };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
@@ -68,4 +68,4 @@ export default (async(_root, args: SessionRequest, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while deleting document.`);
     return { success: false };
   }
-}) satisfies StandardBooleanResponse;
+}

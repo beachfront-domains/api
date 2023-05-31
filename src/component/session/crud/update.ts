@@ -8,7 +8,7 @@ import { log } from "dep/std.ts";
 
 /// util
 
-import { databaseParams, personFromSession, stringTrim } from "src/utility/index.ts";
+import { databaseParams, objectIsEmpty, stringTrim } from "src/utility/index.ts";
 import { CartItem } from "../schema.ts";
 import e from "dbschema";
 
@@ -21,9 +21,13 @@ const thisFilePath = "/src/component/session/crud/update.ts";
 
 /// export
 
-export default (async(_root, args: SessionUpdate, ctx, _info?) => {
+export default async(_root, args: SessionUpdate, _ctx, _info?): StandardResponse => {
   /// NOTE
   /// : this function doesn't need to be auth-gated
+
+  // TODO
+  // : if session exists in `ctx`, update that instead?
+  // : remember to remove underscore from `ctx` if used
 
   const { params, updates } = args;
 
@@ -33,18 +37,23 @@ export default (async(_root, args: SessionUpdate, ctx, _info?) => {
   }
 
   const client = createClient(databaseParams);
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
   let response: DetailObject | null = null;
+
+  function processCartItems(arr): CartItem[] {
+    return arr.map((item: CartItem) => item);
+  }
 
   Object.entries(updates).forEach(([key, value]) => {
     switch(key) {
       case "cart": {
-        query[key] = [...new Set(value as CartItem[])] || null; /// eliminate duplicates
+        // query[key] = [...new Set(value as CartItem[])] || null; /// eliminate duplicates
+        query[key] = processCartItems(value);
         break;
       }
 
       case "customer": {
-        query[key] = stringTrim(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
@@ -94,4 +103,4 @@ export default (async(_root, args: SessionUpdate, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while updating document.`);
     return { detail: response };
   }
-}) satisfies StandardResponse;
+}

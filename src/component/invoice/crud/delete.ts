@@ -5,7 +5,6 @@
 
 import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
-import { toASCII } from "dep/x/tr46.ts";
 
 /// util
 
@@ -21,18 +20,18 @@ const thisFilePath = "/src/component/invoice/crud/delete.ts";
 
 /// export
 
-export default (async(_root, args: InvoiceRequest, ctx, _info?) => {
+export default async(_root, args: InvoiceRequest, ctx, _info?): StandardBooleanResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { success: false };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "id": {
-        query[key] = stringTrim(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
@@ -76,4 +75,4 @@ export default (async(_root, args: InvoiceRequest, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while deleting document.`);
     return { success: false };
   }
-}) satisfies StandardBooleanResponse;
+}

@@ -19,7 +19,7 @@ import {
 
 import e from "dbschema";
 
-import type { ExtensionRequest, ExtensionsRequest } from "../schema.ts";
+import type { Extension, ExtensionRequest, ExtensionsRequest } from "../schema.ts";
 
 import type {
   DetailObject,
@@ -34,16 +34,16 @@ const thisFilePath = "/src/component/extension/crud/read.ts";
 
 /// export
 
-export const get = (async(_root, args: ExtensionRequest, ctx, _info?) => {
+export const get = async(_root, args: ExtensionRequest, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as Extension);
   let response: DetailObject | null = null;
 
-  Object.entries(options).forEach(([key, value]) => {
+  Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "id": {
         query[key] = stringTrim(value);
@@ -77,15 +77,23 @@ export const get = (async(_root, args: ExtensionRequest, ctx, _info?) => {
   return {
     detail: response
   };
-}) satisfies StandardResponse;
+};
 
-export const getMore = (async(_root, args: Partial<ExtensionsRequest>, ctx, _info?) => {
-  if (!await accessControl(ctx))
-    return null;
+export const getMore = async(_root, args: Partial<ExtensionsRequest>, ctx, _info?): StandardPlentyResponse => {
+  if (!await accessControl(ctx)) {
+    return {
+      detail: null,
+      pageInfo: {
+        cursor: null,
+        hasNextPage: false,
+        hasPreviousPage: false
+      }
+    };
+  }
 
   const client = createClient(databaseParams);
   const { pagination, params } = args;
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
   let allDocuments: Array<any> | null = null; // Array<DetailObject> // TODO: find EdgeDB document type
   let hasNextPage = false;
   let hasPreviousPage = false;
@@ -126,16 +134,15 @@ export const getMore = (async(_root, args: Partial<ExtensionsRequest>, ctx, _inf
   // TODO
   // : `created` and `updated` should be a range
 
-  Object.entries(params).forEach(([key, value]) => {
+  Object.entries((params as LooseObject)).forEach(([key, value]) => {
     switch(key) {
-      case "registry": {
-        query[key] = stringTrim(value);
+      case "tier": {
+        query[key] = String(stringTrim(value)).toUpperCase();
         break;
       }
 
-      default: {
+      default:
         break;
-      }
     }
   });
 
@@ -213,4 +220,4 @@ export const getMore = (async(_root, args: Partial<ExtensionsRequest>, ctx, _inf
       hasPreviousPage
     }
   };
-}) satisfies StandardPlentyResponse;
+};

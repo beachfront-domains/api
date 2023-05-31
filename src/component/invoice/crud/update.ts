@@ -8,7 +8,13 @@ import { log } from "dep/std.ts";
 
 /// util
 
-import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
+import {
+  accessControl,
+  databaseParams,
+  objectIsEmpty,
+  stringTrim
+} from "src/utility/index.ts";
+
 import { InvoiceType, InvoiceVendor } from "../schema.ts";
 import e from "dbschema";
 
@@ -21,9 +27,9 @@ const thisFilePath = "/src/component/invoice/crud/create.ts";
 
 /// export
 
-export default (async(_root, args: InvoiceUpdate, ctx, _info?) => {
+export default async(_root, args: InvoiceUpdate, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const { params, updates } = args;
 
@@ -33,7 +39,7 @@ export default (async(_root, args: InvoiceUpdate, ctx, _info?) => {
   }
 
   const client = createClient(databaseParams);
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
   let response: DetailObject | null = null;
 
   Object.entries(updates).forEach(([key, value]) => {
@@ -44,16 +50,16 @@ export default (async(_root, args: InvoiceUpdate, ctx, _info?) => {
       }
 
       case "payment": {
-        query[key] = InvoiceType[stringTrim(value).toUpperCase()] === stringTrim(value).toUpperCase() ?
-          stringTrim(value).toUpperCase() :
-          null;
+        query[key] = InvoiceType[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          InvoiceType[stringTrim(String(value).toUpperCase())] :
+          InvoiceType.CREDITCARD;
         break;
       }
 
       case "vendor": {
-        query[key] = InvoiceVendor[stringTrim(value).toUpperCase()] === stringTrim(value).toUpperCase() ?
-          stringTrim(value).toUpperCase() :
-          null;
+        query[key] = InvoiceVendor[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          InvoiceVendor[stringTrim(String(value).toUpperCase())] :
+          InvoiceVendor.STRIPE;
         break;
       }
 
@@ -70,8 +76,8 @@ export default (async(_root, args: InvoiceUpdate, ctx, _info?) => {
 
   const doesDocumentExist = e.select(e.Invoice, invoice => ({
     filter_single: params.id ?
-      e.op(document.id, "=", e.uuid(stringTrim(params.id))) :
-      e.op(document.invoiceId, "=", Number(params.invoiceId))
+      e.op(invoice.id, "=", e.uuid(String(params.id))) :
+      e.op(invoice.invoiceId, "=", Number(params.invoiceId))
   }));
 
   const existenceResult = await doesDocumentExist.run(client);
@@ -101,4 +107,4 @@ export default (async(_root, args: InvoiceUpdate, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while updating document.`);
     return { detail: response };
   }
-}) satisfies StandardResponse;
+}

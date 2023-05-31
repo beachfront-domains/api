@@ -12,14 +12,21 @@ import {
   accessControl,
   databaseParams,
   maxPaginationLimit,
+  objectIsEmpty,
   stringTrim
 } from "src/utility/index.ts";
 
 import { PaymentKind } from "../schema.ts";
 import e from "dbschema";
 
-import type { PaymentMethodRequest, PaymentMethodsRequest } from "../schema.ts";
-import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
+import type { PaymentMethod, PaymentMethodRequest, PaymentMethodsRequest } from "../schema.ts";
+
+import type {
+  DetailObject,
+  LooseObject,
+  StandardResponse,
+  StandardPlentyResponse
+} from "src/utility/index.ts";
 
 const thisFilePath = "/src/component/payment/crud/read.ts";
 
@@ -27,20 +34,20 @@ const thisFilePath = "/src/component/payment/crud/read.ts";
 
 /// export
 
-export const get = (async(_root, args: PaymentMethodRequest, ctx, _info?) => {
+export const get = async(_root, args: PaymentMethodRequest, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as PaymentMethod);
   let response: DetailObject | null = null;
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "id":
       case "vendorId": {
-        query[key] = stringTrim(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
@@ -67,15 +74,23 @@ export const get = (async(_root, args: PaymentMethodRequest, ctx, _info?) => {
   return {
     detail: response
   };
-}) satisfies StandardResponse;
+};
 
-export const getMore = (async(_root, args: Partial<PaymentMethodsRequest>, ctx, _info?) => {
-  if (!await accessControl(ctx))
-    return null;
+export const getMore = async(_root, args: Partial<PaymentMethodsRequest>, ctx, _info?): StandardPlentyResponse => {
+  if (!await accessControl(ctx)) {
+    return {
+      detail: null,
+      pageInfo: {
+        cursor: null,
+        hasNextPage: false,
+        hasPreviousPage: false
+      }
+    };
+  }
 
   const client = createClient(databaseParams);
   const { pagination, params } = args;
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
   let allDocuments: Array<any> | null = null; // Array<DetailObject> // TODO: find EdgeDB document type
   let hasNextPage = false;
   let hasPreviousPage = false;
@@ -116,23 +131,22 @@ export const getMore = (async(_root, args: Partial<PaymentMethodsRequest>, ctx, 
   // TODO
   // : `created` and `updated` should be a range
 
-  Object.entries(params).forEach(([key, value]) => {
+  Object.entries((params as LooseObject)).forEach(([key, value]) => {
     switch(key) {
       case "customer": {
-        query[key] = stringTrim(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
       case "kind": {
-        query[key] = PaymentKind[stringTrim(value).toUpperCase()] === stringTrim(value).toUpperCase() ?
-          stringTrim(value).toUpperCase() :
-          null;
+        query[key] = PaymentKind[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          PaymentKind[stringTrim(String(value).toUpperCase())] :
+          PaymentKind.FIAT;
         break;
       }
 
-      default: {
+      default:
         break;
-      }
     }
   });
 
@@ -141,22 +155,16 @@ export const getMore = (async(_root, args: Partial<PaymentMethodsRequest>, ctx, 
     order_by: document.created
   }));
 
-  if (query.wildcard) {
-    allDocuments = await e.select(e.Payment, document => ({
-      ...baseShape(document)
-    })).run(client);
-  } else {
-    allDocuments = await e.select(e.Payment, document => ({
-      ...baseShape(document),
-      // TODO
-      // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
-      filter: query.customer ?
-        e.op(document.customer, "=", e.uuid(query.customer)) :
-          query.kind ?
-            e.op(document.kind, "=", query.kind) :
-              null
-    })).run(client);
-  }
+  allDocuments = await e.select(e.Payment, document => ({
+    ...baseShape(document),
+    // TODO
+    // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
+    filter: query.customer ?
+      e.op(document.customer.id, "=", e.uuid(query.customer)) :
+        query.kind ?
+          e.op(document.kind, "=", query.kind) :
+            undefined
+  })).run(client);
 
   const totalDocuments = allDocuments.length;
 
@@ -173,26 +181,18 @@ export const getMore = (async(_root, args: Partial<PaymentMethodsRequest>, ctx, 
     });
   }
 
-  if (query.wildcard) {
-    response = await e.select(e.Payment, document => ({
-      ...baseShape(document),
-      limit,
-      offset
-    })).run(client);
-  } else {
-    response = await e.select(e.Payment, document => ({
-      ...baseShape(document),
-      // TODO
-      // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
-      filter: query.customer ?
-        e.op(document.customer, "=", e.uuid(query.customer)) :
-          query.kind ?
-            e.op(document.kind, "=", query.kind) :
-              null,
-      limit,
-      offset
-    })).run(client);
-  }
+  response = await e.select(e.Payment, document => ({
+    ...baseShape(document),
+    // TODO
+    // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
+    filter: query.customer ?
+      e.op(document.customer.id, "=", e.uuid(query.customer)) :
+        query.kind ?
+          e.op(document.kind, "=", query.kind) :
+            undefined,
+    limit,
+    offset
+  })).run(client);
 
   /// inspired by https://stackoverflow.com/a/62565528
   cursor = response && response.length > 0 ?
@@ -222,4 +222,4 @@ export const getMore = (async(_root, args: Partial<PaymentMethodsRequest>, ctx, 
       hasPreviousPage
     }
   };
-}) satisfies StandardPlentyResponse;
+};

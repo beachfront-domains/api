@@ -39,7 +39,7 @@ export interface Invoice {
   amount: number;
   contents: string[]; /// format: ["register|eat.lunch", "renew|buy.dinner"]
   customer: string;   /// ID of customer
-  invoiceId: number;    /// incremented ID
+  invoiceId: number;  /// incremented ID
   paid: number;
   payment: InvoiceType;
   promo: string;

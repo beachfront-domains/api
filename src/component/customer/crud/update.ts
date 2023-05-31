@@ -12,6 +12,7 @@ import {
   accessControl,
   databaseParams,
   objectIsEmpty,
+  stringTrim,
   validateEmail
 } from "src/utility/index.ts";
 
@@ -32,9 +33,9 @@ const thisFilePath = "/src/component/customer/crud/update.ts";
 
 /// export
 
-export default (async(_root, args: CustomerUpdate, ctx, _info?) => {
+export default async(_root, args: CustomerUpdate, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const { params, updates } = args;
 
@@ -44,7 +45,7 @@ export default (async(_root, args: CustomerUpdate, ctx, _info?) => {
   }
 
   const client = createClient(databaseParams);
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
   let response: DetailObject | null = null;
 
   // TODO
@@ -55,28 +56,28 @@ export default (async(_root, args: CustomerUpdate, ctx, _info?) => {
       case "name":
       case "timezone":
       case "username": {
-        query[key] = String(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
       case "email": {
         query[key] = validateEmail(String(value)) ?
           String(value).toLowerCase() :
-          null;
+          "";
         break;
       }
 
       case "loginMethod": {
-        query[key] = CustomerLoginMethods[String(value).toUpperCase()] === String(value).toUpperCase() ?
-          String(value).toUpperCase() :
-          null;
+        query[key] = CustomerLoginMethods[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          CustomerLoginMethods[stringTrim(String(value).toUpperCase())] :
+          CustomerLoginMethods.LINK;
         break;
       }
 
       case "role": {
-        query[key] = CustomerRoles[String(value).toUpperCase()] === String(value).toUpperCase() ?
-          String(value).toUpperCase() :
-          null;
+        query[key] = CustomerRoles[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          CustomerRoles[stringTrim(String(value).toUpperCase())] :
+          CustomerRoles.CUSTOMER;
         break;
       }
 
@@ -95,9 +96,9 @@ export default (async(_root, args: CustomerUpdate, ctx, _info?) => {
     return { detail: response };
   }
 
-  if (updates.email) {
+  if (updates.email && updates.email.length > 0) {
     const doesDocumentExist = e.select(e.Customer, customer => ({
-      filter_single: e.op(customer.email, "=", updates.email)
+      filter_single: e.op(customer.email, "=", query.email)
     }));
 
     const existenceResult = await doesDocumentExist.run(client);
@@ -110,7 +111,7 @@ export default (async(_root, args: CustomerUpdate, ctx, _info?) => {
 
   if (updates.username) {
     const doesDocumentExist = e.select(e.Customer, customer => ({
-      filter_single: e.op(customer.username, "=", updates.username)
+      filter_single: e.op(customer.username, "=", query.username)
     }));
 
     const existenceResult = await doesDocumentExist.run(client);
@@ -169,4 +170,4 @@ export default (async(_root, args: CustomerUpdate, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while updating document.`);
     return { detail: response };
   }
-}) satisfies StandardResponse;
+}

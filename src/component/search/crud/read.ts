@@ -4,13 +4,14 @@
 /// import
 
 import { Big } from "dep/x/big.ts";
+import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 import { toASCII } from "dep/x/tr46.ts";
 
 /// util
 
 import {
-  accessControl,
+  // accessControl,
   databaseParams,
   hnsPrice,
   // log,
@@ -21,12 +22,14 @@ import {
   validateZeroWidth
 } from "src/utility/index.ts";
 
-import type { DetailObject, LooseObject, SearchResponse } from "src/utility/index.ts";
+import e from "dbschema";
+
+import type { LooseObject /*, SearchResponse*/ } from "src/utility/index.ts";
 import type { SearchRequest, SearchResult } from "../schema.ts";
 
 const thisFilePath = "/src/component/search/crud/read.ts";
 
-import dictionary from "../utility/dictionary.ts";
+// import dictionary from "../utility/dictionary.ts";
 import getPricing from "../utility/domain-pricing.ts";
 import removeVowels from "../utility/remove-vowels.ts";
 import thesaurus from "../utility/thesaurus.ts";
@@ -44,14 +47,15 @@ import thesaurus from "../utility/thesaurus.ts";
 // : max results should be ~50
 // : toggle to show mature TLDs
 
-export default (async(_root, args: SearchRequest, ctx, _info?) => {
+export default async(_root, args: SearchRequest, ctx, _info?) => {
   const client = createClient(databaseParams);
   const { /*pagination,*/ params } = args;
-  const query: LooseObject = {};
-  const results: SearchResult[] = [];
-  let basePrice = 0;
-  let isPremium = false;
-  let premiumPrice = 0;
+  const query = ({} as LooseObject);
+  // const results: SearchResult[] = [];
+  const results = ([] as SearchResult[]);
+  // let basePrice = 0;
+  // let isPremium = false;
+  // let premiumPrice = 0;
 
   if (objectIsEmpty(params)) {
     log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
@@ -68,10 +72,10 @@ export default (async(_root, args: SearchRequest, ctx, _info?) => {
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "name": {
-        query[key] = toASCII(  /// remove ambiguity
+        query[key] = toASCII(         /// remove ambiguity
           String(
-            stringTrim(value)  /// remove excess
-          ).replace(/\s/g, "") /// remove spaces
+            stringTrim(String(value)) /// remove excess
+          ).replace(/\s/g, "")        /// remove spaces
         );
         break;
       }
@@ -121,7 +125,7 @@ export default (async(_root, args: SearchRequest, ctx, _info?) => {
 
   const doesExtensionExist = e.select(e.Extension, ext => ({
     ...e.Extension["*"],
-    filter_single: e.op(ext.name, "=", extension)
+    filter_single: e.op(ext.name, "=", query.extension)
   }));
 
   const extensionExistenceResult = await doesExtensionExist.run(client);
@@ -131,7 +135,10 @@ export default (async(_root, args: SearchRequest, ctx, _info?) => {
     return { detail: results };
   }
 
-  const { pairs } = extensionExistenceResult;
+  // TODO
+  // const { pairs } = extensionExistenceResult;
+  // : use `pairs` for `sld.pair[#]`
+  // : in UI, add sparkle to pair results
 
   // TODO
   // RECOMMENDATION ENGINE
@@ -159,7 +166,7 @@ export default (async(_root, args: SearchRequest, ctx, _info?) => {
   try {
     const { antonyms, synonyms } = await thesaurus(query.sld);
     const domain = query.name;
-    const searchResult = await __findDomain(domain);
+    const searchResult = await findDomain(domain);
     const hns = await hnsPrice();
 
     if (!searchResult) {
@@ -184,7 +191,7 @@ export default (async(_root, args: SearchRequest, ctx, _info?) => {
     results.push({
       available,
       created,
-      domain,
+      name: domain,
       premium,
       priceHNS: __formatHNS(priceUSD, hns),
       priceUSD
@@ -196,7 +203,7 @@ export default (async(_root, args: SearchRequest, ctx, _info?) => {
 
       /// Customer search may already lack vowels...no need to run this function if so
       if (domainSansVowels !== domain) {
-        const searchResult = await __findDomain(domainSansVowels);
+        const searchResult = await findDomain(domainSansVowels);
 
         if (searchResult) {
           const { available, created, premium, priceUSD } = searchResult;
@@ -204,7 +211,7 @@ export default (async(_root, args: SearchRequest, ctx, _info?) => {
           results.push({
             available,
             created,
-            domain: domainSansVowels,
+            name: domainSansVowels,
             premium,
             priceHNS: __formatHNS(priceUSD, hns),
             priceUSD
@@ -223,7 +230,7 @@ export default (async(_root, args: SearchRequest, ctx, _info?) => {
     //     return; /// We do not need to see a duplicate result
 
     //   const domain = `${query.ascii}.${extension}`;
-    //   const searchResult = await __findDomain(domain);
+    //   const searchResult = await findDomain(domain);
 
     //   if (!searchResult)
     //     return;
@@ -242,8 +249,8 @@ export default (async(_root, args: SearchRequest, ctx, _info?) => {
     //   });
     // }));
 
-    const antonymsArray: SearchResult[] = await __findNames(antonyms, query.extension, hns);
-    const synonymsArray: SearchResult[] = await __findNames(synonyms, query.extension, hns);
+    const antonymsArray = await createCollection(antonyms, query.extension, hns); // : SearchResult[]
+    const synonymsArray = await createCollection(synonyms, query.extension, hns); // : SearchResult[]
     const owner = await personFromSession(ctx);
 
     return {
@@ -272,7 +279,7 @@ export default (async(_root, args: SearchRequest, ctx, _info?) => {
 
     return { detail: results };
   }
-}) satisfies SearchResponse;
+}
 
 
 
@@ -329,12 +336,12 @@ export default (async(_root, args: SearchRequest, ctx, _info?) => {
 //   return relatedTLDs;
 // }
 
-async function __findNames(suppliedArray: string[], suppliedExtension: string, hnsPrice: number) {
+async function createCollection(suppliedArray: string[], suppliedExtension: string, hnsPrice: number) {
   const names: SearchResult[] = [];
 
   await Promise.all(suppliedArray.map(async(word: string) => {
     const domain = `${word}.${suppliedExtension}`;
-    const searchResult = await __findDomain(domain);
+    const searchResult = await findDomain(domain);
 
     if (!searchResult)
       return;
@@ -344,7 +351,7 @@ async function __findNames(suppliedArray: string[], suppliedExtension: string, h
     names.push({
       available,
       created,
-      domain: toASCII(domain),
+      name: toASCII(domain),
       premium,
       priceHNS: __formatHNS(priceUSD, hnsPrice),
       priceUSD
@@ -354,12 +361,13 @@ async function __findNames(suppliedArray: string[], suppliedExtension: string, h
   return names;
 }
 
-async function __findDomain(suppliedDomain: string) {
+async function findDomain(suppliedDomain: string) {
+  const client = createClient(databaseParams);
   const extension = suppliedDomain.split(".")[1];
   const sld = suppliedDomain.split(".")[0];
-  let creationDate = null;
-  let isAvailable = true;
-  let isPremium = false;
+  let creationDate;
+  let isAvailable = 1;
+  let isPremium = 0;
 
   const doesExtensionExist = e.select(e.Extension, ext => ({
     ...e.Extension["*"],
@@ -374,31 +382,29 @@ async function __findDomain(suppliedDomain: string) {
   const extensionExistenceResult = await doesExtensionExist.run(client);
   const domainExistenceResult = await doesDomainExist.run(client);
 
-  /// NOTE
-  /// We've checked for extension's existence before this function
-  /// was called, no need for error checking. We call this again for
-  /// pricing information.
+  if (!extensionExistenceResult)
+    return null;
 
   if (domainExistenceResult) {
     creationDate = domainExistenceResult.created;
-    isAvailable = false;
+    isAvailable = 0;
   }
 
   const { premium, tier } = extensionExistenceResult;
 
   /// Check to see if desired name is considered premium
-  premium.map((premiumSLD: string) => {
+  premium && premium.map((premiumSLD: string) => {
     if (premiumSLD === sld)
-      isPremium = true;
+      isPremium = 1;
   });
 
   /// Grab TLD pricing
-  const { priceUSD } = await getPricing({ extension, premium: isPremium, sld, tier });
+  const { priceUSD } = await getPricing({ extension, premium: isPremium, sld, tier: String(tier) });
 
   return {
     available: isAvailable,
     created: creationDate,
-    domain: suppliedDomain,
+    name: suppliedDomain,
     premium: isPremium,
     priceUSD
   };

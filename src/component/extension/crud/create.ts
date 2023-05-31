@@ -10,10 +10,11 @@ import { toASCII } from "dep/x/tr46.ts";
 /// util
 
 import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
+import { ExtensionTier } from "../schema.ts";
 import e from "dbschema";
 
-import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
-import type { ExtensionCreate } from "../schema.ts";
+import type { DetailObject, StandardResponse } from "src/utility/index.ts";
+import type { Extension, ExtensionCreate } from "../schema.ts";
 
 const thisFilePath = "/src/component/extension/crud/create.ts";
 
@@ -21,24 +22,43 @@ const thisFilePath = "/src/component/extension/crud/create.ts";
 
 /// export
 
-export default (async(_root, args: ExtensionCreate, ctx, _info?) => {
+export default async(_root, args: ExtensionCreate, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as Extension);
   let response: DetailObject | null = null;
+
+  function stringifyArrayContents(arr) {
+    // TODO
+    // : figure out how to make `Array.from(new Set())` work without causing `deno check` errors
+    return arr.map(item => String(item));
+  }
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
+      case "pairs":
+      case "premium": {
+        query[key] = stringifyArrayContents(value);
+        break;
+      }
+
       case "name": {
-        query[key] = toASCII(value);
+        query[key] = toASCII(String(value));
         break;
       }
 
       case "registry": {
-        query[key] = stringTrim(value);
+        query[key] = stringTrim(String(value));
+        break;
+      }
+
+      case "tier": {
+        query[key] = ExtensionTier[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          ExtensionTier[stringTrim(String(value).toUpperCase())] :
+          ExtensionTier.DEFAULT;
         break;
       }
 
@@ -51,7 +71,7 @@ export default (async(_root, args: ExtensionCreate, ctx, _info?) => {
   if (!query.name || !query.registry) {
     const error = "Missing required parameter(s).";
     log.warning(`[${thisFilePath}]› ${error}`);
-    return { detail: response, error: [{ code: "TBA", message: error }] };
+    return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
   const doesDocumentExist = e.select(e.Extension, extension => ({
@@ -79,4 +99,4 @@ export default (async(_root, args: ExtensionCreate, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while creating document.`);
     return { detail: response };
   }
-}) satisfies StandardResponse;
+}

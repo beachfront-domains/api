@@ -20,13 +20,13 @@ const thisFilePath = "/src/component/customer/crud/delete.ts";
 
 /// export
 
-export default (async(_root, args: DomainRequest, ctx, _info?) => {
+export default async(_root, args: CustomerRequest, ctx, _info?): StandardBooleanResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { success: false };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
 
   // TODO
   // : if customer owns domains, flag them for deletion
@@ -36,9 +36,10 @@ export default (async(_root, args: DomainRequest, ctx, _info?) => {
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "email":
-      case "id":
+      case "id": {
         query[key] = stringTrim(value);
         break;
+      }
 
       default:
         break;
@@ -47,7 +48,7 @@ export default (async(_root, args: DomainRequest, ctx, _info?) => {
 
   const doesDocumentExist = e.select(e.Customer, customer => ({
     filter_single: query.id ?
-      e.op(customer.id, "=", e.uuid(customer.id)) :
+      e.op(customer.id, "=", e.uuid(query.id)) :
       e.op(customer.email, "=", query.email)
   }));
 
@@ -75,4 +76,4 @@ export default (async(_root, args: DomainRequest, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while deleting document.`);
     return { success: false };
   }
-}) satisfies StandardBooleanResponse;
+}

@@ -20,10 +20,10 @@ export enum PaymentKind {
 }
 
 export interface PaymentMethod {
-  customer?: string; /// ID of customer
-  kind?: PaymentKind;
-  mask?: string;
-  vendorId?: string; /// format: `<vendor>|<uuid in vendor system>` (vendor is lowercase)
+  customer: string; /// ID of customer
+  kind: PaymentKind;
+  mask: string;
+  vendorId: string; /// format: `<vendor>|<uuid in vendor system>` (vendor is lowercase)
   ///
   created: Date;
   id: string;
@@ -37,7 +37,7 @@ export interface PaymentMethodCreate {
     /// Based on `kind`, `mask` will either be the last 4 digits of a credit card
     /// or the first half of a cryptocurrency wallet address
     mask: string;
-    // Won't exist until created
+    // Won't exist until created within create method
     // vendorId: string; /// ID of payment method in vendor system (vendor is lowercase)
   }
 }

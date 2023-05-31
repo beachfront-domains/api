@@ -1,6 +1,17 @@
-CREATE MIGRATION m1inzq3ucwhdmipmgmfuuxihd5ohvru7elpj4z3ykqhrrgugs7aqxq
+CREATE MIGRATION m1xfxfmegu5by46oylqnrrfkwnrsbtymz2y2okmikldz2utoqyn2ya
     ONTO initial
 {
+  CREATE MODULE api IF NOT EXISTS;
+  CREATE TYPE api::Key {
+      CREATE REQUIRED PROPERTY created -> std::datetime {
+          SET default := (std::datetime_of_transaction());
+          SET readonly := true;
+      };
+      CREATE REQUIRED PROPERTY updated -> std::datetime {
+          SET default := (std::datetime_of_transaction());
+      };
+      CREATE REQUIRED PROPERTY url -> std::str;
+  };
   CREATE ABSTRACT TYPE default::BaseRecord {
       CREATE REQUIRED PROPERTY created -> std::datetime {
           SET default := (std::datetime_of_transaction());
@@ -13,23 +24,28 @@ CREATE MIGRATION m1inzq3ucwhdmipmgmfuuxihd5ohvru7elpj4z3ykqhrrgugs7aqxq
   CREATE SCALAR TYPE default::AccountLoginMethod EXTENDING enum<LINK, TOKEN>;
   CREATE SCALAR TYPE default::AccountRole EXTENDING enum<ADMIN, CUSTOMER>;
   CREATE TYPE default::Customer EXTENDING default::BaseRecord {
-      CREATE REQUIRED PROPERTY email -> std::str;
-      CREATE INDEX ON (.email);
-      CREATE PROPERTY external -> tuple<opennode: std::str, square: std::str, stripe: std::str>;
+      CREATE REQUIRED PROPERTY email -> std::str {
+          CREATE CONSTRAINT std::exclusive;
+      };
+      CREATE PROPERTY username -> std::str {
+          CREATE CONSTRAINT std::exclusive;
+      };
+      CREATE INDEX ON ((.email, .username));
       CREATE PROPERTY loginMethod -> default::AccountLoginMethod {
           SET default := (default::AccountLoginMethod.LINK);
       };
-      CREATE PROPERTY name -> std::str;
+      CREATE PROPERTY name -> std::str {
+          SET default := 'Anon Mous';
+      };
       CREATE PROPERTY role -> default::AccountRole {
           SET default := (default::AccountRole.CUSTOMER);
       };
-      CREATE PROPERTY staff -> std::bool {
-          SET default := false;
+      CREATE PROPERTY staff -> std::int16 {
+          SET default := 0;
       };
       CREATE PROPERTY timezone -> std::str;
-      CREATE PROPERTY username -> std::str;
-      CREATE PROPERTY verified -> std::bool {
-          SET default := false;
+      CREATE PROPERTY verified -> std::int16 {
+          SET default := 0;
       };
   };
   CREATE TYPE default::Extension EXTENDING default::BaseRecord {
@@ -48,33 +64,38 @@ CREATE MIGRATION m1inzq3ucwhdmipmgmfuuxihd5ohvru7elpj4z3ykqhrrgugs7aqxq
           SET default := (default::DomainStatusCode.PENDING_CREATE);
       };
   };
-  CREATE SCALAR TYPE default::OrderPaymentType EXTENDING enum<ACH, BTC, CREDITCARD, HNS, WIRE>;
-  CREATE SCALAR TYPE default::OrderType EXTENDING enum<REGISTER, RENEW>;
-  CREATE TYPE default::Order EXTENDING default::BaseRecord {
+  CREATE SCALAR TYPE default::InvoiceNumber EXTENDING std::sequence;
+  CREATE SCALAR TYPE default::InvoicePaymentType EXTENDING enum<ACH, BTC, CREDITCARD, ETH, HNS, WIRE>;
+  CREATE TYPE default::Invoice EXTENDING default::BaseRecord {
       CREATE REQUIRED LINK customer -> default::Customer;
       CREATE REQUIRED PROPERTY amount -> std::int16;
       CREATE REQUIRED PROPERTY contents -> array<std::str>;
-      CREATE REQUIRED PROPERTY payment -> default::OrderPaymentType;
-      CREATE PROPERTY promo -> std::str;
-      CREATE PROPERTY success -> std::bool {
-          SET default := false;
+      CREATE PROPERTY invoiceId -> default::InvoiceNumber {
+          CREATE CONSTRAINT std::exclusive;
       };
-      CREATE PROPERTY type -> default::OrderType;
+      CREATE PROPERTY paid -> std::int16 {
+          SET default := 0;
+      };
+      CREATE PROPERTY payment -> default::InvoicePaymentType {
+          SET default := (default::InvoicePaymentType.CREDITCARD);
+      };
+      CREATE PROPERTY promo -> std::str;
       CREATE PROPERTY vendor -> std::str;
   };
+  CREATE TYPE default::Key EXTENDING default::BaseRecord {
+      CREATE REQUIRED LINK owner -> default::Customer;
+  };
   CREATE SCALAR TYPE default::PaymentKind EXTENDING enum<CRYPTOCURRENCY, FIAT>;
-  CREATE SCALAR TYPE default::PaymentVendor EXTENDING enum<OPENNODE, SQUARE, STRIPE>;
   CREATE TYPE default::Payment EXTENDING default::BaseRecord {
       CREATE REQUIRED LINK customer -> default::Customer;
       CREATE PROPERTY kind -> default::PaymentKind {
           SET default := (default::PaymentKind.FIAT);
       };
       CREATE REQUIRED PROPERTY mask -> std::str;
-      CREATE REQUIRED PROPERTY vendor -> default::PaymentVendor;
       CREATE REQUIRED PROPERTY vendorId -> std::str;
   };
   CREATE TYPE default::Session EXTENDING default::BaseRecord {
-      CREATE REQUIRED LINK customer -> default::Customer;
-      CREATE PROPERTY cart -> tuple<duration: std::int16, name: std::str, price: std::int16>;
+      CREATE LINK customer -> default::Customer;
+      CREATE REQUIRED PROPERTY cart -> tuple<duration: std::int16, name: std::str, price: std::int16>;
   };
 };

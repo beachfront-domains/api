@@ -9,10 +9,10 @@ import { log } from "dep/std.ts";
 /// util
 
 import { databaseParams, personFromSession, stringTrim } from "src/utility/index.ts";
-import { CartItem } from "../schema.ts";
+import { CartItem, Session } from "../schema.ts";
 import e from "dbschema";
 
-import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
+import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 import type { SessionCreate } from "../schema.ts";
 
 const thisFilePath = "/src/component/session/crud/create.ts";
@@ -21,24 +21,30 @@ const thisFilePath = "/src/component/session/crud/create.ts";
 
 /// export
 
-export default (async(_root, args: SessionCreate, ctx, _info?) => {
+export default async(_root, args: SessionCreate, ctx, _info?): StandardResponse => {
   /// NOTE
   /// : this function doesn't need to be auth-gated
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as Session);
   let response: DetailObject | null = null;
+
+  function processCartItems(arr): CartItem[] {
+    return arr.map((item: CartItem) => item);
+  }
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "cart": {
-        query[key] = [...new Set(value as CartItem[])] || null; /// eliminate duplicates
+        // query[key] = [...new Set(value as CartItem[])]; /// eliminate duplicates
+        // query[key] = [...new Set(processCartItems(value))];
+        query[key] = processCartItems(value);
         break;
       }
 
       case "customer": {
-        query[key] = stringTrim(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
@@ -50,7 +56,7 @@ export default (async(_root, args: SessionCreate, ctx, _info?) => {
   if (!query.customer && !query.cart) {
     const error = "Missing required parameter(s).";
     log.warning(`[${thisFilePath}]› ${error}`);
-    return { detail: response, error: [{ code: "TBA", message: error }] };
+    return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
   if (!query.customer) {
@@ -74,7 +80,13 @@ export default (async(_root, args: SessionCreate, ctx, _info?) => {
   // : could `customer` details get exposed to malicious parties?
 
   try {
-    const newDocument = e.insert(e.Session, { ...query });
+    // @ts-ignore | Types of property "cart" are incompatible.
+    const newDocument = e.insert(e.Session, {
+      ...query,
+      customer: e.select(e.Customer, document => ({
+        filter_single: e.op(document.id, "=", e.uuid(query.customer))
+      }))
+    });
 
     const databaseQuery = e.select(newDocument, session => ({
       ...e.Session["*"],
@@ -90,4 +102,4 @@ export default (async(_root, args: SessionCreate, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while creating document.`);
     return { detail: response };
   }
-}) satisfies StandardResponse;
+}

@@ -8,12 +8,18 @@ import { log } from "dep/std.ts";
 
 /// util
 
-import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
+import {
+  accessControl,
+  databaseParams,
+  personFromSession,
+  stringTrim
+} from "src/utility/index.ts";
+
 import { InvoiceType, InvoiceVendor } from "../schema.ts";
 import e from "dbschema";
 
-import type { InvoiceCreate } from "../schema.ts";
-import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
+import type { Invoice, InvoiceCreate } from "../schema.ts";
+import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 
 const thisFilePath = "/src/component/invoice/crud/create.ts";
 
@@ -21,13 +27,13 @@ const thisFilePath = "/src/component/invoice/crud/create.ts";
 
 /// export
 
-export default (async(_root, args: InvoiceCreate, ctx, _info?) => {
+export default async(_root, args: InvoiceCreate, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as Invoice);
   let response: DetailObject | null = null;
 
   /// NOTE
@@ -42,37 +48,41 @@ export default (async(_root, args: InvoiceCreate, ctx, _info?) => {
   // TODO
   // : check `promo` validity (new table?)
 
+  function stringifyArrayContents(arr) {
+    return arr.map(item => String(item));
+  }
+
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "customer":
       case "promo": {
-        query[key] = stringTrim(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
       case "amount": {
-        query[key] = Number(value).toFixed(2) || null;
+        query[key] = Number(value); // .toFixed(2) is apparently a string
         break;
       }
 
       case "contents": {
         // TODO
         // : validate/clean
-        query[key] = value;
+        query[key] = stringifyArrayContents(value);
         break;
       }
 
       case "payment": {
-        query[key] = InvoiceType[stringTrim(value).toUpperCase()] === stringTrim(value).toUpperCase() ?
-          stringTrim(value).toUpperCase() :
-          null;
+        query[key] = InvoiceType[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          InvoiceType[stringTrim(String(value).toUpperCase())] :
+          InvoiceType.CREDITCARD;
         break;
       }
 
       case "vendor": {
-        query[key] = InvoiceVendor[stringTrim(value).toUpperCase()] === stringTrim(value).toUpperCase() ?
-          stringTrim(value).toUpperCase() :
-          null;
+        query[key] = InvoiceVendor[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          InvoiceVendor[stringTrim(String(value).toUpperCase())] :
+          InvoiceVendor.STRIPE;
         break;
       }
 
@@ -85,13 +95,13 @@ export default (async(_root, args: InvoiceCreate, ctx, _info?) => {
   if (!query.amount || !query.contents || !query.customer) {
     const error = "Missing required parameter(s).";
     log.warning(`[${thisFilePath}]› ${error}`);
-    return { detail: response, error: [{ code: "TBA", message: error }] };
+    return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
   if (params.vendor && !query.vendor) {
     const error = "Invalid vendor";
     log.warning(`[${thisFilePath}]› ${error}`);
-    return { detail: response, error: [{ code: "TBA", message: error }] };
+    return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
   /// NOTE
@@ -99,7 +109,19 @@ export default (async(_root, args: InvoiceCreate, ctx, _info?) => {
   ///   different, also, duplicate invoices can be deleted
 
   try {
-    const newDocument = e.insert(e.Invoice, { ...query });
+    const owner = await personFromSession(ctx);
+
+    if (!owner) {
+      log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
+      return { detail: response }; // error: [{ code: "TBA", message: error }]
+    }
+
+    const newDocument = e.insert(e.Invoice, {
+      ...query,
+      customer: e.select(e.Customer, document => ({
+        filter_single: e.op(document.id, "=", e.uuid(owner.id))
+      }))
+    });
 
     const databaseQuery = e.select(newDocument, invoice => ({
       ...e.Invoice["*"],
@@ -115,4 +137,4 @@ export default (async(_root, args: InvoiceCreate, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while creating document.`);
     return { detail: response };
   }
-}) satisfies StandardResponse;
+}

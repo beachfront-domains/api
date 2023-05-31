@@ -12,7 +12,8 @@ import {
   accessControl,
   databaseParams,
   maxPaginationLimit,
-  objectIsEmpty
+  objectIsEmpty,
+  stringTrim
 } from "src/utility/index.ts";
 
 import e from "dbschema";
@@ -32,21 +33,22 @@ const thisFilePath = "/src/component/customer/crud/read.ts";
 
 /// export
 
-export const get = (async(_root, args: CustomerRequest, ctx, _info?) => {
+export const get = async(_root, args: CustomerRequest, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
   let response: DetailObject | null = null;
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "email":
-      case "id":
-        query[key] = String(value);
+      case "id": {
+        query[key] = stringTrim(value);
         break;
+      }
 
       default:
         break;
@@ -70,15 +72,23 @@ export const get = (async(_root, args: CustomerRequest, ctx, _info?) => {
   return {
     detail: response
   };
-}) satisfies StandardResponse;
+};
 
-export const getMore = (async(_root, args: Partial<CustomersRequest>, ctx, _info?) => {
-  if (!await accessControl(ctx))
-    return null;
+export const getMore = async(_root, args: CustomersRequest, ctx, _info?): StandardPlentyResponse => {
+  if (!await accessControl(ctx)) {
+    return {
+      detail: null,
+      pageInfo: {
+        cursor: null,
+        hasNextPage: false,
+        hasPreviousPage: false
+      }
+    };
+  }
 
   const client = createClient(databaseParams);
   const { pagination, params } = args;
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
   let allDocuments: Array<any> | null = null; // Array<DetailObject> // TODO: find EdgeDB document type
   let hasNextPage = false;
   let hasPreviousPage = false;
@@ -158,7 +168,7 @@ export const getMore = (async(_root, args: Partial<CustomersRequest>, ctx, _info
             e.op(document.staff, "=", query.staff) :
               query.verified ?
                 e.op(document.verified, "=", query.verified) :
-                  null
+                  undefined
     })).run(client);
   }
 
@@ -194,7 +204,7 @@ export const getMore = (async(_root, args: Partial<CustomersRequest>, ctx, _info
             e.op(document.staff, "=", query.staff) :
               query.verified ?
                 e.op(document.verified, "=", query.verified) :
-                  null,
+                  undefined,
       limit,
       offset
     })).run(client);
@@ -228,4 +238,4 @@ export const getMore = (async(_root, args: Partial<CustomersRequest>, ctx, _info
       hasPreviousPage
     }
   };
-}) satisfies StandardPlentyResponse;
+};

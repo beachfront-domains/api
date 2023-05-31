@@ -11,7 +11,7 @@ interface ExtensionsRequestParams {
   // length: number;
   // numeric: number;    /// boolean / 0 = false, 1 = true
   // registry: string; // TODO: save as lowercase ASCII?
-  tier: DEFAULT | COMMON | RARE | EPIC | LEGENDARY;
+  tier: "DEFAULT" | "COMMON" | "RARE" | "EPIC" | "LEGENDARY";
   // startsWith: string;
 
   // NOTE
@@ -45,7 +45,11 @@ export interface Extension {
 
 export interface ExtensionCreate {
   params: {
-    name?: string;
+    name: string;
+    pairs?: string[];    // related extension names
+    premium?: string[];  // high-quality SLDs
+    registry?: string;   // TODO | should be an ID in the future
+    tier?: ExtensionTier;
   }
 }
 
@@ -62,6 +66,8 @@ export interface ExtensionUpdate {
     name?: string;
   }
   updates: {
+    pairs: string[];
+    premium: string[];
     registry?: string;
   }
 }

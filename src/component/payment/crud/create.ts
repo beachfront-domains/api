@@ -15,12 +15,12 @@ import {
   stringTrim
 } from "src/utility/index.ts";
 
-import { PaymentKind } from "../schema.ts";
-import * as maskPaymentMethod from "../utility/mask.ts";
+import { PaymentKind, PaymentMethod } from "../schema.ts";
+import { default as maskPaymentMethod } from "../utility/mask.ts";
 import e from "dbschema";
 
 import type { PaymentMethodCreate } from "../schema.ts";
-import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
+import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 
 const thisFilePath = "/src/component/payment/crud/create.ts";
 
@@ -28,26 +28,26 @@ const thisFilePath = "/src/component/payment/crud/create.ts";
 
 /// export
 
-export default (async(_root, args: InvoiceCreate, ctx, _info?) => {
+export default async(_root, args: PaymentMethodCreate, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as PaymentMethod);
   let response: DetailObject | null = null;
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "kind": {
-        query[key] = PaymentKind[stringTrim(value).toUpperCase()] === stringTrim(value).toUpperCase() ?
-          stringTrim(value).toUpperCase() :
-          null;
+        query[key] = PaymentKind[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          PaymentKind[stringTrim(String(value).toUpperCase())] :
+          PaymentKind.FIAT;
         break;
       }
 
       case "mask": {
-        query[key] = stringTrim(value);
+        query[key] = maskPaymentMethod(value);
         break;
       }
 
@@ -59,33 +59,38 @@ export default (async(_root, args: InvoiceCreate, ctx, _info?) => {
   if (!query.kind || !query.mask) {
     const error = "Missing required parameter(s).";
     log.warning(`[${thisFilePath}]› ${error}`);
-    return { detail: response, error: [{ code: "TBA", message: error }] };
+    return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
   if (query.mask.length < 12) { /// credit card numbers have at least 12 digits
     const error = "Invalid length for mask.";
     log.warning(`[${thisFilePath}]› ${error}`);
-    return { detail: response, error: [{ code: "TBA", message: error }] };
+    return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
-
-  const owner = await personFromSession(ctx);
-
-  if (!owner) {
-    log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
-    return { detail: response, error: [{ code: "TBA", message: error }] };
-  }
-
-  query.customer = owner.id;
-  query.mask = maskPaymentMethod(query.mask);
 
   // TODO
   // : should we check for existing document?
   //   : use customer id and mask?
   // : create payment method within third-party service and return ID
   //   : query.vendorId
+  //   : round-robin process
+
+  query.vendorId = "";
 
   try {
-    const newDocument = e.insert(e.Payment, { ...query });
+    const owner = await personFromSession(ctx);
+
+    if (!owner) {
+      log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
+      return { detail: response }; // error: [{ code: "TBA", message: error }]
+    }
+
+    const newDocument = e.insert(e.Payment, {
+      ...query,
+      customer: e.select(e.Customer, document => ({
+        filter_single: e.op(document.id, "=", e.uuid(owner.id))
+      }))
+    });
 
     const databaseQuery = e.select(newDocument, payment => ({
       ...e.Payment["*"],
@@ -101,4 +106,4 @@ export default (async(_root, args: InvoiceCreate, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while creating document.`);
     return { detail: response };
   }
-}) satisfies StandardResponse;
+}

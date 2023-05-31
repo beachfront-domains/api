@@ -16,10 +16,10 @@ import {
 } from "src/utility/index.ts";
 
 import e from "dbschema";
-import { CustomerLoginMethods, CustomerRoles } from "../schema.ts";
+import { Customer, CustomerLoginMethods, CustomerRoles } from "../schema.ts";
 
 import type { CustomerCreate } from "../schema.ts";
-import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
+import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 
 const thisFilePath = "/src/component/customer/crud/create.ts";
 
@@ -27,13 +27,13 @@ const thisFilePath = "/src/component/customer/crud/create.ts";
 
 /// export
 
-export default (async(_root, args: CustomerCreate, ctx, _info?) => {
+export default async(_root, args: CustomerCreate, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as Customer);
   let response: DetailObject | null = null;
 
   // TODO
@@ -52,28 +52,28 @@ export default (async(_root, args: CustomerCreate, ctx, _info?) => {
       case "name":
       case "timezone":
       case "username": {
-        query[key] = stringTrim(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
       case "email": {
-        query[key] = validateEmail(stringTrim(value)) ?
-          String(stringTrim(value)).toLowerCase() :
-          null;
+        query[key] = validateEmail(stringTrim(String(value))) ?
+          stringTrim(String(value).toLowerCase()) :
+          "";
         break;
       }
 
       case "loginMethod": {
-        query[key] = CustomerLoginMethods[stringTrim(value).toUpperCase()] === stringTrim(value).toUpperCase() ?
-          stringTrim(value).toUpperCase() :
-          null;
+        query[key] = CustomerLoginMethods[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          CustomerLoginMethods[stringTrim(String(value).toUpperCase())] :
+          CustomerLoginMethods.LINK;
         break;
       }
 
       case "role": {
-        query[key] = CustomerRoles[stringTrim(value).toUpperCase()] === stringTrim(value).toUpperCase() ?
-          stringTrim(value).toUpperCase() :
-          null;
+        query[key] = CustomerRoles[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          CustomerRoles[stringTrim(String(value).toUpperCase())] :
+          CustomerRoles.CUSTOMER;
         break;
       }
 
@@ -90,10 +90,10 @@ export default (async(_root, args: CustomerCreate, ctx, _info?) => {
   });
 
   /// vibe check
-  if (!query.email) {
+  if (query.email.length === 0) {
     const error = "Missing required parameter(s).";
     log.warning(`[${thisFilePath}]› ${error}`);
-    return { detail: response, error: [{ code: "TBA", message: error }] };
+    return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
   const doesDocumentExist = e.select(e.Customer, customer => ({
@@ -124,7 +124,7 @@ export default (async(_root, args: CustomerCreate, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while creating document.`);
     return { detail: response };
   }
-}) satisfies StandardResponse;
+}
 
 
 

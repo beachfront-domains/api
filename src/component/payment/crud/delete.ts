@@ -20,13 +20,13 @@ const thisFilePath = "/src/component/payment/crud/delete.ts";
 
 /// export
 
-export default (async(_root, args: PaymentMethodRequest, ctx, _info?) => {
+export default async(_root, args: PaymentMethodRequest, ctx, _info?): StandardBooleanResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { success: false };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
@@ -43,7 +43,7 @@ export default (async(_root, args: PaymentMethodRequest, ctx, _info?) => {
 
   const doesDocumentExist = e.select(e.Payment, payment => ({
     filter_single: query.id ?
-      e.op(payment.id, "=", e.uuid(payment.id)) :
+      e.op(payment.id, "=", e.uuid(query.id)) :
       e.op(payment.vendorId, "=", query.vendorId)
   }));
 
@@ -71,4 +71,4 @@ export default (async(_root, args: PaymentMethodRequest, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while deleting document.`);
     return { success: false };
   }
-}) satisfies StandardBooleanResponse;
+}

@@ -1,6 +1,7 @@
 module default {
   scalar type AccountRole extending enum<"ADMIN", "CUSTOMER">;
   scalar type AccountLoginMethod extending enum<"LINK", "TOKEN">;
+  scalar type ExtensionTier extending enum<"DEFAULT", "COMMON", "RARE", "EPIC", "LEGENDARY">;
   scalar type InvoiceNumber extending sequence;
   scalar type InvoicePaymentType extending enum<"ACH", "BTC", "CREDITCARD", "ETH", "HNS", "WIRE">;
   scalar type PaymentKind extending enum<"CRYPTOCURRENCY", "FIAT">;
@@ -82,7 +83,12 @@ module default {
 
   type Extension extending BaseRecord {
     required property name -> str;
-    required property registry -> str;
+    property pairs -> array<str>;
+    property premium -> array<str>;
+    property registry -> str;
+    property tier -> ExtensionTier {
+      default := ExtensionTier.DEFAULT;
+    };
     #
     index on (.name);
   }
@@ -118,7 +124,7 @@ module default {
   }
 
   type Session extending BaseRecord {
-    required property cart -> tuple<
+    property cart -> tuple<
       duration: int16,
       name: str,
       price: int16

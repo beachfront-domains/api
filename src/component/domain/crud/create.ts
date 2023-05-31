@@ -9,12 +9,18 @@ import { toASCII } from "dep/x/tr46.ts";
 
 /// util
 
-import { accessControl, databaseParams, personFromSession } from "src/utility/index.ts";
-import { DomainStatusCode } from "../schema.ts";
+import {
+  accessControl,
+  databaseParams,
+  personFromSession,
+  stringTrim
+} from "src/utility/index.ts";
+
+import { Domain, DomainStatusCode } from "../schema.ts";
 import dotCheck from "../utility/check-dot.ts";
 import e from "dbschema";
 
-import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
+import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 import type { DomainCreate } from "../schema.ts";
 
 const thisFilePath = "/src/component/domain/crud/create.ts";
@@ -23,21 +29,25 @@ const thisFilePath = "/src/component/domain/crud/create.ts";
 
 /// export
 
-export default (async(_root, args: DomainCreate, ctx, _info?) => {
+export default async(_root, args: DomainCreate, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as Domain);
   let response: DetailObject | null = null;
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
-      case "expiry":
       case "extension":
       case "owner": {
-        query[key] = String(value);
+        query[key] = stringTrim(String(value));
+        break;
+      }
+
+      case "expiry": {
+        query[key] = new Date(value);
         break;
       }
 
@@ -47,9 +57,9 @@ export default (async(_root, args: DomainCreate, ctx, _info?) => {
       }
 
       case "status": {
-        query[key] = Object.values(DomainStatusCode).includes(String(value).toUpperCase()) ?
-          String(value).toUpperCase() :
-          null;
+        query[key] = DomainStatusCode[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          DomainStatusCode[stringTrim(String(value).toUpperCase())] :
+          DomainStatusCode.PENDING_CREATE;
         break;
       }
 
@@ -62,13 +72,13 @@ export default (async(_root, args: DomainCreate, ctx, _info?) => {
   if (!query.expiry || !query.extension || !query.name) {
     const error = "Missing required parameter(s).";
     log.warning(`[${thisFilePath}]› ${error}`);
-    return { detail: response, error: [{ code: "TBA", message: error }] };
+    return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
   if (!dotCheck(query.name)) {
     const error = "Invalid domain.";
     log.warning(`[${thisFilePath}]› ${error}`);
-    return { detail: response, error: [{ code: "TBA", message: error }] };
+    return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
   const doesExtensionExist = e.select(e.Extension, extension => ({
@@ -80,12 +90,12 @@ export default (async(_root, args: DomainCreate, ctx, _info?) => {
 
   if (!extensionExistenceResult) {
     log.warning(`[${thisFilePath}]› Extension does not exist.`);
-    return { detail: response, error: [{ code: "TBA", message: error }] };
+    return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
   if (String(query.name).split(".")[1] !== toASCII(extensionExistenceResult.name)) {
     log.warning(`[${thisFilePath}]› Domain does not match extension ID.`);
-    return { detail: response, error: [{ code: "TBA", message: error }] };
+    return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
   const doesDocumentExist = e.select(e.Domain, domain => ({
@@ -105,7 +115,7 @@ export default (async(_root, args: DomainCreate, ctx, _info?) => {
 
     if (!owner) {
       log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
-      return { detail: response, error: [{ code: "TBA", message: error }] };
+      return { detail: response }; // error: [{ code: "TBA", message: error }]
     }
 
     const newDocument = e.insert(e.Domain, {
@@ -131,4 +141,4 @@ export default (async(_root, args: DomainCreate, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while creating document.`);
     return { detail: response };
   }
-}) satisfies StandardResponse;
+}

@@ -12,8 +12,8 @@ import { toASCII } from "dep/x/tr46.ts";
 import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
 import e from "dbschema";
 
-import type { ExtensionRequest } from "../schema.ts";
-import type { LooseObject, StandardBooleanResponse } from "src/utility/index.ts";
+import type { Extension, ExtensionRequest } from "../schema.ts";
+import type { StandardBooleanResponse } from "src/utility/index.ts";
 
 const thisFilePath = "/src/component/extension/crud/delete.ts";
 
@@ -21,13 +21,13 @@ const thisFilePath = "/src/component/extension/crud/delete.ts";
 
 /// export
 
-export default (async(_root, args: ExtensionRequest, ctx, _info?) => {
+export default async(_root, args: ExtensionRequest, ctx, _info?): StandardBooleanResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { success: false };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as Extension);
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
@@ -48,7 +48,7 @@ export default (async(_root, args: ExtensionRequest, ctx, _info?) => {
 
   const doesDocumentExist = e.select(e.Extension, extension => ({
     filter_single: query.id ?
-      e.op(extension.id, "=", e.uuid(extension.id)) :
+      e.op(extension.id, "=", e.uuid(query.id)) :
       e.op(extension.name, "=", query.name)
   }));
 
@@ -64,7 +64,7 @@ export default (async(_root, args: ExtensionRequest, ctx, _info?) => {
 
   /// ensure no domains exist
   const doDomainsExist = e.select(e.Domain, domain => ({
-    filter: e.op(domain.extension, "=", documentId),
+    filter: e.op(domain.extension.id, "=", documentId),
     limit: 2
   }));
 
@@ -89,4 +89,4 @@ export default (async(_root, args: ExtensionRequest, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while deleting document.`);
     return { success: false };
   }
-}) satisfies StandardBooleanResponse;
+}

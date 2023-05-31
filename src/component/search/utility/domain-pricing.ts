@@ -12,10 +12,10 @@ import dictionary from "./dictionary.ts";
 
 interface PriceRequest {
   extension: string;
-  premium: boolean;
+  premium: number;
   sld: string;
   tier: string;
-};
+}
 
 interface PriceResponse {
   domain: string;
@@ -70,7 +70,7 @@ const registryPricingPremium = {
 
 /// export
 
-export default (async(args: PriceRequest) => {
+export default async(args: PriceRequest): Promise<PriceResponse> => {
   const { extension, premium, sld, tier } = args;
 
   // TODO
@@ -84,7 +84,7 @@ export default (async(args: PriceRequest) => {
   let operand2 = new Big(0); /// tier price base * multiplier.*character(s)
   let operand3 = new Big(0); /// multiplier.dictionary
 
-  if (isPremium)
+  if (isPremium === 1)
     operand1 = multiplier.premium;
 
   if (sld.length < 4) {
@@ -107,16 +107,16 @@ export default (async(args: PriceRequest) => {
     }
 
     if (isDictionaryWord)
-      operand3 = operand2.times(dictionaryMultiplier);
+      operand3 = operand2.times(multiplier.dictionary);
   } else {
     operand2 = new Big(generateMarkup(tier));
 
     if (isDictionaryWord)
-      operand3 = operand2.times(dictionaryMultiplier);
+      operand3 = operand2.times(multiplier.dictionary);
   }
 
-  finalPrice = isPremium ?
-    new Big(generateMarkup(tier, true))
+  finalPrice = isPremium === 1 ?
+    new Big(generateMarkup(tier, 1))
       .plus(operand1)
       .plus(operand2)
       .plus(operand3) :
@@ -128,47 +128,47 @@ export default (async(args: PriceRequest) => {
     domain: `${sld}.${extension}`,
     priceUSD: finalPrice.toFixed(2)
   };
-}) satisfies PriceResponse;
+}
 
 
 
 /// helper
 
-function generateMarkup(suppliedTier: string, isPremium?: boolean) {
+function generateMarkup(suppliedTier: string, isPremium?: number) {
   switch(suppliedTier.toUpperCase()) {
     case "DEFAULT": {
-      return isPremium ?
+      return isPremium === 1 ?
         registryPricingPremium.default.plus(beachfrontMarkupPremium.default) :
         registryPricingBase.default.plus(beachfrontMarkupBase.default);
     }
 
     case "COMMON": {
-      return isPremium ?
+      return isPremium === 1 ?
         registryPricingPremium.common.plus(beachfrontMarkupPremium.common) :
         registryPricingBase.common.plus(beachfrontMarkupBase.common);
     }
 
     case "RARE": {
-      return isPremium ?
+      return isPremium === 1 ?
         registryPricingPremium.rare.plus(beachfrontMarkupPremium.rare) :
         registryPricingBase.rare.plus(beachfrontMarkupBase.rare);
     }
 
     case "EPIC": {
-      return isPremium ?
+      return isPremium === 1 ?
         registryPricingPremium.epic.plus(beachfrontMarkupPremium.epic) :
         registryPricingBase.epic.plus(beachfrontMarkupBase.epic);
     }
 
     case "LEGENDARY": {
-      return isPremium ?
+      return isPremium === 1 ?
         registryPricingPremium.legendary.plus(beachfrontMarkupPremium.legendary) :
         registryPricingBase.legendary.plus(beachfrontMarkupBase.legendary);
     }
 
     case "MYTHIC":
     default: {
-      return isPremium ?
+      return isPremium === 1 ?
         registryPricingPremium.mythic.plus(beachfrontMarkupPremium.mythic) :
         registryPricingBase.mythic.plus(beachfrontMarkupBase.mythic);
     }

@@ -11,7 +11,7 @@ import * as colors from "dep/std.ts";
 import e from "dbschema";
 
 const fileConfig = join(Deno.cwd(), "api.json");
-const { shellBold, shellRed } = colors;
+const { bold: shellBold, red: shellRed } = colors;
 
 
 
@@ -31,7 +31,7 @@ export async function checklist() {
   try {
     if (await ensureFileConfig(fileConfig)) {
       const { database, instance, port } = JSON.parse(await Deno.readTextFile(fileConfig));
-
+      /// override base config with file config
       config.database = database;
       config.instance = instance;
       config.port = port;
@@ -40,7 +40,7 @@ export async function checklist() {
     ensureTable("Customer");
     ensureTable("Domain");
     ensureTable("Extension");
-    ensureTable("Order");
+    ensureTable("Invoice");
     ensureTable("Payment");
     ensureTable("Session");
 

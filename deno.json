@@ -3,9 +3,7 @@
     "noImplicitAny": false
   },
   "lint": {
-    "files": {
-      "exclude": ["dbschema/"]
-    },
+    "exclude": ["dbschema/"],
     "rules": {
       "exclude": ["no-explicit-any"]
     }

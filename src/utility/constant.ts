@@ -5,15 +5,16 @@
 
 import { parse } from "dep/std.ts";
 
+/// util
+
+const { environment } = parse(Deno.args);
+
 
 
 /// export
 
-export const { coinmarketcapKey, thesaurusKey } = parse(Deno.args);
+export const isDevelopment = environment === "development";
 export const maxPaginationLimit = 100;
-
-// TODO
-// : support `Deno.args`
 
 export const databaseParams = {
   database: "beachfront"

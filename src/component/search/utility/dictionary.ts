@@ -4,21 +4,30 @@
 /// import
 
 import { cheerio } from "dep/x/cheerio.ts";
+import { wretch } from "dep/x/wretch.ts";
 
 
 
 /// export
 
-export default (async(suppliedWord: string) => {
-  let isWord: boolean = false;
+export default async(suppliedWord: string): Promise<boolean> => {
+  let isWord = false;
 
   try {
-    const response = await fetch(`https://www.dictionary.com/browse/${encodeURIComponent(suppliedWord)}`);
+    const response = await wretch(`https://www.dictionary.com/browse/${encodeURIComponent(suppliedWord)}`)
+      .get()
+      .res();
 
     if (response.status !== 200)
       return false;
 
-    const $ = cheerio.load(response.data, { normalizeWhitespace: true });
+    // let $ = cheerio.load('<div>Hello</div>', null, false);
+    // console.log($.html());
+
+    // // "<div>Hello</div>"
+    // https://github.com/cheeriojs/cheerio/issues/1031#issuecomment-748677236
+
+    const $ = cheerio.load(await response.text());
     const word = $("body #top-definitions-section").find("h1").text().trim();
 
     if (word)
@@ -29,7 +38,7 @@ export default (async(suppliedWord: string) => {
   }
 
   return isWord;
-}) satisfies Promise<boolean>;
+}
 
 
 

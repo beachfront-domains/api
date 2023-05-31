@@ -8,12 +8,25 @@ import { log } from "dep/std.ts";
 
 /// util
 
-import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
-import { InvoiceType, InvoiceVendor } from "../schema.ts";
+import {
+  accessControl,
+  databaseParams,
+  maxPaginationLimit,
+  objectIsEmpty,
+  stringTrim
+} from "src/utility/index.ts";
+
+import { Invoice } from "../schema.ts";
 import e from "dbschema";
 
-import type { InvoiceRequest, InvoiceRequests } from "../schema.ts";
-import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
+import type { InvoiceRequest, InvoicesRequest } from "../schema.ts";
+
+import type {
+  DetailObject,
+  LooseObject,
+  StandardResponse,
+  StandardPlentyResponse
+} from "src/utility/index.ts";
 
 const thisFilePath = "/src/component/invoice/crud/read.ts";
 
@@ -21,19 +34,19 @@ const thisFilePath = "/src/component/invoice/crud/read.ts";
 
 /// export
 
-export const get = (async(_root, args: InvoiceRequest, ctx, _info?) => {
+export const get = async(_root, args: InvoiceRequest, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as Invoice);
   let response: DetailObject | null = null;
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "id": {
-        query[key] = stringTrim(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
@@ -65,15 +78,23 @@ export const get = (async(_root, args: InvoiceRequest, ctx, _info?) => {
   return {
     detail: response
   };
-}) satisfies StandardResponse;
+};
 
-export const getMore = (async(_root, args: Partial<InvoiceRequests>, ctx, _info?) => {
-  if (!await accessControl(ctx))
-    return null;
+export const getMore = async(_root, args: Partial<InvoicesRequest>, ctx, _info?): StandardPlentyResponse => {
+  if (!await accessControl(ctx)) {
+    return {
+      detail: null,
+      pageInfo: {
+        cursor: null,
+        hasNextPage: false,
+        hasPreviousPage: false
+      }
+    };
+  }
 
   const client = createClient(databaseParams);
   const { pagination, params } = args;
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
   let allDocuments: Array<any> | null = null; // Array<DetailObject> // TODO: find EdgeDB document type
   let hasNextPage = false;
   let hasPreviousPage = false;
@@ -114,10 +135,10 @@ export const getMore = (async(_root, args: Partial<InvoiceRequests>, ctx, _info?
   // TODO
   // : `created` and `updated` should be a range
 
-  Object.entries(params).forEach(([key, value]) => {
+  Object.entries((params as LooseObject)).forEach(([key, value]) => {
     switch(key) {
       case "customer": {
-        query[key] = String(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
@@ -126,9 +147,8 @@ export const getMore = (async(_root, args: Partial<InvoiceRequests>, ctx, _info?
         break;
       }
 
-      default: {
+      default:
         break;
-      }
     }
   });
 
@@ -137,22 +157,16 @@ export const getMore = (async(_root, args: Partial<InvoiceRequests>, ctx, _info?
     order_by: document.created
   }));
 
-  if (query.wildcard) {
-    allDocuments = await e.select(e.Invoice, document => ({
-      ...baseShape(document)
-    })).run(client);
-  } else {
-    allDocuments = await e.select(e.Invoice, document => ({
-      ...baseShape(document),
-      // TODO
-      // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
-      filter: query.customer ?
-        e.op(document.customer, "=", e.uuid(query.customer)) :
-          query.paid ?
-            e.op(document.paid, "=", query.paid) :
-              null
-    })).run(client);
-  }
+  allDocuments = await e.select(e.Invoice, document => ({
+    ...baseShape(document),
+    // TODO
+    // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
+    filter: query.customer ?
+      e.op(document.customer.id, "=", e.uuid(query.customer)) :
+        query.paid ?
+          e.op(document.paid, "=", query.paid) :
+            undefined
+  })).run(client);
 
   const totalDocuments = allDocuments.length;
 
@@ -169,26 +183,18 @@ export const getMore = (async(_root, args: Partial<InvoiceRequests>, ctx, _info?
     });
   }
 
-  if (query.wildcard) {
-    response = await e.select(e.Invoice, document => ({
-      ...baseShape(document),
-      limit,
-      offset
-    })).run(client);
-  } else {
-    response = await e.select(e.Invoice, document => ({
-      ...baseShape(document),
-      // TODO
-      // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
-      filter: query.customer ?
-        e.op(document.customer, "=", e.uuid(query.customer)) :
-          query.paid ?
-            e.op(document.paid, "=", query.paid) :
-              null,
-      limit,
-      offset
-    })).run(client);
-  }
+  response = await e.select(e.Invoice, document => ({
+    ...baseShape(document),
+    // TODO
+    // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
+    filter: query.customer ?
+      e.op(document.customer.id, "=", e.uuid(query.customer)) :
+        query.paid ?
+          e.op(document.paid, "=", query.paid) :
+            undefined,
+    limit,
+    offset
+  })).run(client);
 
   /// inspired by https://stackoverflow.com/a/62565528
   cursor = response && response.length > 0 ?
@@ -218,4 +224,4 @@ export const getMore = (async(_root, args: Partial<InvoiceRequests>, ctx, _info?
       hasPreviousPage
     }
   };
-}) satisfies StandardPlentyResponse;
+};

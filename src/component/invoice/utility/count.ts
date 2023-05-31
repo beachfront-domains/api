@@ -16,18 +16,19 @@ const thisFilePath = "/src/component/invoice/utility/count.ts";
 
 /// export
 
-export default (async() => {
+export default async(): Promise<number> => {
   const client = createClient(databaseParams);
   let documentCount = 0;
 
   try {
     const getAllDocuments = e.select(e.Invoice, () => ({ id: true }));
     const response = await getAllDocuments.run(client);
-    documentCount = response.length;
 
-    return documentCount;
+    documentCount = response.length;
   } catch(_) {
     log.warning(`[${thisFilePath}]› Error retrieving document count.`);
-    return documentCount;
   }
-}) satisfies Promise<number>;
+
+  return documentCount;
+}
+

@@ -1,6 +1,17 @@
 
 
 
+/// import
+
+import { createClient } from "edgedb";
+
+/// util
+
+import { databaseParams } from "src/utility/index.ts";
+import e from "dbschema";
+
+
+
 /// export
 
 export default async (ctx) => {
@@ -12,7 +23,7 @@ export default async (ctx) => {
   else
     return false;
 
-  const client = createClient(databaseOptions);
+  const client = createClient(databaseParams);
 
   const doesDocumentExist = e.select(e.Key, key => ({
     ...e.Key["*"],

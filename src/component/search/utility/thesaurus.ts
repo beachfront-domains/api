@@ -1,9 +1,14 @@
 
 
 
+/// import
+
+import { toASCII } from "dep/x/tr46.ts";
+import { wretch } from "dep/x/wretch.ts";
+
 /// util
 
-import { LooseObject, thesaurusKey } from "src/utility/index.ts";
+import { serviceThesaurus } from "src/utility/index.ts";
 
 interface ThesaurusResponse {
   antonyms: string[];
@@ -14,47 +19,32 @@ interface ThesaurusResponse {
 
 /// export
 
-export default (async(suppliedWord: string) => {
-  const unwantedCharactersRegex = /[^\s-\.]/g;
-  let antonyms: any = [];
-  let synonyms: any = [];
+export default async(suppliedWord: string): Promise<ThesaurusResponse> => {
+  let antonyms: any[] = [];
+  let synonyms: any[] = [];
 
   try {
-    const { data } = await fetch(`https://www.dictionaryapi.com/api/v3/references/thesaurus/json/${encodeURIComponent(suppliedWord)}?key=${thesaurusKey}`);
+    const data = await wretch(`https://www.dictionaryapi.com/api/v3/references/thesaurus/json/${encodeURIComponent(suppliedWord)}?key=${serviceThesaurus}`)
+      .get()
+      .json();
 
-    switch(true) {
-      case !data:
-      case !data[0]:
-      case !data[0].meta: {
-        return {
-          antonyms,
-          synonyms
-        };
-      }
-
-      default:
-        break;
+    if (!data![0]!.meta) {
+      return {
+        antonyms,
+        synonyms
+      };
     }
 
-    const words = data[0].meta;
-    const { ants, syns } = words;
+    const { ants, syns } = data![0]!.meta;
 
     antonyms = [...new Set(ants.flat())].sort();
     synonyms = [...new Set(syns.flat())].sort();
 
-    antonyms = antonyms.map((word: string) => {
-      if (word && !unwantedCharactersRegex.test(word))
-        return word;
-      else
-        return "";
-    }).filter((word: string) => word); /// Remove empty strings
+    antonyms = antonyms.map((word: string) => processWord(word))
+      .filter((word: string) => word); /// Remove empty strings
 
-    synonyms = synonyms.map((word: string) => {
-      if (word && !unwantedCharactersRegex.test(word))
-        return word;
-      else
-        return "";
-    }).filter((word: string) => word); /// Remove empty strings
+    synonyms = synonyms.map((word: string) => processWord(word))
+      .filter((word: string) => word); /// Remove empty strings
   } catch(_) {
     /// IGNORE
     /// Probably not a dictionary word
@@ -64,7 +54,20 @@ export default (async(suppliedWord: string) => {
     antonyms,
     synonyms
   };
-}) satisfies ThesaurusResponse;
+}
+
+
+
+/// helper
+
+function processWord(word: string) {
+  const unwantedCharactersRegex = /\w+[\W]\w+/g;
+
+  if (word && !unwantedCharactersRegex.test(word))
+    return toASCII(word.toLowerCase());
+  else
+    return null!; /// https://stackoverflow.com/a/66994737
+}
 
 
 

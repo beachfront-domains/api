@@ -5,16 +5,21 @@
 
 import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
-import { toASCII } from "dep/x/tr46.ts";
 
 /// util
 
-import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
-import { DomainStatusCode } from "../schema.ts";
+import {
+  accessControl,
+  databaseParams,
+  objectIsEmpty,
+  stringTrim
+} from "src/utility/index.ts";
+
+import { ExtensionTier } from "../schema.ts";
 import e from "dbschema";
 
-import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
-import type { ExtensionUpdate } from "../schema.ts";
+import type { DetailObject, StandardResponse } from "src/utility/index.ts";
+import type { Extension, ExtensionUpdate } from "../schema.ts";
 
 const thisFilePath = "/src/component/extension/crud/update.ts";
 
@@ -22,9 +27,9 @@ const thisFilePath = "/src/component/extension/crud/update.ts";
 
 /// export
 
-export default (async(_root, args: ExtensionUpdate, ctx, _info?) => {
+export default async(_root, args: ExtensionUpdate, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const { params, updates } = args;
 
@@ -34,13 +39,37 @@ export default (async(_root, args: ExtensionUpdate, ctx, _info?) => {
   }
 
   const client = createClient(databaseParams);
-  const query: LooseObject = {};
+  const query = ({} as Extension);
   let response: DetailObject | null = null;
+
+  // TODO
+  // : add `pairs` and `premium` to `updates`
+  //   use `new Set` to eliminate duplicates
+
+  function stringifyArrayContents(arr) {
+    // TODO
+    // : figure out how to make `Array.from(new Set())` work without causing `deno check` errors
+    // : are we overwriting original values?
+    return arr.map(item => String(item));
+  }
 
   Object.entries(updates).forEach(([key, value]) => {
     switch(key) {
+      case "pairs":
+      case "premium": {
+        query[key] = stringifyArrayContents(value);
+        break;
+      }
+
       case "registry": {
-        query[key] = stringTrim(value);
+        query[key] = stringTrim(String(value));
+        break;
+      }
+
+      case "tier": {
+        query[key] = ExtensionTier[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
+          ExtensionTier[stringTrim(String(value).toUpperCase())] :
+          ExtensionTier.DEFAULT;
         break;
       }
 
@@ -50,7 +79,7 @@ export default (async(_root, args: ExtensionUpdate, ctx, _info?) => {
   });
 
   const doesDocumentExist = e.select(e.Extension, extension => ({
-    filter_single: e.op(extension.id, "=", e.uuid(stringTrim(params.id)))
+    filter_single: e.op(extension.id, "=", e.uuid(stringTrim(String(params.id))))
   }));
 
   const existenceResult = await doesDocumentExist.run(client);
@@ -80,4 +109,4 @@ export default (async(_root, args: ExtensionUpdate, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while updating document.`);
     return { detail: response };
   }
-}) satisfies StandardResponse;
+}

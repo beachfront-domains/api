@@ -27,7 +27,7 @@ export interface SearchRequest {
 export interface SearchResult {
   available: number;
   created: string;
-  duration: number;
+  // duration: number;
   name: string;
   premium: number;
   priceHNS: string;

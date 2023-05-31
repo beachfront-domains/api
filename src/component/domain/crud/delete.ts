@@ -5,13 +5,14 @@
 
 import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
+import { toASCII } from "dep/x/tr46.ts";
 
 /// util
 
-import { accessControl, databaseParams } from "src/utility/index.ts";
+import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
 import e from "dbschema";
 
-import type { CustomerRequest } from "../schema.ts";
+import type { DomainRequest } from "../schema.ts";
 import type { LooseObject, StandardBooleanResponse } from "src/utility/index.ts";
 
 const thisFilePath = "/src/component/customer/crud/delete.ts";
@@ -20,18 +21,18 @@ const thisFilePath = "/src/component/customer/crud/delete.ts";
 
 /// export
 
-export default (async(_root, args: DomainRequest, ctx, _info?) => {
+export default async(_root, args: DomainRequest, ctx, _info?): StandardBooleanResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { success: false };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "id": {
-        query[key] = String(value);
+        query[key] = stringTrim(value);
         break;
       }
 
@@ -47,7 +48,7 @@ export default (async(_root, args: DomainRequest, ctx, _info?) => {
 
   const doesDocumentExist = e.select(e.Domain, domain => ({
     filter_single: query.id ?
-      e.op(domain.id, "=", e.uuid(domain.id)) :
+      e.op(domain.id, "=", e.uuid(query.id)) :
       e.op(domain.name, "=", query.name)
   }));
 
@@ -75,4 +76,4 @@ export default (async(_root, args: DomainRequest, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while deleting document.`);
     return { success: false };
   }
-}) satisfies StandardBooleanResponse;
+}

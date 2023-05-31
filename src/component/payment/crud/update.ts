@@ -16,8 +16,7 @@ import {
   stringTrim
 } from "src/utility/index.ts";
 
-import { PaymentKind } from "../schema.ts";
-import * as maskPaymentMethod from "../utility/mask.ts";
+import { default as maskPaymentMethod } from "../utility/mask.ts";
 import e from "dbschema";
 
 import type { PaymentMethodUpdate } from "../schema.ts";
@@ -29,9 +28,9 @@ const thisFilePath = "/src/component/payment/crud/update.ts";
 
 /// export
 
-export default (async(_root, args: PaymentMethodUpdate, ctx, _info?) => {
+export default async(_root, args: PaymentMethodUpdate, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx))
-    return null;
+    return { detail: null };
 
   const { params, updates } = args;
 
@@ -41,13 +40,13 @@ export default (async(_root, args: PaymentMethodUpdate, ctx, _info?) => {
   }
 
   const client = createClient(databaseParams);
-  const query: LooseObject = {};
+  const query = ({} as LooseObject);
   let response: DetailObject | null = null;
 
   Object.entries(updates).forEach(([key, value]) => {
     switch(key) {
       case "mask": {
-        query[key] = stringTrim(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
@@ -69,7 +68,7 @@ export default (async(_root, args: PaymentMethodUpdate, ctx, _info?) => {
     // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
     filter_single: params.id ?
       e.op(payment.id, "=", e.uuid(stringTrim(params.id))) :
-      e.op(payment.vendorId, "=", stringTrim(params.vendorId))
+      e.op(payment.vendorId, "=", stringTrim(String(params.vendorId)))
   }));
 
   const existenceResult = await doesDocumentExist.run(client);
@@ -83,7 +82,7 @@ export default (async(_root, args: PaymentMethodUpdate, ctx, _info?) => {
 
   if (!owner) {
     log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
-    return { detail: response, error: [{ code: "TBA", message: error }] };
+    return { detail: response };
   }
 
   if (existenceResult.customer.id !== owner.id) {
@@ -118,4 +117,4 @@ export default (async(_root, args: PaymentMethodUpdate, ctx, _info?) => {
     log.error(`[${thisFilePath}]› Exception caught while updating document.`);
     return { detail: response };
   }
-}) satisfies StandardResponse;
+}

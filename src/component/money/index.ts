@@ -1,6 +1,6 @@
 
 
 
-/// export
+// /// export
 
-export * as paymentIntent from "./utility/payment-intent.ts";
+// export * as paymentIntent from "./utility/payment-intent.ts";

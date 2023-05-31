@@ -23,7 +23,9 @@ const isProduction = Deno.args.includes("--production");
 
 const schema = makeExecutableSchema({
   resolvers: { Query, Mutation },
-  typeDefs: theSchema()
+  // @ts-ignore | TS2322 [ERROR]: Type "DocumentNode | Record<string, unknown>" is not assignable to type "TypeSource".
+  typeDefs: theSchema
+  // https://github.com/ardatan/graphql-tools/blob/a6aced62dbbec02a01450aafd9c00bdd8eb8f0ce/packages/utils/src/Interfaces.ts#L257
 });
 
 

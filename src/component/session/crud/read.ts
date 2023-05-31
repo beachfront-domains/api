@@ -8,11 +8,24 @@ import { log } from "dep/std.ts";
 
 /// util
 
-import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
+import {
+  accessControl,
+  databaseParams,
+  maxPaginationLimit,
+  objectIsEmpty,
+  stringTrim
+} from "src/utility/index.ts";
+
 import e from "dbschema";
 
-import type { SessionRequest, SessionsRequest } from "../schema.ts";
-import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
+import type { Session, SessionRequest, SessionsRequest } from "../schema.ts";
+
+import type {
+  DetailObject,
+  LooseObject,
+  StandardResponse,
+  StandardPlentyResponse
+} from "src/utility/index.ts";
 
 const thisFilePath = "/src/component/session/crud/read.ts";
 
@@ -20,13 +33,14 @@ const thisFilePath = "/src/component/session/crud/read.ts";
 
 /// export
 
-export const get = (async(_root, args: SessionRequest, ctx, _info?) => {
+export const get = async(_root, args: SessionRequest, _ctx, _info?): StandardResponse => {
   /// NOTE
   /// : this function doesn't need to be auth-gated
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query: LooseObject = {};
+  const query = ({} as Session);
+  let response: DetailObject | null = null;
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
@@ -54,11 +68,19 @@ export const get = (async(_root, args: SessionRequest, ctx, _info?) => {
   return {
     detail: response
   };
-}) satisfies StandardResponse;
+};
 
-export const getMore = (async(_root, args: Partial<SessionsRequest>, ctx, _info?) => {
-  if (!await accessControl(ctx))
-    return null;
+export const getMore = async(_root, args: Partial<SessionsRequest>, ctx, _info?): StandardPlentyResponse => {
+  if (!await accessControl(ctx)) {
+    return {
+      detail: null,
+      pageInfo: {
+        cursor: null,
+        hasNextPage: false,
+        hasPreviousPage: false
+      }
+    };
+  }
 
   const client = createClient(databaseParams);
   const { pagination, params } = args;
@@ -103,16 +125,15 @@ export const getMore = (async(_root, args: Partial<SessionsRequest>, ctx, _info?
   // TODO
   // : `created` and `updated` should be a range
 
-  Object.entries(params).forEach(([key, value]) => {
+  Object.entries((params as LooseObject)).forEach(([key, value]) => {
     switch(key) {
       case "customer": {
-        query[key] = stringTrim(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
-      default: {
+      default:
         break;
-      }
     }
   });
 
@@ -121,16 +142,10 @@ export const getMore = (async(_root, args: Partial<SessionsRequest>, ctx, _info?
     order_by: document.created
   }));
 
-  if (query.wildcard) {
-    allDocuments = await e.select(e.Session, document => ({
-      ...baseShape(document)
-    })).run(client);
-  } else {
-    allDocuments = await e.select(e.Session, document => ({
-      ...baseShape(document),
-      filter: e.op(document.customer, "=", e.uuid(query.customer))
-    })).run(client);
-  }
+  allDocuments = await e.select(e.Session, document => ({
+    ...baseShape(document),
+    filter: e.op(document.customer.id, "=", e.uuid(query.customer))
+  })).run(client);
 
   const totalDocuments = allDocuments.length;
 
@@ -147,20 +162,12 @@ export const getMore = (async(_root, args: Partial<SessionsRequest>, ctx, _info?
     });
   }
 
-  if (query.wildcard) {
-    response = await e.select(e.Session, document => ({
-      ...baseShape(document),
-      limit,
-      offset
-    })).run(client);
-  } else {
-    response = await e.select(e.Session, document => ({
-      ...baseShape(document),
-      filter: e.op(document.customer, "=", e.uuid(query.customer)),
-      limit,
-      offset
-    })).run(client);
-  }
+  response = await e.select(e.Session, document => ({
+    ...baseShape(document),
+    filter: e.op(document.customer.id, "=", e.uuid(query.customer)),
+    limit,
+    offset
+  })).run(client);
 
   /// inspired by https://stackoverflow.com/a/62565528
   cursor = response && response.length > 0 ?
@@ -190,4 +197,4 @@ export const getMore = (async(_root, args: Partial<SessionsRequest>, ctx, _info?
       hasPreviousPage
     }
   };
-}) satisfies StandardPlentyResponse;
+};

@@ -53,14 +53,17 @@ export enum DomainStatusCode {
   CLIENT_UPDATE_PROHIBITED = "CLIENT_UPDATE_PROHIBITED"
 }
 
+// TODO
+// : owner previously had `name` and `location` values...
+// : seems like we should instead locate the customer in our database
+//   - if customer exists, update `owner` value
+//   - else, apply ghost owner profile
+
 export interface Domain {
   expiry: Date;
   extension: string; /// ID of extension
   name: string;      /// format: `sld.extension` in ASCII
-  owner: {
-    location: string;
-    name: string;
-  };
+  owner: string;     /// ID of customer
   status: DomainStatusCode;
   ///
   created: Date;
@@ -73,10 +76,7 @@ export interface DomainCreate {
     expiry?: Date;
     extension: string; /// ID of extension
     name: string;      /// format: `sld.extension` in ASCII
-    owner?: {
-      location: string;
-      name: string;
-    };
+    owner?: string;    /// ID of customer
     status?: DomainStatusCode;
   }
 }
@@ -96,14 +96,11 @@ export interface DomainsRequest {
 export interface DomainUpdate {
   params: {
     id?: string;
-    name?: string; /// format: `sld.extension` in ASCII
+    name?: string;  /// format: `sld.extension` in ASCII
   }
   updates: {
     expiry?: Date;
-    owner?: {
-      location: string;
-      name: string;
-    };
+    owner?: string; /// ID of customer
     status?: DomainStatusCode;
   }
 }
