@@ -1,13 +1,14 @@
 
 
 
-######
+#
 # Type
-######
+#
 
 type LoginLink {
+  for: Customer
   link: String
-  newCustomer: Boolean
+  token: String
 }
 
 type LoginResponse {
@@ -16,13 +17,13 @@ type LoginResponse {
 
 
 
-#######
+#
 # Input
-#######
+#
 
 input LoginInput {
   email: String!
-  totp: String
+  token: String
 }
 
 input TokenInput {

@@ -10,7 +10,7 @@ import { log } from "dep/std.ts";
 
 import { databaseParams } from "src/utility/index.ts";
 import e from "dbschema";
-const thisFilePath = "/src/component/session/utility/count.ts";
+const thisFilePath = "/src/component/order/utility/count.ts";
 
 
 
@@ -21,7 +21,7 @@ export default async(): Promise<number> => {
   let documentCount = 0;
 
   try {
-    const getAllDocuments = e.select(e.Session, () => ({ id: true }));
+    const getAllDocuments = e.select(e.Extension, () => ({ id: true }));
     const response = await getAllDocuments.run(client);
 
     documentCount = response.length;

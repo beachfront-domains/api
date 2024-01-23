@@ -76,7 +76,10 @@ export default async(args: PriceRequest): Promise<PriceResponse> => {
   // TODO
   // : if `sld` is an emoji, skip `isDictionaryWord` function
 
-  const isDictionaryWord = await dictionary(toUnicode(sld));
+  const isDictionaryWord = /[aeiou]/.test(sld) ?
+    await dictionary(toUnicode(sld)) :
+    null;
+
   const isPremium = premium;
 
   let finalPrice = new Big(0);

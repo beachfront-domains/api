@@ -15,8 +15,10 @@ interface PaymentMethodRequestParams {
 /// export
 
 export enum PaymentKind {
-  CRYPTOCURRENCY = "CRYPTOCURRENCY",
-  FIAT = "FIAT"
+  BTC = "BTC",
+  ETH = "ETH",
+  FIAT = "FIAT",
+  HNS = "HNS"
 }
 
 export interface PaymentMethod {

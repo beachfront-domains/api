@@ -2,8 +2,8 @@
   "compilerOptions": {
     "noImplicitAny": false
   },
+  "exclude": ["dbschema/"],
   "lint": {
-    "exclude": ["dbschema/"],
     "rules": {
       "exclude": ["no-explicit-any"]
     }

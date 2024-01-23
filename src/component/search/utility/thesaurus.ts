@@ -8,7 +8,7 @@ import { wretch } from "dep/x/wretch.ts";
 
 /// util
 
-import { serviceThesaurus } from "src/utility/index.ts";
+import { serviceNinja } from "src/utility/index.ts";
 
 interface ThesaurusResponse {
   antonyms: string[];
@@ -24,18 +24,21 @@ export default async(suppliedWord: string): Promise<ThesaurusResponse> => {
   let synonyms: any[] = [];
 
   try {
-    const data = await wretch(`https://www.dictionaryapi.com/api/v3/references/thesaurus/json/${encodeURIComponent(suppliedWord)}?key=${serviceThesaurus}`)
+    const data = await wretch(
+      `https://api.api-ninjas.com/v1/thesaurus?word=${encodeURIComponent(suppliedWord)}`, {
+        headers: { "X-Api-Key": serviceNinja }
+      })
       .get()
       .json();
 
-    if (!data![0]!.meta) {
+    if (!data) {
       return {
         antonyms,
         synonyms
       };
     }
 
-    const { ants, syns } = data![0]!.meta;
+    const { antonyms: ants, synonyms: syns } = (data as { antonyms: Array<string>, synonyms: Array<string> });
 
     antonyms = [...new Set(ants.flat())].sort();
     synonyms = [...new Set(syns.flat())].sort();
@@ -48,6 +51,9 @@ export default async(suppliedWord: string): Promise<ThesaurusResponse> => {
   } catch(_) {
     /// IGNORE
     /// Probably not a dictionary word
+    console.group("/src/component/search/utility/thesaurus.ts");
+    console.error(_);
+    console.groupEnd();
   }
 
   return {
@@ -61,7 +67,7 @@ export default async(suppliedWord: string): Promise<ThesaurusResponse> => {
 /// helper
 
 function processWord(word: string) {
-  const unwantedCharactersRegex = /\w+[\W]\w+/g;
+  const unwantedCharactersRegex = /\w+[\W]/;
 
   if (word && !unwantedCharactersRegex.test(word))
     return toASCII(word.toLowerCase());

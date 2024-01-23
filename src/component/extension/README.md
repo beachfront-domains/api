@@ -42,38 +42,41 @@ mutation CreateExtension($variables: ExtensionQueryVariables) {
 
 ## get extension
 
-All acccepted parameters are optional: `ascii`, `id`, and `name`.
+Requires either `id` or `name` parameters.
 
 ### Types
 
-- ascii: `String`
 - id: `String`
 - name: `String`
 
 ### GraphQL query
 
 ```sdl
-query GetExtension($variables: ExtensionQueryVariables) {
-  extension(options: $variables) {
+query GetExtension($params: ExtensionQuery) {
+  extension(params: $params) {
     detail {
-      ascii
-      collection
       id
       name
-      nope
-      pair
-      premium {
-        ascii
-        name
-      }
-      price
-      pricePremium
-      reserved {
-        ascii
-        name
-      }
+      pairs
+      premium
+      registry
+      tier
     }
   }
+}
+
+# Query Variables
+
+{
+  "params": {
+    "name": "editor"
+  }
+}
+
+# HTTP Headers
+
+{
+  "Authorization": "Bearer KEY_ID"
 }
 ```
 

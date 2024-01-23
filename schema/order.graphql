@@ -1,0 +1,85 @@
+
+
+
+#
+# Enum
+#
+
+enum PaymentVendorName {
+  OPENNODE
+  SQUARE
+  STRIPE
+}
+
+#
+# Type
+#
+
+type PaymentVendorDetail {
+  "Customer ID within vendor system"
+  id: ID
+  name: PaymentVendorName
+}
+
+type Order {
+  bag: [BagItem]
+  currency: String
+  customer: Customer
+  "Auto-incrementing value"
+  number: Int
+  "Boolean | 0: false, 1: true"
+  paid: Int
+  promo: String
+  total: Decimal
+  vendor: PaymentVendorDetail
+  #
+  created: DateTime
+  id: ID!
+  updated: DateTime
+}
+
+type OrderResponse {
+  detail: Order
+}
+
+type OrdersResponse {
+  detail: [Order]
+  pageInfo: Pagination
+}
+
+
+
+#
+# Input
+#
+
+input PaymentVendorInput {
+  "Customer ID within vendor system"
+  id: ID
+  name: PaymentVendorName
+}
+
+input OrderInput {
+  bag: [BagItemInput]
+  currency: String
+  customer: ID
+  "Boolean | 0: false, 1: true"
+  paid: Int
+  promo: String
+  total: Decimal
+  vendor: PaymentVendorInput
+}
+
+input OrderQuery {
+  id: ID
+}
+
+input OrdersQuery {
+  created: DateTime
+  customer: ID
+  updated: DateTime
+}
+
+
+
+### be sure to keep this file in sync with `src/component/bag/schema.ts`

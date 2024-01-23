@@ -13,6 +13,7 @@ const { environment } = parse(Deno.args);
 
 /// export
 
+export const appURL = "http://localhost:2513";
 export const isDevelopment = environment === "development";
 export const maxPaginationLimit = 100;
 

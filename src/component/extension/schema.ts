@@ -11,7 +11,7 @@ interface ExtensionsRequestParams {
   // length: number;
   // numeric: number;    /// boolean / 0 = false, 1 = true
   // registry: string; // TODO: save as lowercase ASCII?
-  tier: "DEFAULT" | "COMMON" | "RARE" | "EPIC" | "LEGENDARY";
+  tier: "DEFAULT" | "COMMON" | "RARE" | "EPIC" | "LEGENDARY" | "MYTHIC";
   // startsWith: string;
 
   // NOTE
@@ -28,7 +28,8 @@ export enum ExtensionTier {
   COMMON = "COMMON",
   RARE = "RARE",
   EPIC = "EPIC",
-  LEGENDARY = "LEGENDARY"
+  LEGENDARY = "LEGENDARY",
+  MYTHIC = "MYTHIC"
 }
 
 export interface Extension {

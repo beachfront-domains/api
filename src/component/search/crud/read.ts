@@ -25,6 +25,7 @@ import {
 import e from "dbschema";
 
 import type { LooseObject /*, SearchResponse*/ } from "src/utility/index.ts";
+import type { Extension } from "../../extension/schema.ts";
 import type { SearchRequest, SearchResult } from "../schema.ts";
 
 const thisFilePath = "/src/component/search/crud/read.ts";
@@ -32,7 +33,12 @@ const thisFilePath = "/src/component/search/crud/read.ts";
 // import dictionary from "../utility/dictionary.ts";
 import getPricing from "../utility/domain-pricing.ts";
 import removeVowels from "../utility/remove-vowels.ts";
+import sentimentAnalysis from "../utility/sentiment.ts";
 import thesaurus from "../utility/thesaurus.ts";
+
+const protectedTLDs = [
+  "melanin"
+];
 
 
 
@@ -48,16 +54,21 @@ import thesaurus from "../utility/thesaurus.ts";
 // : toggle to show mature TLDs
 
 export default async(_root, args: SearchRequest, ctx, _info?) => {
+  // console.log("yeah");
+  // console.log(ctx);
+  // console.log(args);
   const client = createClient(databaseParams);
   const { /*pagination,*/ params } = args;
+  const pairResults = ([] as SearchResult[]);
   const query = ({} as LooseObject);
   // const results: SearchResult[] = [];
   const results = ([] as SearchResult[]);
+  const vowelessResult = ([] as SearchResult[]);
   // let basePrice = 0;
   // let isPremium = false;
   // let premiumPrice = 0;
 
-  if (objectIsEmpty(params)) {
+  if (!params || objectIsEmpty(params)) {
     log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
     return { detail: results };
   }
@@ -89,6 +100,8 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
   switch(true) {
     case !query.name:
     case query.name && query.name.length === 0: {
+      console.log(">>> params");
+      console.log(params);
       log.warning(`[${thisFilePath}]› Vibe check failed.`);
       return { detail: results };
     }
@@ -119,7 +132,12 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
   if (query.extension && query.extension.length < 3) {
     /// NOTE
     /// `ani` is the shortest extension we own
-    log.warning(`[${thisFilePath}]› Invalid extension.`);
+    log.warning(`[${thisFilePath}]› Invalid extension.\n${query.extension}/`);
+    return { detail: results };
+  }
+
+  if (!query.extension) {
+    log.warning(`[${thisFilePath}]› Extension required.`);
     return { detail: results };
   }
 
@@ -131,14 +149,70 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
   const extensionExistenceResult = await doesExtensionExist.run(client);
 
   if (!extensionExistenceResult) {
-    log.warning(`[${thisFilePath}]› Extension does not exist.`);
+    log.warning(`[${thisFilePath}]› Extension does not exist.\n${query.extension}/`);
     return { detail: results };
   }
 
-  // TODO
-  // const { pairs } = extensionExistenceResult;
-  // : use `pairs` for `sld.pair[#]`
-  // : in UI, add sparkle to pair results
+  const extensionExists = (extensionExistenceResult as Extension);
+
+  /// >>> TLD OVERRIDES
+
+  const test = await blockNegativeNames(extensionExists.name, query.sld);
+
+  if (!test)
+    return { detail: results };
+
+  // if (extensionExistenceResult.name === "melanin") {
+  //   /// NOTE
+  //   /// : we don't want negative names being registered
+
+  //   log.info("melanin sentiment analysis...");
+
+  //   try {
+  //     const { sentiment } = await sentimentAnalysis(query.sld);
+
+  //     if (sentiment === "negative")
+  //       return { detail: results };
+  //   } catch(error) {
+  //     log.warning(`[${thisFilePath}]› Error analyzing sentiment.`);
+  //     log.error(error);
+
+  //     return { detail: results };
+  //   }
+  // }
+
+  /// TLD OVERRIDES <<<
+
+  const { pairs } = extensionExists;
+
+  /// TODO
+  /// : in UI, add sparkle to pair results
+
+  if (pairs && pairs.length > 0) {
+    pairs.forEach(async(pair) => {
+      const domain = `${query.sld}.${pair}`;
+      const searchResult = await findDomain(domain);
+      const hns = await hnsPrice();
+
+      if (!searchResult)
+        return;
+
+      const { available, created, premium, priceUSD } = searchResult;
+
+      /// TODO
+      /// : add `pair` key, boolean
+
+      pairResults.push({
+        available,
+        created,
+        extension: extensionExists,
+        name: domain,
+        premium,
+        priceHNS: __formatHNS(priceUSD, hns),
+        priceUSD
+      });
+    });
+  }
 
   // TODO
   // RECOMMENDATION ENGINE
@@ -156,7 +230,6 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
 
   // TODO
   // : test for "pagination" and "variables" existence
-  // : maybe only look for "name" since we punycode the input _anyway_...no need for "unicode"
   // : if domain is reserved, require code to purchase
   // : ignore invalid punycode (do this on Neuenet's API)
 
@@ -191,11 +264,15 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
     results.push({
       available,
       created,
+      extension: extensionExists,
       name: domain,
       premium,
       priceHNS: __formatHNS(priceUSD, hns),
       priceUSD
     });
+
+    // TODO
+    // : add "h4ck3r m0d3"
 
     /// NO VWLS
     if (!query.sld.startsWith("xn--") && removeVowels(query.sld).length > 3) {
@@ -208,9 +285,10 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
         if (searchResult) {
           const { available, created, premium, priceUSD } = searchResult;
 
-          results.push({
+          vowelessResult.push({
             available,
             created,
+            extension: extensionExists,
             name: domainSansVowels,
             premium,
             priceHNS: __formatHNS(priceUSD, hns),
@@ -249,9 +327,15 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
     //   });
     // }));
 
-    const antonymsArray = await createCollection(antonyms, query.extension, hns); // : SearchResult[]
+    const antonymsArray = protectedTLDs.includes(query.extension) ?
+      [] :
+      await createCollection(antonyms, query.extension, hns); // : SearchResult[]
     const synonymsArray = await createCollection(synonyms, query.extension, hns); // : SearchResult[]
     const owner = await personFromSession(ctx);
+
+    // TODO
+    // : save results to database with an ID
+    //   - send ID with response, so pagination can work
 
     return {
       detail: [
@@ -259,6 +343,8 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
         // : randomize?
         ...new Set([
           ...results,
+          ...pairResults,
+          ...vowelessResult,
           ...synonymsArray,
           ...antonymsArray
         ])
@@ -340,17 +426,27 @@ async function createCollection(suppliedArray: string[], suppliedExtension: stri
   const names: SearchResult[] = [];
 
   await Promise.all(suppliedArray.map(async(word: string) => {
+    const positiveVibes = await blockNegativeNames(suppliedExtension, word);
+
+    // console.log(">>> positiveVibes");
+    // console.log(word, positiveVibes);
+    // console.log("<<<\n");
+
+    if (!positiveVibes)
+      return;
+
     const domain = `${word}.${suppliedExtension}`;
     const searchResult = await findDomain(domain);
 
     if (!searchResult)
       return;
 
-    const { available, created, premium, priceUSD } = searchResult;
+    const { available, created, extension, premium, priceUSD } = searchResult;
 
     names.push({
       available,
       created,
+      extension,
       name: toASCII(domain),
       premium,
       priceHNS: __formatHNS(priceUSD, hnsPrice),
@@ -358,10 +454,42 @@ async function createCollection(suppliedArray: string[], suppliedExtension: stri
     });
   }));
 
-  return names;
+  // relatedTLDs = [...new Set(relatedTLDs)];
+  // return names;
+
+  return [...new Set(names)]; /// remove duplicates
+}
+
+function isValidDomain(domain: string) {
+  /// TODO
+  /// : add to utility.ts
+
+  const domainRegex = /^(?!-)([A-Za-z0-9-\p{Emoji}]{1,63}(?<!-)\.?)+(0x01|0xa0|acapella|acappella|adults|afrobeat|afrohaus|airhead|airtime|alladat|ani|antifascist|aperitif|apocalypse|architech|astre|astres|astronautica|astronautical|await|backend|balaklava|bald|baldy|ballpoint|banjo|baremetal|bareserver|bareservers|barnacle|battlechip|battlechips|beachfront|bigblackdick|bigmood|biochip|biochips|bitmap|bitmaps|blvck|bootsector|braggart|brandalism|brinner|bubblegum|buttock|buttocks|buttsecks|canvass|caters|cerulean|cherub|chillwave|chown|chroot|cinephile|coda|codesh|colors|compile|conglomerate|coroutine|corsage|craftwork|creek|crud|cursor|cursors|cxnt|datastore|datastores|datastruct|datastructs|dedsec|dedware|dedwares|dedwarez|deepthrust|deepthrusts|dehost|demex|destroy|digestif|dingbat|dingbats|dinner|diskette|diskettes|disrespect|dist|diviner|diviners|divinity|doomscroll|doomsurf|dopameme|dribble|dribbles|drives|ecmascript|editor|editors|endif|exclamation|executable|external|extracurricular|fairpoint|freq|futuros|futurus|gamestart|garterbelt|glacier|gleefresh|goodscroll|grandiose|grundare|guffaw|halide|handyname|herbivore|hereinafter|hexa|hieroglyph|hieroglyphic|hieroglyphics|hieroglyphs|highball|homeroom|horoscopy|hsla|htop|httpx|humanoid|humanoids|hyphen|hyphop|illuminatus|impresario|inasmuch|incorpo|indexof|infocenter|infolink|initial|initials|innanet|insomuch|interior|internetpoint|internetpoints|jargon|jomo|kitsune|kolor|kolors|labia|labio|leapyear|lefty|lewk|lewks|libr|liek|lieu|liss|litre|localroot|lolwut|loupe|loverboi|loverboy|lunch|lynk|marshmallow|maru|marvelous|megatech|meicho|melanin|microsystem|microsystems|mideast|millennium|milliamp|millihenry|millivolt|moemoe|monochrome|moodring|moodrings|moonroom|mvc|nameserve|nbsp|nendoroid|nendoroids|neue|newline|nonsequitur|normie|normy|novae|nullstack|onprem|oooh|operand|outwork|pacote|pagefault|paizuri|param|parameter|params|pearlstone|permafrost|pharaoh|pharaohs|pigeon|playsmart|plethora|pluriverse|pondering|ponderings|postseason|postseasons|potemkin|puns|pxem|pynk|righty|rootserve|saturnalia|savepoint|savepoints|scrot|scrots|secks|serene|shimbun|shinbun|shindeiru|shinderu|shitpost|shitposts|shmup|shorthand|sidereal|sike|slanguage|snapback|snapbacks|soie|soundfont|soundfonts|soundteam|soundteams|southpaw|starboard|sugoi|sunroom|sushirrito|svpply|symbols|technobabble|telephoto|theblackfriday|thecybermonday|thique|tiddies|transmit|uchu|undernet|univeige|uranet|usenetwork|vendo|viii|ware|waveform|webbrowser|webrowser|webscape|websurf|weirdo|whizbang|woebegone|wordplay|xn--apritif-cya|xn--beaut-fsa|xn--co8hfc|xn--cr8h|xn--gi8hva|xn--pn8h7e|xn--pr9hoa|xn--qj8h57g|xn--r9j070h|xn--ri8hkv|xn--seorita-5za|xn--uch-70a|xor|xra|xref|yaga|yitties|yitty|yoink|yuck|yuletide|zaddy)$/u; /// `u` flag is for Unicode (emoji) support
+  return domainRegex.test(domain);
+
+  /*
+    const domainFormatRegex = /^(?!-)([A-Za-z0-9-\p{Emoji}]{1,63}(?<!-)\.?)+[A-Za-z]{2,}$/u;
+    const whitelist = ["0x01", "0xa0", "acapella", "afrobeat", ...]; // Add all your whitelisted domains here
+
+    function isValidDomain(domain: string): boolean {
+      // Check if the domain matches the general format
+      if (!domainFormatRegex.test(domain)) return false;
+
+      // Check if the domain is in the whitelist
+      return whitelist.includes(domain);
+    }
+
+    /// recommended by ChatGPT4
+  */
 }
 
 async function findDomain(suppliedDomain: string) {
+  if (!isValidDomain(suppliedDomain)) {
+    log.warning(`[${thisFilePath}]› findDomain > Invalid domain\n${suppliedDomain}`);
+    console.log(isValidDomain(suppliedDomain));
+    return null;
+  }
+
   const client = createClient(databaseParams);
   const extension = suppliedDomain.split(".")[1];
   const sld = suppliedDomain.split(".")[0];
@@ -382,15 +510,19 @@ async function findDomain(suppliedDomain: string) {
   const extensionExistenceResult = await doesExtensionExist.run(client);
   const domainExistenceResult = await doesDomainExist.run(client);
 
-  if (!extensionExistenceResult)
+  if (!extensionExistenceResult) {
+    log.warning(`[${thisFilePath}]› findDomain > Extension doesn't exist`);
     return null;
+  }
+
+  const extensionExists = (extensionExistenceResult as Extension);
 
   if (domainExistenceResult) {
     creationDate = domainExistenceResult.created;
     isAvailable = 0;
   }
 
-  const { premium, tier } = extensionExistenceResult;
+  const { premium, tier } = extensionExists;
 
   /// Check to see if desired name is considered premium
   premium && premium.map((premiumSLD: string) => {
@@ -404,10 +536,47 @@ async function findDomain(suppliedDomain: string) {
   return {
     available: isAvailable,
     created: creationDate,
+    extension: extensionExists,
     name: suppliedDomain,
     premium: isPremium,
     priceUSD
   };
+}
+
+async function blockNegativeNames(tld: string, sld: string): Promise<boolean> {
+  /// NOTE
+  /// : returns true if sentiment is neutral/positive
+  /// : returns false if sentiment is negative
+
+  let positiveSentiment = true;
+
+  if (!protectedTLDs.includes(tld))
+    return positiveSentiment;
+
+  /// NOTE
+  /// : we don't want negative names being registered
+
+  // log.info(`${tld} > sentiment analysis...`);
+
+  try {
+    const sentiment = await sentimentAnalysis(sld);
+
+    // log.info(`SENTIMENT >>> ${sentiment}\n${sld}`);
+
+    if (sentiment === "negative")
+      positiveSentiment = false;
+  } catch(error) {
+    log.warning(`[${thisFilePath}]› Error analyzing sentiment.`);
+    log.error(error);
+
+    positiveSentiment = false;
+  }
+
+  // log.info(`>>> SLD\n${sld}`)
+  // log.info(positiveSentiment);
+  // log.info("\n")
+
+  return positiveSentiment;
 }
 
 function __formatHNS(priceInUSD: number|string, hns: number|string) {

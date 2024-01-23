@@ -5,27 +5,17 @@
 
 import type { PaginationArgument } from "../pagination/schema.ts";
 
-interface SessionsRequestParams {
-  created: string;
-  customer: string; /// ID
-  updated: string;
-}
-
 
 
 /// export
 
-export interface CartItem {
-  /// NOTE
-  /// : for products without duration, like merch, duration is `0`
-  duration: number;
-  name: string;
-  price: string;
-}
-
 export interface Session {
-  cart: CartItem[];
-  customer: string; /// ID
+  device: string;
+  expires: Date;
+  for: string; // customer ID
+  ip: string;
+  nickname: string;
+  token: string;
   ///
   created: Date;
   id: string;
@@ -34,8 +24,11 @@ export interface Session {
 
 export interface SessionCreate {
   params: {
-    cart: CartItem[];
-    customer?: string; /// ID
+    device?: string;
+    for: string; // customer ID
+    ip?: string;
+    nickname?: string;
+    token: string; // login token
   }
 }
 
@@ -45,23 +38,24 @@ export interface SessionRequest {
   }
 }
 
+export interface SessionsRequest {
+  pagination: PaginationArgument;
+  params: Partial<{
+    for: string; // customer ID
+    wildcard: string;
+  }>;
+}
+
 export interface SessionUpdate {
   params: {
     id: string;
   }
   updates: {
-    cart: CartItem[];
-    /// NOTE
-    /// : visitor could be anonymous and later login
-    customer?: string; /// ID
+    expires?: Date;
+    nickname?: string;
   }
 }
 
-export interface SessionsRequest {
-  pagination: PaginationArgument;
-  params: Partial<SessionsRequestParams>;
-}
 
 
-
-/// be sure to keep this file in sync with `schema/session.graphql`
+/// be sure to keep this file in sync with `/schema/session.graphql`

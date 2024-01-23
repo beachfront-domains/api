@@ -31,7 +31,7 @@ export type SearchResponse = Promise<{
 }>;
 
 export type StandardBooleanResponse = Promise<{ success: boolean }>;
-export type StandardResponse = Promise<{ detail: DetailObject | null }>;
+export type StandardResponse = Promise<{ detail: DetailObject | null, error?: { code: string; message: string; }}>;
 
 export type StandardPlentyResponse = Promise<{
   detail: Array<DetailObject> | null,

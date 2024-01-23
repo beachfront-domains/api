@@ -1,4 +1,5 @@
 # import Customer from "customer.graphql"
+# import Extension from "extension.graphql"
 # import Pagination from "pagination.graphql"
 
 
@@ -11,7 +12,8 @@ type SearchResult {
   "Boolean | 0: false, 1: true"
   available: Int
   created: DateTime
-  duration: Int
+  extension: Extension
+  # duration: Int
   "ASCII format"
   name: String
   "Boolean | 0: false, 1: true"

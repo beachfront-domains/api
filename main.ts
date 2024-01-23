@@ -13,10 +13,12 @@ import {
   underline as shellUnderline
 } from "dep/std.ts";
 
+import cors from "https://deno.land/x/edge_cors/src/cors.ts"; // v0.2.1
+
 /// util
 
 import { checklist } from "src/utility/index.ts";
-import { Query, Mutation } from "src/schema/resolver.ts";
+import { Mutation, Query } from "src/schema/resolver.ts";
 import theSchema from "src/schema/index.ts";
 
 const isProduction = Deno.args.includes("--production");
@@ -41,18 +43,14 @@ const api = new Server({
     const { pathname } = new URL(req.url);
 
     return pathname === "/graphql" ?
-      await GraphQLHTTP<Request>({
+      cors(req, await GraphQLHTTP<Request>({
         context: request => ({
           request,
           "x-session": new Headers(req.headers).get("authorization")
         }),
         graphiql: !isProduction,
-        headers: {
-          // TODO: access control?
-          "Access-Control-Allow-Origin": "*"
-        },
         schema
-      })(req) :
+      })(req)) :
       Response.json({
         detail: "Please visit our documentation for information on how to use the beachfront/ API.",
         status: 406,

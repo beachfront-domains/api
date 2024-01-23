@@ -8,7 +8,7 @@ import { log } from "dep/std.ts";
 
 /// util
 
-import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
+import { accessControl, databaseParams } from "src/utility/index.ts";
 import e from "dbschema";
 
 import type { LooseObject, StandardBooleanResponse } from "src/utility/index.ts";
@@ -26,22 +26,23 @@ export default async(_root, args: SessionRequest, ctx, _info?): StandardBooleanR
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query = ({} as LooseObject);
+  const query: LooseObject = {};
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "id": {
-        query[key] = stringTrim(value);
+        query[key] = String(value);
         break;
       }
 
-      default:
+      default: {
         break;
+      }
     }
   });
 
-  const doesDocumentExist = e.select(e.Session, session => ({
-    filter_single: e.op(session.id, "=", e.uuid(query.id))
+  const doesDocumentExist = e.select(e.Session, document => ({
+    filter_single: e.op(document.id, "=", e.uuid(query.id))
   }));
 
   const existenceResult = await doesDocumentExist.run(client);
@@ -55,12 +56,11 @@ export default async(_root, args: SessionRequest, ctx, _info?): StandardBooleanR
   const documentId = e.uuid(existenceResult.id);
 
   try {
-    const deleteQuery = e.delete(e.Session, session => ({
-      filter_single: e.op(session.id, "=", documentId)
+    const deleteQuery = e.delete(e.Session, document => ({
+      filter_single: e.op(document.id, "=", documentId)
     }));
 
     await deleteQuery.run(client);
-
     return { success: true };
   } catch(_) {
     // TODO

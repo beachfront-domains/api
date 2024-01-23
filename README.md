@@ -51,3 +51,8 @@
       - [Save pm2 config](./doc/PRODUCTION.md#save-pm2-config)
 - [Test](./doc/TEST.md#test)
   - [Testing the code](./doc/TEST.md#testing-the-code)
+
+
+## Notes
+
+- When adding new TLDs to the database, be sure to update the TLD regex in the domain creation functions.

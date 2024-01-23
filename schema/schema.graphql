@@ -1,51 +1,18 @@
 scalar DateTime
 scalar Decimal
 
-# import CustomerInput from "customer.graphql"
-# import CustomerQuery from "customer.graphql"
-# import CustomerResponse from "customer.graphql"
-# import CustomersQuery from "customer.graphql"
-# import CustomersResponse from "customer.graphql"
-
-# import DomainInput from "domain.graphql"
-# import DomainQuery from "domain.graphql"
-# import DomainResponse from "domain.graphql"
-# import DomainsQuery from "domain.graphql"
-# import DomainsResponse from "domain.graphql"
-# import RegistrantInput from "domain.graphql"
-
-# import ExtensionInput from "extension.graphql"
-# import ExtensionQuery from "extension.graphql"
-# import ExtensionResponse from "extension.graphql"
-# import ExtensionsQuery from "extension.graphql"
-# import ExtensionsResponse from "extension.graphql"
-
-# import InvoiceInput from "invoice.graphql"
-# import InvoiceQuery from "invoice.graphql"
-# import InvoiceResponse from "invoice.graphql"
-# import InvoicesQuery from "invoice.graphql"
-# import InvoicesResponse from "invoice.graphql"
-
-# import LoginInput from "access.graphql"
-# import LoginResponse from "access.graphql"
-# import TokenInput from "access.graphql"
-
-# import PaginationOptions from "pagination.graphql"
-
-# import PaymentMethodInput from "payment.graphql"
-# import PaymentMethodQuery from "payment.graphql"
-# import PaymentMethodResponse from "payment.graphql"
-# import PaymentMethodsQuery from "payment.graphql"
-# import PaymentMethodsResponse from "payment.graphql"
-
-# import SearchQuery from "search.graphql"
-# import SearchResponse from "search.graphql"
-
-# import SessionInput from "session.graphql"
-# import SessionQuery from "session.graphql"
-# import SessionResponse from "session.graphql"
-# import SessionsQuery from "session.graphql"
-# import SessionsResponse from "session.graphql"
+# import from "bag.graphql"
+# import from "customer.graphql"
+# import from "error.graphql"
+# import from "login.graphql"
+# import from "domain.graphql"
+# import from "extension.graphql"
+# import from "invoice.graphql"
+# import from "order.graphql"
+# import from "pagination.graphql"
+# import from "payment.graphql"
+# import from "search.graphql"
+# import from "session.graphql"
 
 """
 All the queries that enable the registrar API to function
@@ -58,81 +25,130 @@ type BooleanResponse {
 
 type Query {
   """
+  Bag queries
+  """
+  bag(params: BagQuery): BagResponse
+  bags(params: BagsQuery, pagination: PaginationOptions): BagsResponse
+
+  """
   Customer queries
   """
-  customer(options: CustomerQuery): CustomerResponse
-  customers(options: CustomersQuery, pagination: PaginationOptions): CustomersResponse
+  customer(params: CustomerQuery): CustomerResponse
+  customers(params: CustomersQuery, pagination: PaginationOptions): CustomersResponse
+
   """
   Domain queries
   """
-  domain(options: DomainQuery): DomainResponse
-  domains(options: DomainsQuery, pagination: PaginationOptions): DomainsResponse
+  domain(params: DomainQuery): DomainResponse
+  domains(params: DomainsQuery, pagination: PaginationOptions): DomainsResponse
+
   """
   Extension queries
   """
-  extension(options: ExtensionQuery): ExtensionResponse
-  extensions(options: ExtensionsQuery, pagination: PaginationOptions): ExtensionsResponse
+  extension(params: ExtensionQuery): ExtensionResponse
+  extensions(params: ExtensionsQuery, pagination: PaginationOptions): ExtensionsResponse
+
   """
   Invoice queries
   """
-  invoice(options: InvoiceQuery): InvoiceResponse
-  invoices(options: InvoicesQuery, pagination: PaginationOptions): InvoicesResponse
+  invoice(params: InvoiceQuery): InvoiceResponse
+  invoices(params: InvoicesQuery, pagination: PaginationOptions): InvoicesResponse
+
+  """
+  Login query
+  """
+  login(params: LoginQuery): LoginResponse
+
+  """
+  Order queries
+  """
+  order(params: OrderQuery): OrderResponse
+  orders(params: OrdersQuery, pagination: PaginationOptions): OrdersResponse
+
   """
   Payment method queries
   """
-  paymentMethod(options: PaymentMethodQuery): PaymentMethodResponse
-  paymentMethods(options: PaymentMethodsQuery, pagination: PaginationOptions): PaymentMethodsResponse
+  paymentMethod(params: PaymentMethodQuery): PaymentMethodResponse
+  paymentMethods(params: PaymentMethodsQuery, pagination: PaginationOptions): PaymentMethodsResponse
+
   """
   Search queries
   """
-  search(options: SearchQuery, pagination: PaginationOptions): SearchResponse
+  search(params: SearchQuery, pagination: PaginationOptions): SearchResponse
+
   """
   Session queries
   """
-  session(options: SessionQuery): SessionResponse
-  sessions(options: SessionsQuery, pagination: PaginationOptions): SessionsResponse
+  session(params: SessionQuery): SessionResponse
+  sessions(params: SessionsQuery, pagination: PaginationOptions): SessionsResponse
 }
 
 type Mutation {
+  # """
+  # Authentication mutations
+  # """
+  # login(params: LoginInput): LoginResponse
+  # verify(params: TokenInput): SessionResponse
+
   """
-  Authentication mutations
+  Bag mutations
   """
-  login(options: LoginInput): LoginResponse
-  verify(options: TokenInput): SessionResponse
+  createBag(params: BagInput): BagResponse
+  deleteBag(params: BagQuery): BooleanResponse
+  updateBag(updates: BagInput, params: BagQuery): BagResponse
+
   """
   Customer mutations
   """
-  createCustomer(options: CustomerInput): CustomerResponse
-  deleteCustomer(options: CustomerQuery): BooleanResponse
-  updateCustomer(changes: CustomerInput, options: CustomerQuery): CustomerResponse
+  createCustomer(params: CustomerInput): CustomerResponse
+  deleteCustomer(params: CustomerQuery): BooleanResponse
+  updateCustomer(updates: CustomerInput, params: CustomerQuery): CustomerResponse
+
   """
   Domain mutations
   """
-  createDomain(options: DomainInput): DomainResponse
-  deleteDomain(options: DomainQuery): BooleanResponse
-  updateDomain(changes: DomainInput, options: DomainQuery): DomainResponse
+  createDomain(params: DomainInput): DomainResponse
+  deleteDomain(params: DomainQuery): BooleanResponse
+  updateDomain(updates: DomainInput, params: DomainQuery): DomainResponse
+
   """
   Extension mutations
   """
-  createExtension(options: ExtensionInput): ExtensionResponse
-  deleteExtension(options: ExtensionQuery): BooleanResponse
-  updateExtension(changes: ExtensionInput, options: ExtensionQuery): ExtensionResponse
+  createExtension(params: ExtensionInput): ExtensionResponse
+  deleteExtension(params: ExtensionQuery): BooleanResponse
+  updateExtension(updates: ExtensionInput, params: ExtensionQuery): ExtensionResponse
+
   """
   Invoice mutations
   """
-  createInvoice(options: InvoiceInput): InvoiceResponse
-  deleteInvoice(options: InvoiceQuery): BooleanResponse
-  updateInvoice(changes: InvoiceInput, options: InvoiceQuery): InvoiceResponse
+  createInvoice(params: InvoiceInput): InvoiceResponse
+  deleteInvoice(params: InvoiceQuery): BooleanResponse
+  updateInvoice(updates: InvoiceInput, params: InvoiceQuery): InvoiceResponse
+
+  """
+  Login mutations
+  """
+  createLogin(params: LoginInput): LoginResponse
+  deleteLogin(params: LoginQuery): BooleanResponse
+
+  """
+  Order mutations
+  """
+  createOrder(params: OrderInput): OrderResponse
+  deleteOrder(params: OrderQuery): BooleanResponse
+  updateOrder(updates: OrderInput, params: OrderQuery): OrderResponse
+
   """
   Payment method mutations
   """
-  createPaymentMethod(options: PaymentMethodInput): PaymentMethodResponse
-  deletePaymentMethod(options: PaymentMethodQuery): BooleanResponse
-  updatePaymentMethod(changes: PaymentMethodInput, options: PaymentMethodQuery): PaymentMethodResponse
+  createPaymentMethod(params: PaymentMethodInput): PaymentMethodResponse
+  deletePaymentMethod(params: PaymentMethodQuery): BooleanResponse
+  updatePaymentMethod(updates: PaymentMethodInput, params: PaymentMethodQuery): PaymentMethodResponse
+
   """
   Session mutations
   """
-  createSession(options: SessionInput): SessionResponse
-  deleteSession(options: SessionQuery): BooleanResponse
-  updateSession(changes: SessionInput, options: SessionQuery): SessionResponse
+  createSession(params: SessionInput): SessionResponse
+  deleteSession(params: SessionQuery): BooleanResponse
+  updateSession(updates: SessionInput, params: SessionQuery): SessionResponse
 }

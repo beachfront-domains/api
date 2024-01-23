@@ -28,9 +28,9 @@ export async function accessControl(ctx) {
 
   const client = createClient(databaseParams);
 
-  const doesDocumentExist = e.select(e.Key, key => ({
-    ...e.Key["*"],
-    filter_single: e.op(key.id, "=", e.uuid(sessionToken))
+  const doesDocumentExist = e.select(e.api.Key, document => ({
+    ...e.api.Key["*"],
+    filter_single: e.op(document.id, "=", e.uuid(sessionToken))
   }));
 
   const existenceResult = await doesDocumentExist.run(client);

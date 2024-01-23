@@ -1,12 +1,12 @@
 module api {
   type Key {
-    required property created -> datetime {
+    required created: datetime {
       default := datetime_of_transaction();
       readonly := true;
     };
-    required property updated -> datetime {
+    required updated: datetime {
       default := datetime_of_transaction();
     };
-    required property url -> str;
+    required url: str;
   }
 }

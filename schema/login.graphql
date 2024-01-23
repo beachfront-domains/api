@@ -1,0 +1,39 @@
+
+#
+# Type
+#
+
+type Login {
+  for: Customer
+  link: String
+  token: String
+  #
+  created: DateTime!
+  id: ID!
+  updated: DateTime!
+}
+
+type LoginResponse {
+  detail: Login
+  error: [Error]
+}
+
+#
+# Input
+#
+
+input LoginInput {
+  "Customer email"
+  email: String!
+  token: String
+  # no created, id, updated
+}
+
+input TokenInput {
+  token: String!
+}
+
+input LoginQuery {
+  email: String
+  id: ID
+}

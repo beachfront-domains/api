@@ -3,6 +3,7 @@
 
 /// util
 
+import type { Extension } from "../extension/schema.ts";
 import type { PaginationArgument } from "../pagination/schema.ts";
 
 interface SearchRequestParams {
@@ -28,6 +29,7 @@ export interface SearchResult {
   available: number;
   created: string;
   // duration: number;
+  extension: Extension;
   name: string;
   premium: number;
   priceHNS: string;

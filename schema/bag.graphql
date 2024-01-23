@@ -1,0 +1,69 @@
+
+
+
+#
+# Type
+#
+
+type BagItem {
+  """
+  During checkout, contents of bag are validated to ensure availability
+  """
+  duration: Int
+  name: String
+  price: String
+}
+
+type Bag {
+  """
+  Array of domain names
+  """
+  bag: [BagItem]
+  currency: String
+  customer: Customer
+  #
+  created: DateTime
+  id: ID!
+  updated: DateTime
+}
+
+type BagResponse {
+  detail: Bag
+}
+
+type BagsResponse {
+  detail: [Bag]
+  pageInfo: Pagination
+}
+
+
+
+#
+# Input
+#
+
+input BagItemInput {
+  duration: Int
+  name: String
+  price: String
+}
+
+input BagInput {
+  bag: [BagItemInput]
+  currency: String
+  customer: ID
+}
+
+input BagQuery {
+  id: ID
+}
+
+input BagsQuery {
+  created: DateTime
+  customer: ID
+  updated: DateTime
+}
+
+
+
+### be sure to keep this file in sync with `src/component/bag/schema.ts`

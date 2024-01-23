@@ -4,6 +4,14 @@
 /// util
 
 import {
+  create as createBag,
+  del as deleteBag,
+  getBag as bag,
+  getBags as bags,
+  update as updateBag
+} from "../component/bag/index.ts";
+
+import {
   create as createCustomer,
   del as deleteCustomer,
   getCustomer as customer,
@@ -36,6 +44,20 @@ import {
 } from "../component/invoice/index.ts";
 
 import {
+  create as createLogin,
+  del as deleteLogin,
+  getLogin as login
+} from "../component/login/index.ts";
+
+import {
+  create as createOrder,
+  del as deleteOrder,
+  getOrder as order,
+  getOrders as orders,
+  update as updateOrder
+} from "../component/order/index.ts";
+
+import {
   create as createPaymentMethod,
   del as deletePaymentMethod,
   getPaymentMethod as paymentMethod,
@@ -63,6 +85,8 @@ import {
 /// export
 
 export const Query = {
+  bag,
+  bags,
   customer,
   customers,
   domain,
@@ -71,32 +95,41 @@ export const Query = {
   extensions,
   invoice,
   invoices,
-  // login,
+  login,
+  order,
+  orders,
   paymentMethod,
   paymentMethods,
   search,
   session,
   sessions
-  // verify
 };
 
 export const Mutation = {
+  createBag,
   createCustomer,
   createDomain,
   createExtension,
   createInvoice,
+  createLogin,
+  createOrder,
   createPaymentMethod,
   createSession,
+  deleteBag,
   deleteCustomer,
   deleteDomain,
   deleteExtension,
   deleteInvoice,
+  deleteLogin,
+  deleteOrder,
   deletePaymentMethod,
   deleteSession,
+  updateBag,
   updateCustomer,
   updateDomain,
   updateExtension,
   updateInvoice,
+  updateOrder,
   updatePaymentMethod,
   updateSession
 };

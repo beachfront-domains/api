@@ -17,6 +17,14 @@ const schema = importQL(join("schema", "schema.graphql"));
 export default () => schema;
 
 export type {
+  Bag,
+  BagCreate,
+  BagRequest,
+  BagsRequest,
+  BagUpdate
+} from "../component/bag/schema.ts";
+
+export type {
   Customer,
   CustomerCreate,
   CustomerRequest,
@@ -52,6 +60,20 @@ export type {
 //   PaginationArgument,
 //   PaginationResponse
 // } from "../component/pagination/schema.ts";
+
+export type {
+  Login,
+  LoginCreate,
+  LoginRequest
+} from "../component/login/schema.ts";
+
+export type {
+  Order,
+  OrderCreate,
+  OrderRequest,
+  OrdersRequest,
+  OrderUpdate
+} from "../component/order/schema.ts";
 
 export type {
   PaymentMethod,

@@ -5,15 +5,21 @@
 
 import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
+import { toASCII } from "dep/x/tr46.ts";
 
 /// util
 
-import { databaseParams, objectIsEmpty, stringTrim } from "src/utility/index.ts";
-import { CartItem } from "../schema.ts";
+import {
+  accessControl,
+  databaseParams,
+  objectIsEmpty,
+  validateDate
+} from "src/utility/index.ts";
+
 import e from "dbschema";
 
-import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
 import type { SessionUpdate } from "../schema.ts";
+import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
 
 const thisFilePath = "/src/component/session/crud/update.ts";
 
@@ -21,39 +27,34 @@ const thisFilePath = "/src/component/session/crud/update.ts";
 
 /// export
 
-export default async(_root, args: SessionUpdate, _ctx, _info?): StandardResponse => {
-  /// NOTE
-  /// : this function doesn't need to be auth-gated
-
-  // TODO
-  // : if session exists in `ctx`, update that instead?
-  // : remember to remove underscore from `ctx` if used
+export default async(_root, args: SessionUpdate, ctx, _info?): StandardResponse => {
+  if (!await accessControl(ctx))
+    return { detail: null };
 
   const { params, updates } = args;
+  let response: DetailObject | null = null;
 
   if (objectIsEmpty(params) || objectIsEmpty(updates)) {
     log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
-    return { detail: null };
+    return { detail: response };
   }
 
   const client = createClient(databaseParams);
-  const query = ({} as LooseObject);
-  let response: DetailObject | null = null;
-
-  function processCartItems(arr): CartItem[] {
-    return arr.map((item: CartItem) => item);
-  }
+  const query: LooseObject = {};
 
   Object.entries(updates).forEach(([key, value]) => {
     switch(key) {
-      case "cart": {
-        // query[key] = [...new Set(value as CartItem[])] || null; /// eliminate duplicates
-        query[key] = processCartItems(value);
+      case "expires": {
+        query[key] = validateDate(String(value)) ?
+          new Date(String(value)) :
+          null;
         break;
       }
 
-      case "customer": {
-        query[key] = stringTrim(String(value));
+      case "nickname": {
+        query[key] = String(value).length > 0 ?
+          toASCII(String(value)) :
+          "Some Device";
         break;
       }
 
@@ -62,17 +63,14 @@ export default async(_root, args: SessionUpdate, _ctx, _info?): StandardResponse
     }
   });
 
-  /// NOTE
-  /// We do not check the `customer` ID for validity, as this is
-  /// supposed to be a quick and easy way to have a persistent
-  /// cart. We do not care at this point in time.
-  ///
-  /// When checkout occurs, we will validate `customer` ID.
+  /// vibe check
+  if (updates.expires && !query.expires) {
+    log.warning(`[${thisFilePath}]› Vibe check failed.`);
+    return { detail: response };
+  }
 
-  const doesDocumentExist = e.select(e.Session, session => ({
-    ...e.Session["*"],
-    customer: session.customer["*"],
-    filter_single: e.op(session.id, "=", e.uuid(stringTrim(params.id)))
+  const doesDocumentExist = e.select(e.Session, document => ({
+    filter_single: e.op(document.id, "=", e.uuid(String(params.id)))
   }));
 
   const existenceResult = await doesDocumentExist.run(client);
@@ -82,18 +80,25 @@ export default async(_root, args: SessionUpdate, _ctx, _info?): StandardResponse
     return { detail: response };
   }
 
+  // TODO
+  // : if `existenceResult.expires` has elapsed, delete document and return blank response
+
+  // TODO
+  // : add check to prevent updating `expires` to a time in the past
+  //   if you want to invalidate a session, just delete it instead.
+
   try {
-    const updateQuery = e.update(e.Session, session => ({
-      filter_single: e.op(session.id, "=", e.uuid(existenceResult.id)),
+    const updateQuery = e.update(e.Session, document => ({
+      filter_single: e.op(document.id, "=", e.uuid(existenceResult.id)),
       set: {
         ...query,
         updated: e.datetime_of_transaction()
       }
     }));
 
-    response = await e.select(updateQuery, session => ({
+    response = await e.select(updateQuery, document => ({
       ...e.Session["*"],
-      customer: session.customer["*"],
+      for: document.for["*"]
     })).run(client);
 
     return { detail: response };

@@ -5,11 +5,17 @@
 
 import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
+import { toASCII } from "dep/x/tr46.ts";
 
 /// util
 
-import { databaseParams, personFromSession, stringTrim } from "src/utility/index.ts";
-import { CartItem, Session } from "../schema.ts";
+import {
+  createSessionToken,
+  databaseParams,
+  decode,
+  verify
+} from "src/utility/index.ts";
+
 import e from "dbschema";
 
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
@@ -21,80 +27,96 @@ const thisFilePath = "/src/component/session/crud/create.ts";
 
 /// export
 
-export default async(_root, args: SessionCreate, ctx, _info?): StandardResponse => {
-  /// NOTE
-  /// : this function doesn't need to be auth-gated
-
+export default async(_root, args: SessionCreate, _ctx?, _info?): StandardResponse => {
+  /// this function needs to be accessible to non-authenticated folks
   const client = createClient(databaseParams);
   const { params } = args;
-  const query = ({} as Session);
+  const query: any = {};
   let response: DetailObject | null = null;
 
-  function processCartItems(arr): CartItem[] {
-    return arr.map((item: CartItem) => item);
-  }
+  /// after clicking login link, the jwt is passing through `token`
+  /// if legit, discard token and proceed to create session
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
-      case "cart": {
-        // query[key] = [...new Set(value as CartItem[])]; /// eliminate duplicates
-        // query[key] = [...new Set(processCartItems(value))];
-        query[key] = processCartItems(value);
+      case "device":
+      case "for":
+      case "ip":
+      case "token": {
+        query[key] = String(value);
         break;
       }
 
-      case "customer": {
-        query[key] = stringTrim(String(value));
+      case "nickname": {
+        query[key] = String(value).length > 0 ?
+          toASCII(String(value)) :
+          "Some Device";
         break;
       }
 
-      default:
+      default: {
         break;
+      }
     }
   });
 
-  if (!query.customer && !query.cart) {
-    const error = "Missing required parameter(s).";
-    log.warning(`[${thisFilePath}]› ${error}`);
-    return { detail: response }; // error: [{ code: "TBA", message: error }]
+  /// vibe check
+  if (!query.for || !query.token) {
+    const err = "Missing required parameter(s).";
+
+    log.warning(`[${thisFilePath}]› ${err}`);
+    return { detail: response, error: { code: "TBA", message: err } };
   }
 
-  if (!query.customer) {
-    const owner = await personFromSession(ctx);
+  /// validate token
+  if (!verify(query.token)) {
+    const err = "Token is invalid.";
 
-    if (owner)
-      query.customer = owner.id;
+    log.warning(`[${thisFilePath}]› ${err}`);
+    return { detail: response, error: { code: "TBA", message: err } };
   }
 
-  /// NOTE
-  /// We do not check the `customer` ID for validity, as this is
-  /// supposed to be a quick and easy way to have a persistent
-  /// cart. We do not care at this point in time.
-  ///
-  /// When checkout occurs, we will validate `customer` ID.
-  ///
-  /// We also do not check for existing session document, they'll
-  /// get auto-deleted after some time.
+  /// ensure focus of session exists
+  const doesCustomerExist = e.select(e.Customer, customer => ({
+    ...e.Customer["*"],
+    filter_single: e.op(customer.id, "=", e.uuid(query.for))
+  }));
 
-  // TODO
-  // : could `customer` details get exposed to malicious parties?
+  const customerExistenceResult = await doesCustomerExist.run(client);
+
+  if (!customerExistenceResult) {
+    log.warning(`[${thisFilePath}]› Customer doesn't exist.`);
+    return { detail: response };
+  }
+
+  /// ensure token subject and session focus from previous step matches
+  const { payload: { sub: jwtSubject }} = decode(query.token);
+
+  if (customerExistenceResult.id !== jwtSubject.split("id|")[1]) {
+    log.warning(`[${thisFilePath}]› Token subject doesn't match customer.`);
+    return { detail: response };
+  }
 
   try {
-    // @ts-ignore | Types of property "cart" are incompatible.
     const newDocument = e.insert(e.Session, {
       ...query,
-      customer: e.select(e.Customer, document => ({
-        filter_single: e.op(document.id, "=", e.uuid(query.customer))
-      }))
+      expires: new Date(
+        new Date().getTime() + /// currentTime
+        20160 * 60 * 1000      /// add 20,160 minutes (two weeks)
+      ),
+      /// linked properties require subqueries...kind of a waste of resources
+      for: e.select(e.Customer, customer => ({
+        filter: e.op(customer.id, "=", e.uuid(customerExistenceResult.id))
+      })),
+      token: createSessionToken(query.for)
     });
 
     const databaseQuery = e.select(newDocument, session => ({
       ...e.Session["*"],
-      customer: session.customer["*"]
+      for: session.for["*"]
     }));
 
     response = await databaseQuery.run(client);
-
     return { detail: response };
   } catch(_) {
     // TODO

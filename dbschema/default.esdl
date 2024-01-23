@@ -1,10 +1,12 @@
 module default {
   scalar type AccountRole extending enum<"ADMIN", "CUSTOMER">;
   scalar type AccountLoginMethod extending enum<"LINK", "TOKEN">;
-  scalar type ExtensionTier extending enum<"DEFAULT", "COMMON", "RARE", "EPIC", "LEGENDARY">;
+  scalar type ExtensionTier extending enum<"DEFAULT", "COMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC">;
   scalar type InvoiceNumber extending sequence;
   scalar type InvoicePaymentType extending enum<"ACH", "BTC", "CREDITCARD", "ETH", "HNS", "WIRE">;
-  scalar type PaymentKind extending enum<"CRYPTOCURRENCY", "FIAT">;
+  scalar type OrderNumber extending sequence;
+  scalar type PaymentKind extending enum<"BTC", "ETH", "FIAT", "HNS">;
+  scalar type PaymentVendorName extending enum<"OPENNODE", "SQUARE", "STRIPE">;
 
   scalar type DomainStatusCode extending enum<
     "ADD_PERIOD",
@@ -33,36 +35,48 @@ module default {
   >;
 
   abstract type BaseRecord {
-    required property created -> datetime {
+    required created: datetime {
       default := datetime_of_transaction();
       readonly := true;
     };
-    required property updated -> datetime {
+    required updated: datetime {
       default := datetime_of_transaction();
     };
   }
 
+  type Bag extending BaseRecord {
+    bag: array<tuple<
+      duration: int16,
+      name: str,
+      price: str
+    >>;
+    currency: PaymentKind {
+      default := PaymentKind.FIAT;
+    };
+    link customer: Customer;
+  }
+
   type Customer extending BaseRecord {
-    required property email -> str {
+    required email: str {
       constraint exclusive;
     };
-    property loginMethod -> AccountLoginMethod {
+    loginMethod: AccountLoginMethod {
       default := AccountLoginMethod.LINK;
     };
-    property name -> str {
+    name: str {
       default := "Anon Mous";
-    }
-    property role -> AccountRole {
+    };
+    role: AccountRole {
       default := AccountRole.CUSTOMER;
     };
-    property staff -> int16 {
+    staff: int16 {
       default := 0;
     };
-    property timezone -> str;
-    property username -> str {
+    timezone: str;
+    username: str {
       constraint exclusive;
     };
-    property verified -> int16 {
+    verified: int16 {
       default := 0;
     };
     #
@@ -70,11 +84,14 @@ module default {
   }
 
   type Domain extending BaseRecord {
-    required property expiry -> datetime;
-    required link extension -> Extension;
-    required property name -> str;
-    link owner -> Customer;
-    property status -> DomainStatusCode {
+    required expiry: datetime;
+    required link extension: Extension;
+    required name: str;
+    link owner: Customer;
+    property premium -> int16 {
+      default := 0;
+    };
+    status: DomainStatusCode {
       default := DomainStatusCode.PENDING_CREATE;
     };
     #
@@ -82,11 +99,15 @@ module default {
   }
 
   type Extension extending BaseRecord {
-    required property name -> str;
-    property pairs -> array<str>;
-    property premium -> array<str>;
-    property registry -> str;
-    property tier -> ExtensionTier {
+    mature: int16 {
+      default := 0;
+    };
+    required name: str;
+    pairs: array<str>;
+    premium: array<str>;
+    registry: str;
+    reserved: array<str>;
+    tier: ExtensionTier {
       default := ExtensionTier.DEFAULT;
     };
     #
@@ -94,41 +115,66 @@ module default {
   }
 
   type Invoice extending BaseRecord {
-    required property amount -> int16;
-    required property contents -> array<str>;
-    required link customer -> Customer;
-    property invoiceId -> InvoiceNumber {
+    required amount: int16;
+    required contents: array<str>;
+    required link customer: Customer;
+    invoiceId: InvoiceNumber {
       constraint exclusive;
     }
-    property paid -> int16 {
+    paid: int16 {
       default := 0;
     };
-    property payment -> InvoicePaymentType {
+    payment: InvoicePaymentType {
       default := InvoicePaymentType.CREDITCARD;
     };
-    property promo -> str;
-    property vendor -> str;
+    promo: str;
+    vendor: str;
   }
 
   type Key extending BaseRecord {
-    required link owner -> Customer;
+    required link owner: Customer;
+  }
+
+  type Login extending BaseRecord {
+    required link `for` -> Customer;
+    required property token -> str;
+  }
+
+  type Order extending BaseRecord {
+    bag: array<tuple<
+      duration: int16,
+      name: str,
+      price: str
+    >>;
+    currency: str;
+    link customer: Customer;
+    number: OrderNumber;
+    paid: int16 {
+      default := 0;
+    };
+    promo: str;
+    total: str;
+    vendor: tuple<
+      id: str,
+      name: PaymentVendorName
+    >;
   }
 
   type Payment extending BaseRecord {
-    required link customer -> Customer;
-    property kind -> PaymentKind {
+    required link customer: Customer;
+    kind: PaymentKind {
       default := PaymentKind.FIAT;
     };
-    required property mask -> str;
-    required property vendorId -> str;
+    required mask: str;
+    required vendorId: str;
   }
 
   type Session extending BaseRecord {
-    property cart -> tuple<
-      duration: int16,
-      name: str,
-      price: int16
-    >;
-    link customer -> Customer;
+    property expires -> datetime;
+    property device -> str;
+    required link `for` -> Customer;
+    property ip -> str;
+    property nickname -> str;
+    required property token -> str;
   }
 }

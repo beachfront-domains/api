@@ -1,60 +1,45 @@
-# import Customer from "customer.graphql"
-# import Pagination from "pagination.graphql"
 
-
-
-######
+#
 # Type
-######
-
-type Cart {
-  """
-  During checkout, contents of cart are validated to ensure availability
-  """
-  duration: Int
-  name: String
-  price: String
-}
+#
 
 type Session {
-  """
-  Array of domain names
-  """
-  cart: [Cart]
-  customer: Customer
+  device: String
+  expires: DateTime!
+  for: Customer
+  ip: String
+  nickname: String
+  token: String
   #
-  created: DateTime
+  created: DateTime!
   id: ID!
-  updated: DateTime
+  updated: DateTime!
 }
 
 type SessionResponse {
   detail: Session
+  error: [Error]
 }
 
 type SessionsResponse {
   detail: [Session]
+  error: [Error]
   pageInfo: Pagination
 }
 
-
-
-#######
+#
 # Input
-#######
-
-input CartInput {
-  duration: Int
-  name: String
-  price: String
-}
+#
 
 input SessionInput {
-  cart: [CartInput]
-  customer: ID
-  # no created
-  # no id
-  # no updated
+  device: String
+  expires: DateTime
+  "Customer ID"
+  for: String
+  ip: String
+  nickname: String
+  token: String
+  # no created, id, updated
 }
 
 input SessionQuery {
@@ -62,11 +47,7 @@ input SessionQuery {
 }
 
 input SessionsQuery {
-  created: DateTime
-  customer: ID
-  updated: DateTime
+  "Customer ID"
+  for: String
+  wildcard: String
 }
-
-
-
-### be sure to keep this file in sync with `src/component/session/schema.ts`

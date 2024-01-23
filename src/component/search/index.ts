@@ -3,4 +3,4 @@
 
 /// export
 
-export * as search from "./crud/read.ts";
+export { default as search } from "./crud/read.ts";

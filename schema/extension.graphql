@@ -3,6 +3,19 @@
 
 
 ######
+# Enum
+######
+
+enum Tier {
+  DEFAULT
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+  MYTHIC
+}
+
+######
 # Type
 ######
 
@@ -11,10 +24,13 @@ type Extension {
   ASCII representation of extension
   """
   name: String
+  pairs: [String]
+  premium: [String]
   """
   Name of registry this extension comes from
   """
   registry: String
+  tier: Tier
   #
   created: DateTime!
   id: ID!
@@ -37,15 +53,14 @@ type ExtensionsResponse {
 #######
 
 input ExtensionInput {
-  ascii: String
   name: String
+  registry: String
   # no created
   # no id
   # no updated
 }
 
 input ExtensionQuery {
-  ascii: String
   id: ID
   name: String
 }

@@ -1,0 +1,238 @@
+
+#
+# Enum
+#
+
+enum RecordClass {
+  CH
+  CS
+  HS
+  IN
+}
+
+enum RecordType {
+  A
+  AAAA
+  CAA
+  CNAME
+  DNAME
+  DNSKEY
+  DS
+  HINFO
+  MX
+  NAPTR
+  NS
+  NSEC
+  NSEC3
+  # NULL
+  # OPT
+  PTR
+  RP
+  RRSIG
+  SOA
+  SRV
+  SSHFP
+  TLSA
+  TXT
+}
+
+enum Tag {
+  iodef
+  issue
+  issuewild
+}
+
+#
+# Type # Data
+#
+
+union Data = DataObject | DataString
+
+type DataObject {
+  # CAA
+  issuerCritical: Int
+  tag: Tag
+  value: String
+  # DNSKEY
+  key: String
+  # DS
+  digest: String
+  digestType: Int
+  # HINFO
+  cpu: String
+  os: String
+  # MX
+  exchange: String
+  # NAPTR
+  order: Int
+  regexp: String
+  replacement: String
+  services: String
+  # NSEC/NSEC3
+  nextDomain: String
+  rrtypes: [String]
+  # NSEC3
+  iterations: Int
+  salt: String
+  # RP
+  mbox: String
+  txt: String
+  # RRSIG
+  expiration: DateTime
+  inception: DateTime
+  labels: Int
+  originalTTL: Int
+  signature: String
+  signersName: String
+  typeCovered: String
+  # SOA
+  expire: Int
+  minimum: Int
+  mname: String
+  refresh: Int
+  retry: Int
+  rname: String
+  serial: Int
+  # SRV
+  port: Int
+  priority: Int
+  target: String
+  weight: Int
+  # SSHFP
+  fingerprint: String
+  hash: Int
+  # TLSA
+  certificate: String
+  matchingType: Int
+  selector: Int
+  usage: Int
+  # Shared
+  algorithm: Int
+  flags: Flag
+  keyTag: Int
+  preference: Int
+}
+
+type DataString {
+  data: String
+}
+
+#
+# Type # Flag
+#
+
+union Flag = FlagInt | FlagString
+
+type FlagInt {
+  flags: Int!
+}
+
+type FlagString {
+  flags: String!
+}
+
+#
+# Type # Record
+#
+
+type Record {
+  # Base
+  class: RecordClass
+  data: Data
+  name: String!
+  ttl: Int
+  type: RecordType!
+  #
+  created: DateTime!
+  id: ID!
+  updated: DateTime!
+}
+
+type RecordResponse {
+  detail: [Record]
+  error: [Error]
+}
+
+#
+# Input
+#
+
+input RecordInput {
+  class: RecordClass
+  data: String
+  name: String
+  ttl: Int
+  type: RecordType
+  # no created, id, updated
+  # CAA
+  issuerCritical: Int
+  tag: Tag
+  value: String
+  # DNSKEY
+  key: String
+  # DS
+  digest: String
+  digestType: Int
+  # HINFO
+  cpu: String
+  os: String
+  # MX
+  exchange: String
+  # NAPTR
+  order: Int
+  regexp: String
+  replacement: String
+  services: String
+  # NSEC/NSEC3
+  nextDomain: String
+  rrtypes: [String]
+  # NSEC3
+  iterations: Int
+  salt: String
+  # RP
+  mbox: String
+  txt: String
+  # RRSIG
+  expiration: DateTime
+  inception: DateTime
+  labels: Int
+  originalTTL: Int
+  signature: String
+  signersName: String
+  typeCovered: String
+  # SOA
+  expire: Int
+  minimum: Int
+  mname: String
+  refresh: Int
+  retry: Int
+  rname: String
+  serial: Int
+  # SRV
+  port: Int
+  priority: Int
+  target: String
+  weight: Int
+  # SSHFP
+  fingerprint: String
+  hash: Int
+  # TLSA
+  certificate: String
+  matchingType: Int
+  selector: Int
+  usage: Int
+  # Shared
+  algorithm: Int
+  flags: String
+  keyTag: Int
+  preference: Int
+}
+
+input RecordQuery {
+  name: String
+  type: RecordType
+}
+
+
+
+# be sure to keep this file in sync with `/src/api/component/record/schema.ts`

@@ -3,8 +3,11 @@
 
 /// import
 
-import { cheerio } from "dep/x/cheerio.ts";
 import { wretch } from "dep/x/wretch.ts";
+
+/// util
+
+import { serviceNinja } from "src/utility/index.ts";
 
 
 
@@ -14,27 +17,27 @@ export default async(suppliedWord: string): Promise<boolean> => {
   let isWord = false;
 
   try {
-    const response = await wretch(`https://www.dictionary.com/browse/${encodeURIComponent(suppliedWord)}`)
+    const data = await wretch(
+      `https://api.api-ninjas.com/v1/dictionary?word=${encodeURIComponent(suppliedWord)}`, {
+        headers: { "X-Api-Key": serviceNinja }
+      })
       .get()
-      .res();
+      .json<{ valid?: boolean; }>();
 
-    if (response.status !== 200)
-      return false;
+    if (!data || !data.valid)
+      return isWord;
 
-    // let $ = cheerio.load('<div>Hello</div>', null, false);
-    // console.log($.html());
-
-    // // "<div>Hello</div>"
-    // https://github.com/cheeriojs/cheerio/issues/1031#issuecomment-748677236
-
-    const $ = cheerio.load(await response.text());
-    const word = $("body #top-definitions-section").find("h1").text().trim();
-
-    if (word)
-      isWord = true;
+    isWord = true;
   } catch(_) {
     /// IGNORE
     /// Probably not a dictionary word
+    // const { status, url } = _;
+
+    console.group("/src/component/search/utility/dictionary.ts");
+    // console.error(status, url);
+    console.error(_);
+    console.error(`>>> ${suppliedWord}`);
+    console.groupEnd();
   }
 
   return isWord;

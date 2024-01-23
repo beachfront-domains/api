@@ -12,13 +12,12 @@ import {
   accessControl,
   databaseParams,
   maxPaginationLimit,
-  objectIsEmpty,
-  stringTrim
+  objectIsEmpty
 } from "src/utility/index.ts";
 
 import e from "dbschema";
 
-import type { Session, SessionRequest, SessionsRequest } from "../schema.ts";
+import type { SessionRequest, SessionsRequest } from "../schema.ts";
 
 import type {
   DetailObject,
@@ -33,31 +32,32 @@ const thisFilePath = "/src/component/session/crud/read.ts";
 
 /// export
 
-export const get = async(_root, args: SessionRequest, _ctx, _info?): StandardResponse => {
-  /// NOTE
-  /// : this function doesn't need to be auth-gated
+export async function get(_root, args: SessionRequest, ctx, _info?): StandardResponse {
+  if (!await accessControl(ctx))
+    return { detail: null };
 
   const client = createClient(databaseParams);
   const { params } = args;
-  const query = ({} as Session);
+  const query: LooseObject = {};
   let response: DetailObject | null = null;
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "id": {
-        query[key] = stringTrim(value);
+        query[key] = String(value);
         break;
       }
 
-      default:
+      default: {
         break;
+      }
     }
   });
 
-  const doesDocumentExist = e.select(e.Session, session => ({
+  const doesDocumentExist = e.select(e.Session, document => ({
     ...e.Session["*"],
-    customer: session.customer["*"],
-    filter_single: e.op(session.id, "=", e.uuid(query.id))
+    filter_single: e.op(document.id, "=", e.uuid(query.id)),
+    for: document.for["*"]
   }));
 
   const existenceResult = await doesDocumentExist.run(client);
@@ -68,27 +68,19 @@ export const get = async(_root, args: SessionRequest, _ctx, _info?): StandardRes
   return {
     detail: response
   };
-};
+}
 
-export const getMore = async(_root, args: Partial<SessionsRequest>, ctx, _info?): StandardPlentyResponse => {
-  if (!await accessControl(ctx)) {
-    return {
-      detail: null,
-      pageInfo: {
-        cursor: null,
-        hasNextPage: false,
-        hasPreviousPage: false
-      }
-    };
-  }
-
+export async function getMore(_root, args: Partial<SessionsRequest>, _ctx?, _info?): StandardPlentyResponse {
+  // TODO
+  // : use `ctx` for access-control
+  // : backwards cursor navigation (ex. previous page)
   const client = createClient(databaseParams);
   const { pagination, params } = args;
   const query: LooseObject = {};
-  let allDocuments: Array<any> | null = null; // Array<DetailObject> // TODO: find EdgeDB document type
+  let allDocuments: Array<DetailObject> | null = null;
   let hasNextPage = false;
   let hasPreviousPage = false;
-  let response: Array<any> | null = null; // Array<DetailObject>
+  let response: Array<DetailObject> | null = null;
 
   if (objectIsEmpty(params)) {
     log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
@@ -122,18 +114,17 @@ export const getMore = async(_root, args: Partial<SessionsRequest>, ctx, _info?)
   let cursorId;
   let offset = 0;
 
-  // TODO
-  // : `created` and `updated` should be a range
-
-  Object.entries((params as LooseObject)).forEach(([key, value]) => {
+  Object.entries((params as SessionsRequest["params"])).forEach(([key, value]) => {
     switch(key) {
-      case "customer": {
-        query[key] = stringTrim(String(value));
+      case "for":
+      case "wildcard": {
+        query[key] = String(value);
         break;
       }
 
-      default:
+      default: {
         break;
+      }
     }
   });
 
@@ -142,10 +133,18 @@ export const getMore = async(_root, args: Partial<SessionsRequest>, ctx, _info?)
     order_by: document.created
   }));
 
-  allDocuments = await e.select(e.Session, document => ({
-    ...baseShape(document),
-    filter: e.op(document.customer.id, "=", e.uuid(query.customer))
-  })).run(client);
+  if (query.wildcard) {
+    allDocuments = await e.select(e.Session, document => ({
+      ...baseShape(document),
+      for: document.for["*"]
+    })).run(client);
+  } else {
+    allDocuments = await e.select(e.Session, document => ({
+      ...baseShape(document),
+      filter: e.op(document.for.id, "=", e.uuid(query.for)),
+      for: document.for["*"]
+    })).run(client);
+  }
 
   const totalDocuments = allDocuments.length;
 
@@ -162,19 +161,29 @@ export const getMore = async(_root, args: Partial<SessionsRequest>, ctx, _info?)
     });
   }
 
-  response = await e.select(e.Session, document => ({
-    ...baseShape(document),
-    filter: e.op(document.customer.id, "=", e.uuid(query.customer)),
-    limit,
-    offset
-  })).run(client);
+  if (query.wildcard) {
+    response = await e.select(e.Session, document => ({
+      ...baseShape(document),
+      for: document.for["*"],
+      limit,
+      offset
+    })).run(client);
+  } else {
+    response = await e.select(e.Session, document => ({
+      ...baseShape(document),
+      filter: e.op(document.for.id, "=", e.uuid(query.for)),
+      for: document.for["*"],
+      limit,
+      offset
+    })).run(client);
+  }
 
   /// inspired by https://stackoverflow.com/a/62565528
   cursor = response && response.length > 0 ?
     btoa(response.slice(-1)[0].id) :
     null;
 
-  if (response && response.length > 0) {
+  if (response.length > 0) {
     if (offset + limit >= totalDocuments)
       hasNextPage = false;
     else
@@ -186,9 +195,6 @@ export const getMore = async(_root, args: Partial<SessionsRequest>, ctx, _info?)
       hasPreviousPage = false;
   }
 
-  // TODO
-  // : unknown if full linked documents are returned
-
   return {
     detail: response,
     pageInfo: {
@@ -197,4 +203,4 @@ export const getMore = async(_root, args: Partial<SessionsRequest>, ctx, _info?)
       hasPreviousPage
     }
   };
-};
+}

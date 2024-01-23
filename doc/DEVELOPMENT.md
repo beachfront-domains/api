@@ -18,6 +18,9 @@ edgedb project init
 # run this every time
 denon start
 
+# run denon with a stacktrace for Deno devs if a panic occurs
+RUST_BACKTRACE=1 denon start
+
 # what denon does under the hood:
 deno run --allow-env --allow-net --allow-read --unstable --import-map import_map.json main.ts
 ```
@@ -69,6 +72,8 @@ You can pass the `--database` flag to connect as expected though.
 edgedb --database beachfront
 ```
 
+When upgrading EdgeDB, you'll need to re-create the `edgedb` database (it can be safely removed once the upgrade is complete though).
+
 ### Schema Updates
 
 ```sh
@@ -79,7 +84,7 @@ edgedb migration create --instance beachfront --database beachfront
 edgedb migrate --instance beachfront --database beachfront
 
 # query builder
-deno run -A --unstable https://deno.land/x/edgedb@v1.1.0/generate.ts edgeql-js --instance beachfront --database beachfront --target deno
+deno run -A --unstable https://deno.land/x/edgedb@v1.4.1/generate.ts edgeql-js --instance beachfront --database beachfront --target deno
 ```
 
 <!-- The query builder will generate files in `dbschema/edgeql-js`. You'll need to do a bit of manual work now. For every import that comes from `"/edgedb"`, replace with `"../../edgedb.ts";`. That way, the pastry-server binary will actually work when you compile it. -->
