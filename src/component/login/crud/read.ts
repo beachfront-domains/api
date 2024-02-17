@@ -1,13 +1,9 @@
 
 
 
-/// import
-
-import { createClient } from "edgedb";
-
 /// util
 
-import { databaseParams, orOperation } from "src/utility/index.ts";
+import { client, orOperation } from "src/utility/index.ts";
 import e from "dbschema";
 
 import type { LoginRequest } from "../schema.ts";
@@ -24,7 +20,6 @@ import type {
 
 export async function get(_root, args: LoginRequest, _ctx?, _info?): StandardResponse {
   /// this function needs to be accessible to non-authenticated folks
-  const client = createClient(databaseParams);
   const { params } = args;
   const query: LooseObject = {};
   let response: DetailObject | null = null;
@@ -43,7 +38,7 @@ export async function get(_root, args: LoginRequest, _ctx?, _info?): StandardRes
     }
   });
 
-  const doesDocumentExist = e.select(e.Login, login => ({
+  const doesDocumentExist = e.select(e.Login, document => ({
     ...e.Login["*"],
     // TODO
     // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
@@ -51,10 +46,10 @@ export async function get(_root, args: LoginRequest, _ctx?, _info?): StandardRes
     //   e.op(login.id, "=", e.uuid(query.id)) :
     //   e.op(login.email, "=", query.email),
     filter_single: orOperation(
-      e.op(login.id, "=", e.uuid(query.id)),
-      e.op(login.email, "=", query.email)
+      e.op(document.id, "=", e.uuid(query.id)),
+      e.op(document.for.email, "=", query.email)
     ),
-    for: login.for["*"]
+    for: document.for["*"]
   }));
 
   const existenceResult = await doesDocumentExist.run(client);

@@ -5,9 +5,8 @@
       "allow": ["env", "net", "read"],
       "cmd": "deno run main.ts",
       "desc": "Start beachfront/ API",
-      "env": "RUST_BACKTRACE=1",
       "importMap": "import_map.json",
-      "unstable": true
+      "unstable": false
     }
   }
 }

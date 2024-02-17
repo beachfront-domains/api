@@ -36,6 +36,7 @@ type Customer {
   Default value is `0` (false).
   """
   staff: Int
+  stripe: String
   timezone: String
   username: String
   "Boolean | 0: false, 1: true"

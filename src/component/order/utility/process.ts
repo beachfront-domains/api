@@ -5,18 +5,17 @@
 
 import { PaymentVendorName } from "../schema.ts";
 
+type VendorObject = {
+  id: string,
+  name: keyof typeof PaymentVendorName
+};
+
 
 
 /// export
 
-export default (obj: { id: string, name: keyof typeof PaymentVendorName }): { id: string, name: keyof typeof PaymentVendorName } => { // | null
-  // if (!obj.id) // || typeof obj.name !== PaymentVendorName)
-  //   return null;
-
-  const trimmedName = PaymentVendorName[obj.name.trim().toUpperCase()]; // || null;
-
-  // if (!trimmedName)
-  //   return null;
+export default (obj: VendorObject): VendorObject => {
+  const trimmedName = PaymentVendorName[obj.name.trim().toUpperCase()];
 
   return {
     id: String(obj.id),

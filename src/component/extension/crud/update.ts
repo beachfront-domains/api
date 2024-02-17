@@ -3,14 +3,13 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 
 /// util
 
 import {
   accessControl,
-  databaseParams,
+  client,
   objectIsEmpty,
   stringTrim
 } from "src/utility/index.ts";
@@ -21,7 +20,8 @@ import e from "dbschema";
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 import type { Extension, ExtensionUpdate } from "../schema.ts";
 
-const thisFilePath = "/src/component/extension/crud/update.ts";
+// const thisFilePath = "/src/component/extension/crud/update.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -38,7 +38,6 @@ export default async(_root, args: ExtensionUpdate, ctx, _info?): StandardRespons
     return { detail: null };
   }
 
-  const client = createClient(databaseParams);
   const query = ({} as Extension);
   let response: DetailObject | null = null;
 

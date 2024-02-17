@@ -22,7 +22,7 @@ import e from "dbschema";
 import type { PaymentMethodCreate } from "../schema.ts";
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/payment/crud/create.ts";
+const thisFilePath = import.meta.filename;
 
 
 

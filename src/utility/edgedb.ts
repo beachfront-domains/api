@@ -1,8 +1,13 @@
 
 
 
+/// import
+
+import { createClient } from "edgedb";
+
 /// util
 
+import { databaseParams } from "./constant.ts";
 import e from "dbschema";
 import type { $expr_Operator } from "dbschema/funcops.ts";
 
@@ -10,7 +15,21 @@ import type { $expr_Operator } from "dbschema/funcops.ts";
 
 /// export
 
-export function combineOperation(
+export const client = createClient(databaseParams);
+
+export function andOperation(...inputs: $expr_Operator<any, any>[]): $expr_Operator<any, any> | undefined {
+  return combineOperation("and", ...inputs);
+}
+
+export function orOperation(...inputs: $expr_Operator<any, any>[]): $expr_Operator<any, any> | undefined {
+  return combineOperation("or", ...inputs);
+}
+
+
+
+/// helper
+
+function combineOperation(
   operator: string,
   ...inputs: $expr_Operator<any, any>[]
 ): $expr_Operator<any, any> | undefined {
@@ -25,14 +44,6 @@ export function combineOperation(
     operator as never,
     combineOperation(operator, ...inputs.slice(1)) as $expr_Operator<any, any>,
   )
-}
-
-export function andOperation(...inputs: $expr_Operator<any, any>[]): $expr_Operator<any, any> | undefined {
-  return combineOperation("and", ...inputs);
-}
-
-export function orOperation(...inputs: $expr_Operator<any, any>[]): $expr_Operator<any, any> | undefined {
-  return combineOperation("or", ...inputs);
 }
 
 

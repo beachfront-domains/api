@@ -14,7 +14,8 @@ import { accessControl, databaseParams } from "src/utility/index.ts";
 import type { LooseObject, StandardBooleanResponse } from "src/utility/index.ts";
 import type { RecordRequest } from "../schema.ts";
 
-const thisFilePath = "/src/component/record/crud/delete.ts";
+// const thisFilePath = "/src/component/record/crud/delete.ts";
+const thisFilePath = import.meta.filename;
 
 
 

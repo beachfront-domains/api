@@ -21,7 +21,7 @@ import { checklist } from "src/utility/index.ts";
 import { Mutation, Query } from "src/schema/resolver.ts";
 import theSchema from "src/schema/index.ts";
 
-const isProduction = Deno.args.includes("--production");
+const isDevelopment = Deno.args.includes("--development");
 
 const schema = makeExecutableSchema({
   resolvers: { Query, Mutation },
@@ -48,14 +48,14 @@ const api = new Server({
           request,
           "x-session": new Headers(req.headers).get("authorization")
         }),
-        graphiql: !isProduction,
+        graphiql: isDevelopment,
         schema
       })(req)) :
       Response.json({
         detail: "Please visit our documentation for information on how to use the beachfront/ API.",
         status: 406,
         title: "Not Acceptable",
-        url: "https://app.beachfront/help/developer"
+        url: "https://domains.beachfront/kb/developer"
       });
   },
   port

@@ -3,14 +3,13 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 
 /// util
 
 import {
   accessControl,
-  databaseParams,
+  client,
   maxPaginationLimit,
   objectIsEmpty,
   stringTrim
@@ -27,17 +26,17 @@ import type {
   StandardPlentyResponse
 } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/session/crud/read.ts";
+// const thisFilePath = "/src/component/session/crud/read.ts";
+const thisFilePath = import.meta.filename;
 
 
 
 /// export
 
-export const get = (async(_root, args: BagRequest, _ctx, _info?) => {
+export async function get(_root, args: BagRequest, _ctx, _info?): StandardResponse {
   /// NOTE
   /// : this function doesn't need to be auth-gated
 
-  const client = createClient(databaseParams);
   const { params } = args;
   const query = ({} as Bag);
   let response: DetailObject | null = null;
@@ -68,9 +67,9 @@ export const get = (async(_root, args: BagRequest, _ctx, _info?) => {
   return {
     detail: response
   };
-}) satisfies StandardResponse;
+}
 
-export const getMore = async(_root, args: Partial<BagsRequest>, ctx, _info?): StandardPlentyResponse => {
+export async function getMore(_root, args: Partial<BagsRequest>, ctx, _info?): StandardPlentyResponse {
   if (!await accessControl(ctx)) {
     return {
       detail: null,
@@ -82,7 +81,6 @@ export const getMore = async(_root, args: Partial<BagsRequest>, ctx, _info?): St
     };
   }
 
-  const client = createClient(databaseParams);
   const { pagination, params } = args;
   const query: LooseObject = {};
   let allDocuments: Array<any> | null = null; // Array<DetailObject> // TODO: find EdgeDB document type
@@ -197,4 +195,4 @@ export const getMore = async(_root, args: Partial<BagsRequest>, ctx, _info?): St
       hasPreviousPage
     }
   };
-};
+}

@@ -3,7 +3,6 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 import { toASCII } from "dep/x/tr46.ts";
 
@@ -11,7 +10,7 @@ import { toASCII } from "dep/x/tr46.ts";
 
 import {
   accessControl,
-  databaseParams,
+  client,
   objectIsEmpty,
   validateDate
 } from "src/utility/index.ts";
@@ -21,7 +20,8 @@ import e from "dbschema";
 import type { SessionUpdate } from "../schema.ts";
 import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/session/crud/update.ts";
+// const thisFilePath = "/src/component/session/crud/update.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -39,7 +39,6 @@ export default async(_root, args: SessionUpdate, ctx, _info?): StandardResponse 
     return { detail: response };
   }
 
-  const client = createClient(databaseParams);
   const query: LooseObject = {};
 
   Object.entries(updates).forEach(([key, value]) => {

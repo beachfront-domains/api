@@ -3,14 +3,13 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 
 /// util
 
 import {
   accessControl,
-  databaseParams,
+  client,
   objectIsEmpty,
   stringTrim,
   validateUUID
@@ -22,7 +21,8 @@ import { default as isValidBinaryValue } from "../utility/binary.ts";
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 import type { Order, OrderUpdate } from "../schema.ts";
 
-const thisFilePath = "/src/component/order/crud/update.ts";
+// const thisFilePath = "/src/component/order/crud/update.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -39,7 +39,6 @@ export default async(_root, args: OrderUpdate, ctx, _info?): StandardResponse =>
     return { detail: null };
   }
 
-  const client = createClient(databaseParams);
   const query = ({} as Order);
   let response: DetailObject | null = null;
 

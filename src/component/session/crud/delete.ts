@@ -3,18 +3,18 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 
 /// util
 
-import { accessControl, databaseParams } from "src/utility/index.ts";
+import { accessControl, client } from "src/utility/index.ts";
 import e from "dbschema";
 
 import type { LooseObject, StandardBooleanResponse } from "src/utility/index.ts";
 import type { SessionRequest } from "../schema.ts";
 
-const thisFilePath = "/src/component/session/crud/delete.ts";
+// const thisFilePath = "/src/component/session/crud/delete.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -24,7 +24,6 @@ export default async(_root, args: SessionRequest, ctx, _info?): StandardBooleanR
   if (!await accessControl(ctx))
     return { success: false };
 
-  const client = createClient(databaseParams);
   const { params } = args;
   const query: LooseObject = {};
 

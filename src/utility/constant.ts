@@ -1,21 +1,11 @@
 
 
 
-/// import
-
-import { parse } from "dep/std.ts";
-
-/// util
-
-const { environment } = parse(Deno.args);
-
-
-
 /// export
 
 export const appURL = "http://localhost:2513";
-export const isDevelopment = environment === "development";
-export const maxPaginationLimit = 100;
+export const isDevelopment = Deno.args.includes("--development") || Deno.args.includes("--staging");
+export const maxPaginationLimit = 50;
 
 export const databaseParams = {
   database: "beachfront"

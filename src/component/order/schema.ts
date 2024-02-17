@@ -3,7 +3,7 @@
 
 /// util
 
-import type { BagItem } from "../bag/schema.ts";
+// import type { BagItem } from "../bag/schema.ts";
 import type { PaginationArgument } from "../pagination/schema.ts";
 
 
@@ -17,7 +17,8 @@ export enum PaymentVendorName {
 }
 
 export interface Order {
-  bag: BagItem[];
+  // bag: BagItem[];
+  bag: string;         /// ID
   currency: string;
   customer: string;    /// ID
   number: number;      /// auto-incremented ID
@@ -36,12 +37,12 @@ export interface Order {
 
 export interface OrderCreate {
   params: {
-    bag: BagItem[];
+    bag: string;       /// ID
     currency?: string;
     customer: string;  /// ID
     paid?: number;     /// Boolean / 0: false / 1: true
     promo?: string;
-    total?: string;    /// should be calculated within the API
+    // total?: string;    /// should be calculated within the API
     vendor: {
       id: string;      /// ID
       name: keyof typeof PaymentVendorName;

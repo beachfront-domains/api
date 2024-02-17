@@ -6,6 +6,6 @@
     "edgedb": "https://deno.land/x/edgedb@v1.4.1/mod.ts",
     "edgedb/": "https://deno.land/x/edgedb@v1.4.1/",
     "src/": "./src/",
-    "std/": "https://deno.land/std@0.210.0/"
+    "std/": "https://deno.land/std@0.213.0/"
   }
 }

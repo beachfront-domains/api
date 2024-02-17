@@ -35,7 +35,8 @@ import type {
   // TXTRecord
 } from "nameserver/record.ts";
 
-const thisFilePath = "/src/component/record/crud/create.ts";
+// const thisFilePath = "/src/component/record/crud/create.ts";
+const thisFilePath = import.meta.filename;
 
 
 

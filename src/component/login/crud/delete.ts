@@ -3,18 +3,18 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 
 /// util
 
-import { accessControl, databaseParams, orOperation } from "src/utility/index.ts";
+import { accessControl, client, orOperation } from "src/utility/index.ts";
 import e from "dbschema";
 
 import type { LooseObject, StandardBooleanResponse } from "src/utility/index.ts";
 import type { LoginRequest } from "../schema.ts";
 
-const thisFilePath = "/src/component/registrar/crud/delete.ts";
+// const thisFilePath = "/src/component/registrar/crud/delete.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -22,9 +22,8 @@ const thisFilePath = "/src/component/registrar/crud/delete.ts";
 
 export default async(_root, args: LoginRequest, ctx, _info?): StandardBooleanResponse => {
   if (!await accessControl(ctx)) ///!!
-    return null;
+    return { success: false };
 
-  const client = createClient(databaseParams);
   const { params } = args;
   const query: LooseObject = {};
 
@@ -50,7 +49,7 @@ export default async(_root, args: LoginRequest, ctx, _info?): StandardBooleanRes
     //   e.op(login.email, "=", query.email)
     filter_single: orOperation(
       e.op(document.id, "=", e.uuid(query.id)),
-      e.op(document.email, "=", query.email)
+      e.op(document.for.email, "=", query.email)
     )
   }));
 
@@ -63,7 +62,9 @@ export default async(_root, args: LoginRequest, ctx, _info?): StandardBooleanRes
 
   try {
     const deleteQuery = e.delete(e.Login, document => ({
-      filter_single: e.op(document.id, "=", e.uuid(existenceResult.id))
+      // TODO
+      // : why is `existenceResult` an array? check this assumption
+      filter_single: e.op(document.id, "=", e.uuid(existenceResult[0].id))
     }));
 
     await deleteQuery.run(client);

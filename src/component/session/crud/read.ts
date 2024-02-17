@@ -3,14 +3,13 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 
 /// util
 
 import {
   accessControl,
-  databaseParams,
+  client,
   maxPaginationLimit,
   objectIsEmpty
 } from "src/utility/index.ts";
@@ -26,7 +25,8 @@ import type {
   StandardPlentyResponse
 } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/session/crud/read.ts";
+// const thisFilePath = "/src/component/session/crud/read.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -36,7 +36,6 @@ export async function get(_root, args: SessionRequest, ctx, _info?): StandardRes
   if (!await accessControl(ctx))
     return { detail: null };
 
-  const client = createClient(databaseParams);
   const { params } = args;
   const query: LooseObject = {};
   let response: DetailObject | null = null;
@@ -74,7 +73,6 @@ export async function getMore(_root, args: Partial<SessionsRequest>, _ctx?, _inf
   // TODO
   // : use `ctx` for access-control
   // : backwards cursor navigation (ex. previous page)
-  const client = createClient(databaseParams);
   const { pagination, params } = args;
   const query: LooseObject = {};
   let allDocuments: Array<DetailObject> | null = null;
@@ -180,7 +178,7 @@ export async function getMore(_root, args: Partial<SessionsRequest>, _ctx?, _inf
 
   /// inspired by https://stackoverflow.com/a/62565528
   cursor = response && response.length > 0 ?
-    btoa(response.slice(-1)[0].id) :
+    btoa((response as Array<any>).slice(-1)[0].id) :
     null;
 
   if (response.length > 0) {

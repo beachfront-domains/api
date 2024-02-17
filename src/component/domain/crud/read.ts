@@ -3,7 +3,6 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 import { toASCII } from "dep/x/tr46.ts";
 
@@ -11,10 +10,12 @@ import { toASCII } from "dep/x/tr46.ts";
 
 import {
   accessControl,
-  databaseParams,
+  client,
   maxPaginationLimit,
   objectIsEmpty,
-  stringTrim
+  orOperation,
+  stringTrim,
+  validateUUID
 } from "src/utility/index.ts";
 
 import e from "dbschema";
@@ -28,17 +29,16 @@ import type {
   StandardPlentyResponse
 } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/domain/crud/read.ts";
+const thisFilePath = import.meta.filename;
 
 
 
 /// export
 
-export const get = async(_root, args: DomainRequest, ctx, _info?): StandardResponse => {
+export async function get(_root, args: DomainRequest, ctx, _info?): StandardResponse {
   if (!await accessControl(ctx))
     return { detail: null };
 
-  const client = createClient(databaseParams);
   const { params } = args;
   const query = ({} as Domain);
   let response: DetailObject | null = null;
@@ -46,7 +46,7 @@ export const get = async(_root, args: DomainRequest, ctx, _info?): StandardRespo
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "id": {
-        query[key] = String(value);
+        query[key] = stringTrim(String(value));
         break;
       }
 
@@ -60,13 +60,20 @@ export const get = async(_root, args: DomainRequest, ctx, _info?): StandardRespo
     }
   });
 
-  const doesDocumentExist = e.select(e.Domain, domain => ({
+  /// vibe check
+  if (params.id && !validateUUID(query.id)) {
+    const error = "Missing required parameter(s).";
+    log.warning(`[${thisFilePath}]› ${error}`);
+    return { detail: response, error: { code: "TBA", message: error }};
+  }
+
+  /// existence check
+  const doesDocumentExist = e.select(e.Domain, document => ({
     ...e.Domain["*"],
-    // TODO
-    // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
-    filter_single: query.id ?
-      e.op(domain.id, "=", e.uuid(query.id)) :
-      e.op(domain.name, "=", query.name)
+    filter_single: orOperation(
+      e.op(document.id, "=", e.uuid(query.id)),
+      e.op(document.name, "=", query.name)
+    )
   }));
 
   const existenceResult = await doesDocumentExist.run(client);
@@ -77,21 +84,21 @@ export const get = async(_root, args: DomainRequest, ctx, _info?): StandardRespo
   return {
     detail: response
   };
-};
+}
 
-export const getMore = async(_root, args: Partial<DomainsRequest>, ctx, _info?): StandardPlentyResponse => {
-  if (!await accessControl(ctx)) {
-    return {
-      detail: null,
-      pageInfo: {
-        cursor: null,
-        hasNextPage: false,
-        hasPreviousPage: false
-      }
-    };
-  }
+export async function getMore(_root, args: Partial<DomainsRequest>, ctx, _info?): StandardPlentyResponse {
+  const emptyResponse = {
+    detail: null,
+    pageInfo: {
+      cursor: null,
+      hasNextPage: false,
+      hasPreviousPage: false
+    }
+  };
 
-  const client = createClient(databaseParams);
+  if (!await accessControl(ctx))
+    return emptyResponse;
+
   const { pagination, params } = args;
   const query = ({} as LooseObject);
   let allDocuments: Array<any> | null = null; // Array<DetailObject> // TODO: find EdgeDB document type
@@ -101,31 +108,15 @@ export const getMore = async(_root, args: Partial<DomainsRequest>, ctx, _info?):
 
   if (objectIsEmpty(params)) {
     log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
-
-    return {
-      detail: response,
-      pageInfo: {
-        cursor: null,
-        hasNextPage,
-        hasPreviousPage
-      }
-    };
+    return emptyResponse;
   }
 
   const limit = !pagination || (!pagination.first || isNaN(pagination.first)) ?
     20 :
     pagination.first;
 
-  if (limit > maxPaginationLimit) {
-    return {
-      detail: response,
-      pageInfo: {
-        cursor: null,
-        hasNextPage,
-        hasPreviousPage
-      }
-    };
-  }
+  if (limit > maxPaginationLimit)
+    return emptyResponse;
 
   let cursor = pagination && pagination.after && String(pagination.after) || null;
   let cursorId;
@@ -136,46 +127,40 @@ export const getMore = async(_root, args: Partial<DomainsRequest>, ctx, _info?):
 
   Object.entries((params as LooseObject)).forEach(([key, value]) => {
     switch(key) {
-      // case "startsWith":
       case "extension":
       case "owner": {
-        query[key] = stringTrim(String(value));
+        query[key] = validateUUID(stringTrim(value)) ? stringTrim(value) : null;
         break;
       }
-
-      // case "emoji":
-      // case "idn":
-      // case "length":
-      // case "numeric": {
-      //   query[key] = Number(value);
-      //   break;
-      // }
 
       default:
         break;
     }
   });
 
+  if (params!.extension && !query.extension)
+    return emptyResponse;
+
+  if (params!.owner && !query.owner)
+    return emptyResponse;
+
   const baseShape = e.shape(e.Domain, document => ({
     ...e.Domain["*"],
     order_by: document.created
   }));
 
-  // if (query.wildcard) {
-  //   allDocuments = await e.select(e.Domain, document => ({
-  //     ...baseShape(document)
-  //   })).run(client);
-  // } else {
-
   allDocuments = await e.select(e.Domain, document => ({
     ...baseShape(document),
-    // TODO
-    // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
-    filter: query.extension ?
-      e.op(document.extension.id, "=", e.uuid(query.extension)) :
-        query.owner ?
-          e.op(document.owner.id, "=", e.uuid(query.owner)) :
-            undefined
+    // filter: orOperation(
+    //   e.op(document.extension.id, "=", e.uuid(query.extension)),
+    //   e.op(document.owner.id, "=", e.uuid(query.owner))
+    // )
+    ...(query.extension ? {
+      filter: e.op(document.extension.id, "=", e.uuid(query.extension))
+    } : {}),
+    ...(query.owner ? {
+      filter: e.op(document.owner.id, "=", e.uuid(query.owner))
+    } : {}),
   })).run(client);
 
   const totalDocuments = allDocuments.length;
@@ -193,23 +178,18 @@ export const getMore = async(_root, args: Partial<DomainsRequest>, ctx, _info?):
     });
   }
 
-  // if (query.wildcard) {
-  //   response = await e.select(e.Domain, document => ({
-  //     ...baseShape(document),
-  //     limit,
-  //     offset
-  //   })).run(client);
-  // } else {
-
   response = await e.select(e.Domain, document => ({
     ...baseShape(document),
-    // TODO
-    // : https://github.com/edgedb/edgedb-js/issues/347 : https://discord.com/channels/841451783728529451/1103366864937160846
-    filter: query.extension ?
-      e.op(document.extension.id, "=", e.uuid(query.extension)) :
-        query.owner ?
-          e.op(document.owner.id, "=", e.uuid(query.owner)) :
-            undefined,
+    // filter: orOperation(
+    //   e.op(document.extension.id, "=", e.uuid(query.extension)),
+    //   e.op(document.owner.id, "=", e.uuid(query.owner))
+    // ),
+    ...(query.extension ? {
+      filter: e.op(document.extension.id, "=", e.uuid(query.extension))
+    } : {}),
+    ...(query.owner ? {
+      filter: e.op(document.owner.id, "=", e.uuid(query.owner))
+    } : {}),
     limit,
     offset
   })).run(client);
@@ -242,4 +222,4 @@ export const getMore = async(_root, args: Partial<DomainsRequest>, ctx, _info?):
       hasPreviousPage
     }
   };
-};
+}

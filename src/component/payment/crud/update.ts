@@ -22,7 +22,8 @@ import e from "dbschema";
 import type { PaymentMethodUpdate } from "../schema.ts";
 import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/payment/crud/update.ts";
+// const thisFilePath = "/src/component/payment/crud/update.ts";
+const thisFilePath = import.meta.filename;
 
 
 

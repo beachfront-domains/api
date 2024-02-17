@@ -3,14 +3,13 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 
 /// util
 
 import {
   accessControl,
-  databaseParams,
+  client,
   maxPaginationLimit,
   objectIsEmpty,
   stringTrim
@@ -27,7 +26,8 @@ import type {
   StandardPlentyResponse
 } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/customer/crud/read.ts";
+// const thisFilePath = "/src/component/customer/crud/read.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -37,7 +37,6 @@ export const get = async(_root, args: CustomerRequest, ctx, _info?): StandardRes
   if (!await accessControl(ctx))
     return { detail: null };
 
-  const client = createClient(databaseParams);
   const { params } = args;
   const query = ({} as LooseObject);
   let response: DetailObject | null = null;
@@ -86,7 +85,6 @@ export const getMore = async(_root, args: CustomersRequest, ctx, _info?): Standa
     };
   }
 
-  const client = createClient(databaseParams);
   const { pagination, params } = args;
   const query = ({} as LooseObject);
   let allDocuments: Array<any> | null = null; // Array<DetailObject> // TODO: find EdgeDB document type

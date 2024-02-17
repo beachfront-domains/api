@@ -3,14 +3,13 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 
 /// util
 
 import {
   accessControl,
-  databaseParams,
+  client,
   objectIsEmpty,
   stringTrim,
   validateEmail
@@ -27,7 +26,8 @@ import type {
   StandardResponse
 } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/customer/crud/update.ts";
+// const thisFilePath = "/src/component/customer/crud/update.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -44,7 +44,6 @@ export default async(_root, args: CustomerUpdate, ctx, _info?): StandardResponse
     return { detail: null };
   }
 
-  const client = createClient(databaseParams);
   const query = ({} as LooseObject);
   let response: DetailObject | null = null;
 

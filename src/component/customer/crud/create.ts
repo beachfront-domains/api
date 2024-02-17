@@ -3,25 +3,26 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
+import { Stripe } from "dep/x/stripe.ts";
 
 /// util
 
 import {
   accessControl,
-  databaseParams,
+  client,
   stringTrim,
   validateEmail
 } from "src/utility/index.ts";
 
 import e from "dbschema";
 import { Customer, CustomerLoginMethods, CustomerRoles } from "../schema.ts";
+import { STRIPE_SECRET } from "src/utility/stripe/constant.ts";
 
 import type { CustomerCreate } from "../schema.ts";
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/customer/crud/create.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -31,7 +32,6 @@ export default async(_root, args: CustomerCreate, ctx, _info?): StandardResponse
   if (!await accessControl(ctx))
     return { detail: null };
 
-  const client = createClient(databaseParams);
   const { params } = args;
   const query = ({} as Customer);
   let response: DetailObject | null = null;
@@ -115,8 +115,22 @@ export default async(_root, args: CustomerCreate, ctx, _info?): StandardResponse
     const newDocument = e.insert(e.Customer, { ...query });
     const databaseQuery = e.select(newDocument, () => ({ ...e.Customer["*"] }));
 
-    response = await databaseQuery.run(client);
+    /// we create the customer in our database, create the customer in Stripe's database,
+    /// get the ID of customer within Stripe's database, update customer in our database
+    /// with said ID
 
+    const newCustomer = await databaseQuery.run(client);
+    const stripeId = await createStripeCustomer(newCustomer);
+
+    const updateQuery = e.update(e.Customer, customer => ({
+      filter_single: e.op(customer.id, "=", e.uuid(newCustomer.id)),
+      set: {
+        stripe: stripeId,
+        updated: e.datetime_of_transaction()
+      }
+    }));
+
+    response = await e.select(updateQuery, () => ({ ...e.Customer["*"] })).run(client);
     return { detail: response };
   } catch(_) {
     // TODO
@@ -129,6 +143,22 @@ export default async(_root, args: CustomerCreate, ctx, _info?): StandardResponse
 
 
 /// helper
+
+async function createStripeCustomer(info: any): Promise<string> {
+  const stripe = new Stripe(STRIPE_SECRET);
+  const { email, id, name } = info;
+
+  const customer = await stripe.customers.create({
+    description: id,
+    email,
+    metadata: {
+      beachfront: id
+    },
+    name
+  });
+
+  return customer.id || "";
+}
 
 function createUsername(suppliedEmail: string): string {
   // TODO

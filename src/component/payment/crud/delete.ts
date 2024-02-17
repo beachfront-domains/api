@@ -14,7 +14,8 @@ import e from "dbschema";
 import type { PaymentMethodRequest } from "../schema.ts";
 import type { LooseObject, StandardBooleanResponse } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/payment/crud/delete.ts";
+// const thisFilePath = "/src/component/payment/crud/delete.ts";
+const thisFilePath = import.meta.filename;
 
 
 

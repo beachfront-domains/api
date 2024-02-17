@@ -1,12 +1,9 @@
-# import Customer from "customer.graphql"
-# import CustomerInput from "customer.graphql"
-# import Pagination from "pagination.graphql"
 
 
 
-######
+#
 # Enum
-######
+#
 
 enum DomainStatusCode {
   """
@@ -45,13 +42,13 @@ enum DomainStatusCode {
 
 
 
-######
+#
 # Type
-######
+#
 
 type Domain {
   expiry: DateTime
-  extension: String
+  extension: Extension
   """
   ASCII representation of domain
   `sld.extension` format
@@ -65,26 +62,22 @@ type Domain {
   updated: DateTime!
 }
 
-# type AvailableDomain {
-#   premium: Boolean
-#   price: Decimal
-#   sld: SLD
-# }
-
 type DomainResponse {
   detail: Domain
+  error: Error
 }
 
 type DomainsResponse {
   detail: [Domain]
+  error: Error
   pageInfo: Pagination
 }
 
 
 
-#######
+#
 # Input
-#######
+#
 
 input DomainInput {
   expiry: DateTime
@@ -107,15 +100,8 @@ input DomainQuery {
 }
 
 input DomainsQuery {
-  "Boolean | 0: false, 1: true"
-  emoji: Int
-  "Boolean | 0: false, 1: true"
-  idn: Int
-  length: Int
-  "Boolean | 0: false, 1: true"
-  number: Int
+  extension: ID
   owner: ID
-  startsWith: String
 }
 
 

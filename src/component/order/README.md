@@ -14,6 +14,7 @@ Requires `bag`, `customer`, and `vendor` parameters.
   - duration: `Int`
   - name: `String`
   - price: `String`
+- bag: `ID`
 - customer: `ID`
 - vendor: `PaymentVendorInput`
   - `id`: `ID`
@@ -44,6 +45,10 @@ mutation CreateOrder($params: OrderInput) {
         id
         name
       }
+    }
+    error {
+      code
+      message
     }
   }
 }
@@ -81,7 +86,7 @@ mutation CreateOrder($params: OrderInput) {
 
 ```json
 {
-  "Authorization": "Bearer KEY_ID"
+  "Authorization": "Bearer SESSION_TOKEN"
 }
 ```
 

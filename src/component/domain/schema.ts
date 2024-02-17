@@ -5,20 +5,6 @@
 
 import type { PaginationArgument } from "../pagination/schema.ts";
 
-interface DomainsRequestParams {
-  extension: string;  /// get all domains under an extension / extension ID
-  // emoji: number;      /// boolean / 0 = false, 1 = true
-  // idn: number;        /// boolean / 0 = false, 1 = true
-  // length: number;
-  // numeric: number;    /// boolean / 0 = false, 1 = true
-  owner: string;      /// customer ID
-  // startsWith: string;
-
-  // NOTE
-  // : `emoji`, `idn`, `length`, `numeric`, `startsWith`, `created`, and `updated`
-  //   are disabled until range filtering is figured out
-}
-
 
 
 /// export
@@ -90,7 +76,15 @@ export interface DomainRequest {
 
 export interface DomainsRequest {
   pagination: PaginationArgument;
-  params: Partial<DomainsRequestParams>;
+  params: Partial<{
+    extension: string;  /// get all domains under an extension / extension ID
+    owner: string;      /// customer ID
+    // status: DomainStatusCode;
+
+    /// NOTE
+    /// : `emoji`, `idn`, `length`, `numeric`, `startsWith`, `created`, and `updated`
+    ///   are disabled until range filtering is figured out
+  }>;
 }
 
 export interface DomainUpdate {

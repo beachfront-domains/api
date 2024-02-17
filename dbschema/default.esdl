@@ -72,6 +72,7 @@ module default {
     staff: int16 {
       default := 0;
     };
+    stripe: str;
     timezone: str;
     username: str {
       constraint exclusive;

@@ -3,19 +3,19 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 import { toASCII } from "dep/x/tr46.ts";
 
 /// util
 
-import { accessControl, databaseParams, stringTrim } from "src/utility/index.ts";
+import { accessControl, client, stringTrim } from "src/utility/index.ts";
 import e from "dbschema";
 
 import type { Extension, ExtensionRequest } from "../schema.ts";
 import type { StandardBooleanResponse } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/extension/crud/delete.ts";
+// const thisFilePath = "/src/component/extension/crud/delete.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -25,7 +25,6 @@ export default async(_root, args: ExtensionRequest, ctx, _info?): StandardBoolea
   if (!await accessControl(ctx))
     return { success: false };
 
-  const client = createClient(databaseParams);
   const { params } = args;
   const query = ({} as Extension);
 

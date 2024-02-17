@@ -3,13 +3,12 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 
 /// util
 
 import { Bag } from "../schema.ts";
-import { databaseParams, personFromSession, stringTrim } from "src/utility/index.ts";
+import { client, personFromSession, stringTrim } from "src/utility/index.ts";
 import e from "dbschema";
 import { PaymentKind } from "src/component/payment/schema.ts";
 import { processBagItems } from "../utility/process.ts";
@@ -17,7 +16,9 @@ import { processBagItems } from "../utility/process.ts";
 import type { BagCreate } from "../schema.ts";
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/bag/crud/create.ts";
+// const thisFilePath = "/src/component/bag/crud/create.ts";
+// const thisFilePath = import.meta.filename;
+const thisFilePath = import.meta.filename.split("src")[1];
 
 
 
@@ -27,7 +28,6 @@ export default async(_root, args: BagCreate, ctx, _info?): StandardResponse => {
   /// NOTE
   /// : this function doesn't need to be auth-gated
 
-  const client = createClient(databaseParams);
   const { params } = args;
   const query = ({} as Bag);
   let response: DetailObject | null = null;
@@ -83,14 +83,16 @@ export default async(_root, args: BagCreate, ctx, _info?): StandardResponse => {
 
   // TODO
   // : could `customer` details get exposed to malicious parties?
+  // : what if `query.customer` doesn't exist?
 
   try {
-    // @ts-ignore | 2345 | Type 'BagItem[]' is not assignable to type '{ duration: number; name: string; price: number; } | TypeSet<NamedTupleType<{ duration: $number; name: $str; price: $number; }>, Cardinality.AtMostOne | Cardinality.One | Cardinality.Empty> | null | undefined'.
     const newDocument = e.insert(e.Bag, {
       ...query,
-      customer: query.customer && e.select(e.Customer, document => ({
-        filter_single: e.op(document.id, "=", e.uuid(query.customer))
-      }))
+      ...(query.customer ? { /// `query.customer` might not exist
+        customer: e.select(e.Customer, customerDocument => ({
+          filter_single: e.op(customerDocument.id, "=", e.uuid(String(query.customer)))
+        })),
+      } : {}),
     });
 
     const databaseQuery = e.select(newDocument, document => ({
@@ -102,11 +104,10 @@ export default async(_root, args: BagCreate, ctx, _info?): StandardResponse => {
 
     return { detail: response };
   } catch(_) {
-    console.log(">>> _");
-    console.log(_);
     // TODO
     // : create error ingest system : https://github.com/neuenet/pastry-api/issues/10
     log.error(`[${thisFilePath}]› Exception caught while creating document.`);
+    log.error(_);
     return { detail: response };
   }
 }

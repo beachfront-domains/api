@@ -40,6 +40,7 @@ type Order {
 
 type OrderResponse {
   detail: Order
+  error: Error
 }
 
 type OrdersResponse {
@@ -60,13 +61,13 @@ input PaymentVendorInput {
 }
 
 input OrderInput {
-  bag: [BagItemInput]
+  bag: ID
   currency: String
   customer: ID
   "Boolean | 0: false, 1: true"
   paid: Int
   promo: String
-  total: Decimal
+  # total: Decimal
   vendor: PaymentVendorInput
 }
 

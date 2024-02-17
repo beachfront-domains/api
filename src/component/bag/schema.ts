@@ -21,7 +21,7 @@ export interface BagItem {
 export interface Bag {
   bag: BagItem[];
   currency: PaymentKind;
-  customer: string; /// ID
+  customer?: string; /// ID
   ///
   created: Date;
   id: string;

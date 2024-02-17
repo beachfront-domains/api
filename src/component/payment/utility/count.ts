@@ -10,7 +10,9 @@ import { log } from "dep/std.ts";
 
 import { databaseParams } from "src/utility/index.ts";
 import e from "dbschema";
-const thisFilePath = "/src/component/payment/utility/count.ts";
+
+// const thisFilePath = "/src/component/payment/utility/count.ts";
+const thisFilePath = import.meta.filename;
 
 
 

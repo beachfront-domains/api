@@ -10,9 +10,9 @@ import type { Customer } from "src/component/customer/schema.ts";
 /// export
 
 export interface DetailObject {
-  created: Date;
-  id: string;
-  updated: Date;
+  created?: Date;
+  id?: string;
+  updated?: Date;
   [key: string]: any;
 }
 

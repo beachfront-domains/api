@@ -35,13 +35,13 @@ import {
   update as updateExtension
 } from "../component/extension/index.ts";
 
-import {
-  create as createInvoice,
-  del as deleteInvoice,
-  getInvoice as invoice,
-  getInvoices as invoices,
-  update as updateInvoice
-} from "../component/invoice/index.ts";
+// import {
+//   create as createInvoice,
+//   del as deleteInvoice,
+//   getInvoice as invoice,
+//   getInvoices as invoices,
+//   update as updateInvoice
+// } from "../component/invoice/index.ts";
 
 import {
   create as createLogin,
@@ -93,8 +93,8 @@ export const Query = {
   domains,
   extension,
   extensions,
-  invoice,
-  invoices,
+  // invoice,
+  // invoices,
   login,
   order,
   orders,
@@ -110,7 +110,7 @@ export const Mutation = {
   createCustomer,
   createDomain,
   createExtension,
-  createInvoice,
+  // createInvoice,
   createLogin,
   createOrder,
   createPaymentMethod,
@@ -119,7 +119,7 @@ export const Mutation = {
   deleteCustomer,
   deleteDomain,
   deleteExtension,
-  deleteInvoice,
+  // deleteInvoice,
   deleteLogin,
   deleteOrder,
   deletePaymentMethod,
@@ -128,7 +128,7 @@ export const Mutation = {
   updateCustomer,
   updateDomain,
   updateExtension,
-  updateInvoice,
+  // updateInvoice,
   updateOrder,
   updatePaymentMethod,
   updateSession

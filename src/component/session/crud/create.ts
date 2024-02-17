@@ -3,7 +3,6 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 import { toASCII } from "dep/x/tr46.ts";
 
@@ -11,7 +10,7 @@ import { toASCII } from "dep/x/tr46.ts";
 
 import {
   createSessionToken,
-  databaseParams,
+  client,
   decode,
   verify
 } from "src/utility/index.ts";
@@ -21,7 +20,8 @@ import e from "dbschema";
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 import type { SessionCreate } from "../schema.ts";
 
-const thisFilePath = "/src/component/session/crud/create.ts";
+// const thisFilePath = "/src/component/session/crud/create.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -29,7 +29,6 @@ const thisFilePath = "/src/component/session/crud/create.ts";
 
 export default async(_root, args: SessionCreate, _ctx?, _info?): StandardResponse => {
   /// this function needs to be accessible to non-authenticated folks
-  const client = createClient(databaseParams);
   const { params } = args;
   const query: any = {};
   let response: DetailObject | null = null;

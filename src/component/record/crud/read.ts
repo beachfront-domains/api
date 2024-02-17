@@ -28,7 +28,8 @@ import type {
   StandardResponse
 } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/record/crud/read.ts";
+// const thisFilePath = "/src/component/record/crud/read.ts";
+const thisFilePath = import.meta.filename;
 
 
 

@@ -4,7 +4,6 @@
 /// import
 
 import { Big } from "dep/x/big.ts";
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 import { toASCII } from "dep/x/tr46.ts";
 
@@ -12,7 +11,7 @@ import { toASCII } from "dep/x/tr46.ts";
 
 import {
   // accessControl,
-  databaseParams,
+  client,
   hnsPrice,
   // log,
   // maxPaginationLimit,
@@ -28,13 +27,15 @@ import type { LooseObject /*, SearchResponse*/ } from "src/utility/index.ts";
 import type { Extension } from "../../extension/schema.ts";
 import type { SearchRequest, SearchResult } from "../schema.ts";
 
-const thisFilePath = "/src/component/search/crud/read.ts";
+const thisFilePath = import.meta.filename;
 
 // import dictionary from "../utility/dictionary.ts";
 import getPricing from "../utility/domain-pricing.ts";
 import removeVowels from "../utility/remove-vowels.ts";
 import sentimentAnalysis from "../utility/sentiment.ts";
 import thesaurus from "../utility/thesaurus.ts";
+
+// const client = createClient(databaseParams);
 
 const protectedTLDs = [
   "melanin"
@@ -57,7 +58,6 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
   // console.log("yeah");
   // console.log(ctx);
   // console.log(args);
-  const client = createClient(databaseParams);
   const { /*pagination,*/ params } = args;
   const pairResults = ([] as SearchResult[]);
   const query = ({} as LooseObject);
@@ -490,7 +490,6 @@ async function findDomain(suppliedDomain: string) {
     return null;
   }
 
-  const client = createClient(databaseParams);
   const extension = suppliedDomain.split(".")[1];
   const sld = suppliedDomain.split(".")[0];
   let creationDate;

@@ -3,13 +3,12 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { elliptic } from "dep/x/elliptic.ts";
-import { load } from "dep/std.ts";
+import { load, v1 } from "dep/std.ts";
 
 /// util
 
-import { databaseParams } from "src/utility/index.ts";
+import { client } from "src/utility/index.ts";
 import e from "dbschema";
 import { encode as base64encode } from "./helper.ts";
 
@@ -36,12 +35,10 @@ export async function accessControl(ctx) {
   // TODO
   // : check to ensure `sessionToken` is 128 characters? will this length ever change?
 
-  const client = createClient(databaseParams);
-
-  const doesDocumentExist = e.select(e.Session, session => ({
+  const doesDocumentExist = e.select(e.Session, document => ({
     ...e.Session["*"],
-    filter: e.op(session.token, "=", sessionToken),
-    for: session.for["*"]
+    filter: e.op(document.token, "=", sessionToken),
+    for: document.for["*"]
   }));
 
   const existenceResult = await doesDocumentExist.run(client);
@@ -73,12 +70,14 @@ export async function accessControl(ctx) {
 export function createSessionToken(memberID: string) {
   /// please note that this function doesn't verify memberID
   const key = ec.keyFromSecret(env["keySecret"]); // privateKey
+  const hmm = `${memberID}+${v1.generate()}`;
 
-  const signature = key.sign(
-    base64encode(memberID)
-  ).toHex();
+  // import { generate } from "https://deno.land/std@0.212.0/uuid/v1.ts";
+  console.log(">>> createSessionToken");
+  console.log(hmm);
+  console.log(memberID);
 
-  return signature;
+  return key.sign(base64encode(hmm)).toHex();
 }
 
 /*

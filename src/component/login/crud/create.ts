@@ -3,14 +3,13 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 import { Resend } from "dep/x/resend.ts";
 
 /// util
 
 import {
-  databaseParams,
+  client,
   sign,
   validateEmail
 } from "src/utility/index.ts";
@@ -22,7 +21,7 @@ import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 import type { LoginCreate } from "../schema.ts";
 
 const appURL = "http://localhost:2513";
-const thisFilePath = "/src/component/login/crud/create.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -30,7 +29,6 @@ const thisFilePath = "/src/component/login/crud/create.ts";
 
 export default async(_root, args: LoginCreate, _ctx?, _info?): StandardResponse => {
   /// this function needs to be accessible to non-authenticated folks
-  const client = createClient(databaseParams);
   const { params } = args;
   const query: any = {};
   let response: DetailObject | null = null;
@@ -55,7 +53,7 @@ export default async(_root, args: LoginCreate, _ctx?, _info?): StandardResponse 
     const err = "Missing required parameter(s).";
 
     log.warning(`[${thisFilePath}]› ${err}`);
-    return { detail: response, error: [{ code: "TBA", message: err }] };
+    return { detail: response, error: { code: "TBA", message: err }};
   }
 
   const doesCustomerExist = e.select(e.Customer, customer => ({
@@ -84,7 +82,7 @@ export default async(_root, args: LoginCreate, _ctx?, _info?): StandardResponse 
       const err = "New customer creation failed";
       log.error(`[${thisFilePath}]› Exception caught while creating new customer.`);
 
-      return { detail: response, error: [{ code: "TBA", message: err }] };
+      return { detail: response, error: { code: "TBA", message: err }};
     }
   }
 

@@ -3,7 +3,6 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 import { toASCII } from "dep/x/tr46.ts";
 
@@ -11,7 +10,7 @@ import { toASCII } from "dep/x/tr46.ts";
 
 import {
   accessControl,
-  databaseParams,
+  client,
   personFromSession,
   stringTrim
 } from "src/utility/index.ts";
@@ -23,7 +22,8 @@ import e from "dbschema";
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 import type { DomainCreate } from "../schema.ts";
 
-const thisFilePath = "/src/component/domain/crud/create.ts";
+// const thisFilePath = "/src/component/domain/crud/create.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -33,7 +33,6 @@ export default async(_root, args: DomainCreate, ctx, _info?): StandardResponse =
   if (!await accessControl(ctx))
     return { detail: null };
 
-  const client = createClient(databaseParams);
   const { params } = args;
   const query = ({} as Domain);
   let response: DetailObject | null = null;

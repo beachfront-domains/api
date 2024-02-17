@@ -17,7 +17,7 @@ export {
 } from "./env.ts";
 
 export { accessControl, createSessionToken } from "./auth/access.ts";
-export { andOperation, combineOperation, orOperation } from "./filter.ts";
+export { andOperation, client, orOperation } from "./edgedb.ts";
 export { checklist } from "./checklist.ts";
 export { decode, sign, verify } from "./auth/sign.ts";
 export { emailRegex, default as validateEmail } from "./validate/email.ts";

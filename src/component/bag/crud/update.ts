@@ -3,13 +3,12 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 
 /// util
 
 import { Bag } from "../schema.ts";
-import { databaseParams, objectIsEmpty, stringTrim } from "src/utility/index.ts";
+import { client, objectIsEmpty, stringTrim } from "src/utility/index.ts";
 import e from "dbschema";
 import { PaymentKind } from "src/component/payment/schema.ts";
 import { processBagItems } from "../utility/process.ts";
@@ -17,7 +16,8 @@ import { processBagItems } from "../utility/process.ts";
 import type { BagUpdate } from "../schema.ts";
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/bag/crud/update.ts";
+// const thisFilePath = "/src/component/bag/crud/update.ts";
+const thisFilePath = import.meta.filename.split("src")[1];
 
 
 
@@ -38,7 +38,6 @@ export default async(_root, args: BagUpdate, _ctx, _info?): StandardResponse => 
     return { detail: null };
   }
 
-  const client = createClient(databaseParams);
   const query = ({} as Bag);
   let response: DetailObject | null = null;
 
@@ -65,6 +64,12 @@ export default async(_root, args: BagUpdate, _ctx, _info?): StandardResponse => 
         break;
     }
   });
+
+  log.info(">>> params");
+  log.info(params);
+
+  log.info(">>> updates");
+  log.info(updates);
 
   /// NOTE
   /// We do not check the `customer` ID for validity, as this is
@@ -107,12 +112,15 @@ export default async(_root, args: BagUpdate, _ctx, _info?): StandardResponse => 
       filter_single: e.op(document.id, "=", e.uuid(existenceResult.id)),
       set: {
         ...query,
-        customer: query.customer && e.select(e.Customer, customerDocument => ({
-          filter_single: e.op(customerDocument.id, "=", e.uuid(query.customer))
-        })),
+        ...(query.customer ? { /// `query.customer` might not exist
+          customer: e.select(e.Customer, customerDocument => ({
+            filter_single: e.op(customerDocument.id, "=", e.uuid(String(query.customer)))
+          })),
+        } : {}),
         updated: e.datetime_of_transaction()
       }
     }));
+
 
     response = await e.select(updateQuery, document => ({
       ...e.Bag["*"],
@@ -121,10 +129,10 @@ export default async(_root, args: BagUpdate, _ctx, _info?): StandardResponse => 
 
     return { detail: response };
   } catch(_) {
-    console.log(_);
     // TODO
     // : create error ingest system : https://github.com/neuenet/pastry-api/issues/10
     log.error(`[${thisFilePath}]› Exception caught while updating document.`);
+    log.error(_);
     return { detail: response };
   }
 }

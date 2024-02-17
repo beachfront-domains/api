@@ -3,14 +3,13 @@
 
 /// import
 
-import { createClient } from "edgedb";
 import { log } from "dep/std.ts";
 
 /// util
 
 import {
   accessControl,
-  databaseParams,
+  client,
   stringTrim,
   validateUUID
 } from "src/utility/index.ts";
@@ -20,7 +19,8 @@ import e from "dbschema";
 import type { Order, OrderRequest } from "../schema.ts";
 import type { StandardBooleanResponse } from "src/utility/index.ts";
 
-const thisFilePath = "/src/component/order/crud/delete.ts";
+// const thisFilePath = "/src/component/order/crud/delete.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -30,7 +30,6 @@ export default async(_root, args: OrderRequest, ctx, _info?): StandardBooleanRes
   if (!await accessControl(ctx))
     return { success: false };
 
-  const client = createClient(databaseParams);
   const { params } = args;
   const query = ({} as Order);
 
