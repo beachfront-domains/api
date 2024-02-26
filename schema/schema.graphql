@@ -7,10 +7,8 @@ scalar Decimal
 # import from "login.graphql"
 # import from "domain.graphql"
 # import from "extension.graphql"
-# import from "invoice.graphql"
 # import from "order.graphql"
 # import from "pagination.graphql"
-# import from "payment.graphql"
 # import from "search.graphql"
 # import from "session.graphql"
 
@@ -48,11 +46,11 @@ type Query {
   extension(params: ExtensionQuery): ExtensionResponse
   extensions(params: ExtensionsQuery, pagination: PaginationOptions): ExtensionsResponse
 
-  """
-  Invoice queries
-  """
-  invoice(params: InvoiceQuery): InvoiceResponse
-  invoices(params: InvoicesQuery, pagination: PaginationOptions): InvoicesResponse
+  # """
+  # Invoice queries
+  # """
+  # invoice(params: InvoiceQuery): InvoiceResponse
+  # invoices(params: InvoicesQuery, pagination: PaginationOptions): InvoicesResponse
 
   """
   Login query
@@ -65,11 +63,11 @@ type Query {
   order(params: OrderQuery): OrderResponse
   orders(params: OrdersQuery, pagination: PaginationOptions): OrdersResponse
 
-  """
-  Payment method queries
-  """
-  paymentMethod(params: PaymentMethodQuery): PaymentMethodResponse
-  paymentMethods(params: PaymentMethodsQuery, pagination: PaginationOptions): PaymentMethodsResponse
+  # """
+  # Payment method queries
+  # """
+  # paymentMethod(params: PaymentMethodQuery): PaymentMethodResponse
+  # paymentMethods(params: PaymentMethodsQuery, pagination: PaginationOptions): PaymentMethodsResponse
 
   """
   Search queries
@@ -118,12 +116,12 @@ type Mutation {
   deleteExtension(params: ExtensionQuery): BooleanResponse
   updateExtension(updates: ExtensionInput, params: ExtensionQuery): ExtensionResponse
 
-  """
-  Invoice mutations
-  """
-  createInvoice(params: InvoiceInput): InvoiceResponse
-  deleteInvoice(params: InvoiceQuery): BooleanResponse
-  updateInvoice(updates: InvoiceInput, params: InvoiceQuery): InvoiceResponse
+  # """
+  # Invoice mutations
+  # """
+  # createInvoice(params: InvoiceInput): InvoiceResponse
+  # deleteInvoice(params: InvoiceQuery): BooleanResponse
+  # updateInvoice(updates: InvoiceInput, params: InvoiceQuery): InvoiceResponse
 
   """
   Login mutations
@@ -138,12 +136,12 @@ type Mutation {
   deleteOrder(params: OrderQuery): BooleanResponse
   updateOrder(updates: OrderInput, params: OrderQuery): OrderResponse
 
-  """
-  Payment method mutations
-  """
-  createPaymentMethod(params: PaymentMethodInput): PaymentMethodResponse
-  deletePaymentMethod(params: PaymentMethodQuery): BooleanResponse
-  updatePaymentMethod(updates: PaymentMethodInput, params: PaymentMethodQuery): PaymentMethodResponse
+  # """
+  # Payment method mutations
+  # """
+  # createPaymentMethod(params: PaymentMethodInput): PaymentMethodResponse
+  # deletePaymentMethod(params: PaymentMethodQuery): BooleanResponse
+  # updatePaymentMethod(updates: PaymentMethodInput, params: PaymentMethodQuery): PaymentMethodResponse
 
   """
   Session mutations

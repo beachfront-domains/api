@@ -3,11 +3,14 @@
 
 /// import
 
+import { log } from "dep/std.ts";
 import { wretch } from "dep/x/wretch.ts";
 
 /// util
 
 import { serviceNinja } from "src/utility/index.ts";
+
+const thisFilePath = import.meta.filename;
 
 
 
@@ -22,22 +25,24 @@ export default async(suppliedWord: string): Promise<boolean> => {
         headers: { "X-Api-Key": serviceNinja }
       })
       .get()
-      .json<{ valid?: boolean; }>();
+      .json<{ valid?: boolean; }>()
+      .catch(error => {
+        const { message: message } = error;
+        log.error(`[${thisFilePath}]› ${message}`);
+        return isWord;
+      });
 
     if (!data || !data.valid)
       return isWord;
 
     isWord = true;
   } catch(_) {
-    /// IGNORE
-    /// Probably not a dictionary word
-    // const { status, url } = _;
+    const { cause, response, url, message, json, text, status } = _;
+    log.error(`[${thisFilePath}]› Third-party service error: ${message}`);
 
-    console.group("/src/component/search/utility/dictionary.ts");
-    // console.error(status, url);
-    console.error(_);
-    console.error(`>>> ${suppliedWord}`);
-    console.groupEnd();
+    json && log.error(JSON.parse(json));
+    text && log.error(text);
+    url && log.error(url);
   }
 
   return isWord;

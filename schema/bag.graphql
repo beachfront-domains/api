@@ -11,7 +11,9 @@ type BagItem {
   """
   duration: Int
   name: String
+  premium: Int
   price: String
+  tier: Tier
 }
 
 type Bag {
@@ -29,10 +31,12 @@ type Bag {
 
 type BagResponse {
   detail: Bag
+  error: Error
 }
 
 type BagsResponse {
   detail: [Bag]
+  error: Error
   pageInfo: Pagination
 }
 
@@ -45,7 +49,9 @@ type BagsResponse {
 input BagItemInput {
   duration: Int
   name: String
+  premium: Int
   price: String
+  tier: Tier
 }
 
 input BagInput {

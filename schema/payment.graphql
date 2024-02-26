@@ -1,78 +1,78 @@
-# import Customer from "customer.graphql"
-# import CustomerInput from "customer.graphql"
-# import Pagination from "pagination.graphql"
+# # import Customer from "customer.graphql"
+# # import CustomerInput from "customer.graphql"
+# # import Pagination from "pagination.graphql"
 
 
 
-######
-# Enum
-######
+# ######
+# # Enum
+# ######
 
-enum PaymentKind {
-  CRYPTOCURRENCY
-  FIAT
-}
-
-
-
-######
-# Type
-######
-
-type PaymentMethod {
-  customer: Customer
-  kind: PaymentKind
-  """
-  - if `kind` is FIAT, last 4/5 digits are shown, rest is replaced with `*`
-  - if `kind` is CRYPTOCURRENCY, first/last 5 characters are shown, rest is replaced with `*`
-  """
-  mask: String
-  """
-  Vendor IDs could potentially conflict so the ID should be saved as
-  `<VENDOR>|<UUID>` (vendor is lowercase)
-  """
-  vendorId: ID
-  #
-  created: DateTime!
-  id: ID!
-  updated: DateTime!
-}
-
-type PaymentMethodResponse {
-  detail: PaymentMethod
-}
-
-type PaymentMethodsResponse {
-  detail: [PaymentMethod]
-  pageInfo: Pagination
-}
+# enum PaymentKind {
+#   CRYPTOCURRENCY
+#   FIAT
+# }
 
 
 
-#######
-# Input
-#######
+# ######
+# # Type
+# ######
 
-input PaymentMethodInput {
-  customer: CustomerInput
-  kind: PaymentKind
-  mask: String
-  vendorId: ID
-  # no created
-  # no id
-  # no updated
-}
+# type PaymentMethod {
+#   customer: Customer
+#   kind: PaymentKind
+#   """
+#   - if `kind` is FIAT, last 4/5 digits are shown, rest is replaced with `*`
+#   - if `kind` is CRYPTOCURRENCY, first/last 5 characters are shown, rest is replaced with `*`
+#   """
+#   mask: String
+#   """
+#   Vendor IDs could potentially conflict so the ID should be saved as
+#   `<VENDOR>|<UUID>` (vendor is lowercase)
+#   """
+#   vendorId: ID
+#   #
+#   created: DateTime!
+#   id: ID!
+#   updated: DateTime!
+# }
 
-input PaymentMethodQuery {
-  id: ID
-  vendorId: ID
-}
+# type PaymentMethodResponse {
+#   detail: PaymentMethod
+# }
 
-input PaymentMethodsQuery {
-  customer: CustomerInput
-  kind: PaymentKind
-}
-
+# type PaymentMethodsResponse {
+#   detail: [PaymentMethod]
+#   pageInfo: Pagination
+# }
 
 
-### be sure to keep this file in sync with `src/component/payment/schema.ts`
+
+# #######
+# # Input
+# #######
+
+# input PaymentMethodInput {
+#   customer: CustomerInput
+#   kind: PaymentKind
+#   mask: String
+#   vendorId: ID
+#   # no created
+#   # no id
+#   # no updated
+# }
+
+# input PaymentMethodQuery {
+#   id: ID
+#   vendorId: ID
+# }
+
+# input PaymentMethodsQuery {
+#   customer: CustomerInput
+#   kind: PaymentKind
+# }
+
+
+
+# ### be sure to keep this file in sync with `src/component/payment/schema.ts`

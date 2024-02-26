@@ -4,18 +4,19 @@
 /// import
 
 import { log } from "dep/std.ts";
-import { Resend } from "dep/x/resend.ts";
+// import { Resend } from "dep/x/resend.ts";
 
 /// util
 
 import {
   client,
+  resend,
   sign,
   validateEmail
 } from "src/utility/index.ts";
 
 import e from "dbschema";
-import { serviceResend } from "src/utility/env.ts";
+// import { serviceResend } from "src/utility/env.ts";
 
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 import type { LoginCreate } from "../schema.ts";
@@ -116,7 +117,7 @@ export default async(_root, args: LoginCreate, _ctx?, _info?): StandardResponse 
     response = await databaseQuery.run(client);
 
     const loginLink = `${appURL}/access?${response.token}`;
-    const resend = new Resend(serviceResend);
+    // const resend = new Resend(serviceResend);
 
     const emailBody = `
       <p>Hey!</p>
@@ -124,14 +125,21 @@ export default async(_root, args: LoginCreate, _ctx?, _info?): StandardResponse 
       <p>If you did not request this link, please ignore this email and enjoy the rest of your day.</p>
       <p>Cordially yours, <a href="${appURL}">beachfront/</a>.</p>
       <p>🏖️</p>
+      <p><a href="https://beachfront.domains">https://beachfront.domains</a> / <a href="https://domains.beachfront">https://domains.beachfront</a></p>
     `;
     const emailBodyPlain = `
       Hey!
-      Sign-in to beachfront/:\n
-      ${loginLink}\n
+
+      Sign-in to beachfront/:
+      ${loginLink}
+
       If you did not request this link, please ignore this email and enjoy the rest of your day.
-      Cordially yours, beachfront/.\n
+
+      Cordially yours, beachfront/.
+
       🏖️
+
+      https://beachfront.domains / https://domains.beachfront
     `;
 
     resend.emails.send({

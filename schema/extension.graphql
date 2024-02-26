@@ -1,10 +1,9 @@
-# import Pagination from "pagination.graphql"
 
 
 
-######
+#
 # Enum
-######
+#
 
 enum Tier {
   DEFAULT
@@ -15,11 +14,13 @@ enum Tier {
   MYTHIC
 }
 
-######
+#
 # Type
-######
+#
 
 type Extension {
+  description: String
+  hash: String
   """
   ASCII representation of extension
   """
@@ -39,18 +40,20 @@ type Extension {
 
 type ExtensionResponse {
   detail: Extension
+  error: Error
 }
 
 type ExtensionsResponse {
   detail: [Extension]
+  error: Error
   pageInfo: Pagination
 }
 
 
 
-#######
+#
 # Input
-#######
+#
 
 input ExtensionInput {
   name: String

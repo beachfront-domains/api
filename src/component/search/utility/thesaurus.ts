@@ -3,12 +3,15 @@
 
 /// import
 
+import { log } from "dep/std.ts";
 import { toASCII } from "dep/x/tr46.ts";
 import { wretch } from "dep/x/wretch.ts";
 
 /// util
 
 import { serviceNinja } from "src/utility/index.ts";
+
+const thisFilePath = import.meta.filename;
 
 interface ThesaurusResponse {
   antonyms: string[];
@@ -29,7 +32,8 @@ export default async(suppliedWord: string): Promise<ThesaurusResponse> => {
         headers: { "X-Api-Key": serviceNinja }
       })
       .get()
-      .json();
+      .json()
+      .catch(error => log.error(`[${thisFilePath}]› ${error}`));
 
     if (!data) {
       return {
@@ -51,9 +55,12 @@ export default async(suppliedWord: string): Promise<ThesaurusResponse> => {
   } catch(_) {
     /// IGNORE
     /// Probably not a dictionary word
-    console.group("/src/component/search/utility/thesaurus.ts");
-    console.error(_);
-    console.groupEnd();
+    // console.group("/src/component/search/utility/thesaurus.ts");
+    // console.error(_);
+    // console.groupEnd();
+    log.error(`[${thisFilePath}]› Third-party service error`);
+    log.error(_);
+    // log.error(Error.trace(_));
   }
 
   return {

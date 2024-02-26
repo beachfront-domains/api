@@ -146,7 +146,9 @@ export async function getMore(_root, args: Partial<DomainsRequest>, ctx, _info?)
 
   const baseShape = e.shape(e.Domain, document => ({
     ...e.Domain["*"],
-    order_by: document.created
+    extension: e.Extension["*"],
+    order_by: document.created,
+    owner: e.Customer["*"]
   }));
 
   allDocuments = await e.select(e.Domain, document => ({

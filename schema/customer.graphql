@@ -1,10 +1,9 @@
-# import Pagination from "pagination.graphql"
 
 
 
-######
+#
 # Enum
-######
+#
 
 enum LoginMethod {
   LINK
@@ -18,9 +17,9 @@ enum Role {
 
 
 
-######
+#
 # Type
-######
+#
 
 type Customer {
   email: String
@@ -49,18 +48,20 @@ type Customer {
 
 type CustomerResponse {
   detail: Customer
+  error: Error
 }
 
 type CustomersResponse {
   detail: [Customer]
+  error: Error
   pageInfo: Pagination
 }
 
 
 
-#######
+#
 # Input
-#######
+#
 
 input CustomerInput {
   email: String

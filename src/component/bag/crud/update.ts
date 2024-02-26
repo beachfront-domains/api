@@ -65,11 +65,12 @@ export default async(_root, args: BagUpdate, _ctx, _info?): StandardResponse => 
     }
   });
 
-  log.info(">>> params");
-  log.info(params);
+  // log.info(">>> params");
+  // log.info(params);
 
   log.info(">>> updates");
   log.info(updates);
+  log.info("<<<");
 
   /// NOTE
   /// We do not check the `customer` ID for validity, as this is

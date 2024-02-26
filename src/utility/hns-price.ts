@@ -10,7 +10,7 @@ import { wretch } from "dep/x/wretch.ts";
 
 import { serviceCoinmarketcap } from "src/utility/index.ts";
 
-const thisFilePath = "/src/utility/hns-price.ts";
+const thisFilePath = import.meta.filename;
 
 
 
@@ -24,11 +24,15 @@ export default async(): Promise<number> => {
     const { data } = await wretch("https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=HNS&convert=USD")
       .headers({ "X-CMC_PRO_API_KEY": serviceCoinmarketcap })
       .get()
-      .json();
+      .json()
+      .catch(error => log.error(`[${thisFilePath}]› ${error}`));
 
     value = data?.HNS?.quote?.USD?.price || 0;
   } catch(_) {
     log.error(`[${thisFilePath}]› Error retrieving HNS price.`);
+    // log.error(Object.keys(_));
+    log.error(_);
+    // log.error(Error.trace(_));
     value = 0;
   }
 

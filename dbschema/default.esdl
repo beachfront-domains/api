@@ -48,7 +48,9 @@ module default {
     bag: array<tuple<
       duration: int16,
       name: str,
-      price: str
+      premium: int16,
+      price: str,
+      tier: ExtensionTier
     >>;
     currency: PaymentKind {
       default := PaymentKind.FIAT;
@@ -100,6 +102,8 @@ module default {
   }
 
   type Extension extending BaseRecord {
+    description: str;
+    hash: str;
     mature: int16 {
       default := 0;
     };
@@ -145,7 +149,9 @@ module default {
     bag: array<tuple<
       duration: int16,
       name: str,
-      price: str
+      premium: int16,
+      price: str,
+      tier: ExtensionTier
     >>;
     currency: str;
     link customer: Customer;

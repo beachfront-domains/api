@@ -5,6 +5,7 @@
 
 import type { PaginationArgument } from "../pagination/schema.ts";
 import type { PaymentKind } from "../payment/schema.ts";
+import type { ExtensionTier } from "../extension/schema.ts";
 
 
 
@@ -15,7 +16,9 @@ export interface BagItem {
   /// : for products without duration, like merch, duration is `0`
   duration: number;
   name: string;
+  premium: number;
   price: string;
+  tier: ExtensionTier;
 }
 
 export interface Bag {

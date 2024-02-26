@@ -1,12 +1,9 @@
-# import Customer from "customer.graphql"
-# import Extension from "extension.graphql"
-# import Pagination from "pagination.graphql"
 
 
 
-######
+#
 # Type
-######
+#
 
 type SearchResult {
   "Boolean | 0: false, 1: true"
@@ -30,9 +27,9 @@ type SearchResponse {
 
 
 
-#######
+#
 # Input
-#######
+#
 
 input SearchQuery {
   emoji: Int

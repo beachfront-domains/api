@@ -57,13 +57,13 @@ import {
   update as updateOrder
 } from "../component/order/index.ts";
 
-import {
-  create as createPaymentMethod,
-  del as deletePaymentMethod,
-  getPaymentMethod as paymentMethod,
-  getPaymentMethods as paymentMethods,
-  update as updatePaymentMethod
-} from "../component/payment/index.ts";
+// import {
+//   create as createPaymentMethod,
+//   del as deletePaymentMethod,
+//   getPaymentMethod as paymentMethod,
+//   getPaymentMethods as paymentMethods,
+//   update as updatePaymentMethod
+// } from "../component/payment/index.ts";
 
 import { search } from "../component/search/index.ts";
 
@@ -98,8 +98,8 @@ export const Query = {
   login,
   order,
   orders,
-  paymentMethod,
-  paymentMethods,
+  // paymentMethod,
+  // paymentMethods,
   search,
   session,
   sessions
@@ -113,7 +113,7 @@ export const Mutation = {
   // createInvoice,
   createLogin,
   createOrder,
-  createPaymentMethod,
+  // createPaymentMethod,
   createSession,
   deleteBag,
   deleteCustomer,
@@ -122,7 +122,7 @@ export const Mutation = {
   // deleteInvoice,
   deleteLogin,
   deleteOrder,
-  deletePaymentMethod,
+  // deletePaymentMethod,
   deleteSession,
   updateBag,
   updateCustomer,
@@ -130,6 +130,6 @@ export const Mutation = {
   updateExtension,
   // updateInvoice,
   updateOrder,
-  updatePaymentMethod,
+  // updatePaymentMethod,
   updateSession
 };

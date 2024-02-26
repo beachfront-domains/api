@@ -48,13 +48,13 @@ export type {
   ExtensionUpdate
 } from "../component/extension/schema.ts";
 
-export type {
-  Invoice,
-  InvoiceCreate,
-  InvoiceRequest,
-  InvoiceUpdate,
-  InvoicesRequest
-} from "../component/invoice/schema.ts";
+// export type {
+//   Invoice,
+//   InvoiceCreate,
+//   InvoiceRequest,
+//   InvoiceUpdate,
+//   InvoicesRequest
+// } from "../component/invoice/schema.ts";
 
 // export type {
 //   PaginationArgument,
@@ -75,13 +75,13 @@ export type {
   OrderUpdate
 } from "../component/order/schema.ts";
 
-export type {
-  PaymentMethod,
-  PaymentMethodCreate,
-  PaymentMethodRequest,
-  PaymentMethodsRequest,
-  PaymentMethodUpdate
-} from "../component/payment/schema.ts";
+// export type {
+//   PaymentMethod,
+//   PaymentMethodCreate,
+//   PaymentMethodRequest,
+//   PaymentMethodsRequest,
+//   PaymentMethodUpdate
+// } from "../component/payment/schema.ts";
 
 export type {
   SearchRequest,

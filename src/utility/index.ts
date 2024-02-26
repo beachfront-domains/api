@@ -25,6 +25,8 @@ export { default as hnsPrice } from "./hns-price.ts";
 export { objectIsEmpty } from "./is-object-empty.ts";
 export { default as personFromSession } from "./person-from-session.ts";
 export { processRecordData } from "./helper.ts";
+export { default as randomSelection } from "./random-selection.ts";
+export { resend } from "./resend.ts";
 export { default as sortObject } from "./sort-object.ts";
 export { default as stringTrim } from "./string-trim.ts";
 export { uuidRegex, default as validateUUID } from "./validate/uuid.ts";

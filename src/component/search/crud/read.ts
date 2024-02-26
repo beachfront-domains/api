@@ -17,9 +17,12 @@ import {
   // maxPaginationLimit,
   objectIsEmpty,
   personFromSession,
+  randomSelection,
   stringTrim,
   validateZeroWidth
 } from "src/utility/index.ts";
+
+import tlds from "src/utility/tlds.ts";
 
 import e from "dbschema";
 
@@ -34,8 +37,6 @@ import getPricing from "../utility/domain-pricing.ts";
 import removeVowels from "../utility/remove-vowels.ts";
 import sentimentAnalysis from "../utility/sentiment.ts";
 import thesaurus from "../utility/thesaurus.ts";
-
-// const client = createClient(databaseParams);
 
 const protectedTLDs = [
   "melanin"
@@ -55,22 +56,16 @@ const protectedTLDs = [
 // : toggle to show mature TLDs
 
 export default async(_root, args: SearchRequest, ctx, _info?) => {
-  // console.log("yeah");
-  // console.log(ctx);
-  // console.log(args);
   const { /*pagination,*/ params } = args;
   const pairResults = ([] as SearchResult[]);
+  const owner = await personFromSession(ctx) || null;
   const query = ({} as LooseObject);
-  // const results: SearchResult[] = [];
   const results = ([] as SearchResult[]);
   const vowelessResult = ([] as SearchResult[]);
-  // let basePrice = 0;
-  // let isPremium = false;
-  // let premiumPrice = 0;
 
   if (!params || objectIsEmpty(params)) {
     log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
-    return { detail: results };
+    return { detail: results, viewer: owner };
   }
 
   // TODO
@@ -100,15 +95,13 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
   switch(true) {
     case !query.name:
     case query.name && query.name.length === 0: {
-      console.log(">>> params");
-      console.log(params);
       log.warning(`[${thisFilePath}]› Vibe check failed.`);
-      return { detail: results };
+      return { detail: results, viewer: owner };
     }
 
     case query.name && validateZeroWidth(query.name): {
       log.warning(`[${thisFilePath}]› Query contains invalid characters.`);
-      return { detail: results };
+      return { detail: results, viewer: owner };
     }
 
     default:
@@ -133,12 +126,30 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
     /// NOTE
     /// `ani` is the shortest extension we own
     log.warning(`[${thisFilePath}]› Invalid extension.\n${query.extension}/`);
-    return { detail: results };
+    return { detail: results, viewer: owner };
   }
 
   if (!query.extension) {
-    log.warning(`[${thisFilePath}]› Extension required.`);
-    return { detail: results };
+    const randomExtensions = randomSelection(tlds, 50);
+    const hns = await hnsPrice();
+
+    await Promise.all(randomExtensions.map(async(randomExtension) => {
+      const domain = `${query.sld}.${randomExtension}`;
+      const searchResult = await findDomain(domain);
+      const { available, created, extension, premium, priceUSD } = searchResult;
+
+      results.push({
+        available,
+        created,
+        extension,
+        name: domain,
+        premium,
+        priceHNS: __formatHNS(priceUSD, hns),
+        priceUSD
+      });
+    }));
+
+    return { detail: results, viewer: owner };
   }
 
   const doesExtensionExist = e.select(e.Extension, ext => ({
@@ -150,7 +161,7 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
 
   if (!extensionExistenceResult) {
     log.warning(`[${thisFilePath}]› Extension does not exist.\n${query.extension}/`);
-    return { detail: results };
+    return { detail: results, viewer: owner };
   }
 
   const extensionExists = (extensionExistenceResult as Extension);
@@ -256,7 +267,7 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
       console.groupEnd();
 
       log.warning(`[${thisFilePath}]› How the heck did this occur?`);
-      return { detail: results };
+      return { detail: results, viewer: owner };
     }
 
     const { available, created, premium, priceUSD } = searchResult;
@@ -331,7 +342,7 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
       [] :
       await createCollection(antonyms, query.extension, hns); // : SearchResult[]
     const synonymsArray = await createCollection(synonyms, query.extension, hns); // : SearchResult[]
-    const owner = await personFromSession(ctx);
+    // const owner = await personFromSession(ctx);
 
     // TODO
     // : save results to database with an ID
@@ -354,16 +365,20 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
       //   // hasNextPage
       //   // hasPreviousPage
       // },
-      viewer: owner ? owner : null
+      viewer: owner
     };
   } catch(error) {
     // TODO
     // : rate limiting?
 
-    log.warning(`[${thisFilePath}]› Error retrieving search results.`);
-    log.error(error);
+    const { source } = error;
 
-    return { detail: results };
+    log.warning(`[${thisFilePath}]› Error retrieving search results.`);
+    log.error(Object.keys(error));
+    // log.error(error);
+    log.error(source);
+
+    return { detail: results, viewer: owner };
   }
 }
 
@@ -459,6 +474,10 @@ async function createCollection(suppliedArray: string[], suppliedExtension: stri
 
   return [...new Set(names)]; /// remove duplicates
 }
+
+// TODO
+// : create function that takes an SLD and applies it to 25 random TLDs
+// : randomize the final list as well
 
 function isValidDomain(domain: string) {
   /// TODO
