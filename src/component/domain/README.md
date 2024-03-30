@@ -8,7 +8,64 @@ TBD
 
 ## get domain
 
-TBD
+All acccepted parameters are optional: `id` and `name`.
+
+### Types
+
+- id: `String`
+- name: `String`
+
+```sdl
+query GetDomain($params: DomainQuery) {
+  domain(params: $params) {
+    detail {
+      created
+      expiry
+      extension {
+        id
+        name
+      }
+      id
+      name
+      owner {
+        id
+        name
+        username
+      }
+      record {
+        name
+        records
+        ttl
+        type
+      }
+      status
+      updated
+    }
+    error {
+      code
+      message
+    }
+  }
+}
+```
+
+### GraphQL Variables
+
+```json
+{
+  "params": {
+    "name": "get.lynk"
+  }
+}
+```
+
+### Authorization Header
+
+```json
+{
+  "Authorization": "Bearer KEY_ID"
+}
+```
 
 
 
@@ -85,3 +142,76 @@ TBD
 ## delete domain
 
 TBD
+
+
+
+## update domain
+
+All acccepted parameters are optional: `id` and `name`.
+
+### Types
+
+- id: `String`
+- name: `String`
+
+```sdl
+mutation UpdateDomain($params: DomainQuery, $updates: DomainInput) {
+  updateDomain(params: $params, updates: $updates) {
+    detail {
+      created
+      expiry
+      extension {
+        id
+        name
+        tier
+      }
+      id
+      name
+      owner {
+        id
+        name
+        username
+      }
+      record {
+        name
+        records
+        ttl
+        type
+      }
+      status
+      updated
+    }
+    error {
+      code
+      message
+    }
+  }
+}
+
+```
+
+### GraphQL Variables
+
+```json
+{
+  "params": {
+    "name": "get.lynk"
+    // add `type` here to indicate update?
+  },
+  "updates": {
+    "record": [{
+      "name": "meta.webscape",
+      "ttl": 200,
+      "type": "A"
+    }]
+  }
+}
+```
+
+### Authorization Header
+
+```json
+{
+  "Authorization": "Bearer KEY_ID"
+}
+```

@@ -27,6 +27,8 @@ export const {
   devApp,
   prodAPI,
   prodApp,
+  //
+  nameserverKey,
   // SERVICES
   serviceCoinmarketcap,
   serviceDictionary,

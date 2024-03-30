@@ -3,6 +3,7 @@
 
 /// import
 
+// import { default as createDNS } from "src/component/domain/utility/create-dns.ts";
 import { GraphQLHTTP } from "dep/x/alpha.ts";
 import { makeExecutableSchema } from "dep/x/graphql-tools.ts";
 
@@ -81,6 +82,7 @@ async function getVersion() {
   let version = "";
 
   try {
+    // await createDNS("super.lynk");
     version = await Deno.readTextFileSync("./version.txt");
   } catch(_) {
     /// ignore

@@ -1,6 +1,3 @@
-
-
-
 /// import
 
 import { createClient } from "edgedb";
@@ -18,27 +15,25 @@ import e from "dbschema";
 import type { Extension } from "src/component/extension/schema.ts";
 
 const client = createClient(databaseParams);
-const createArray = (arr) => arr.map(item => toASCII(String(item))).sort();
+const createArray = (arr) => arr.map((item) => toASCII(String(item))).sort();
 const portfolio = await Deno.readTextFileSync(join("import", "portfolio.csv"));
 const rawPortfolioData = parse(portfolio, { skipFirstRow: true, strip: true });
-const portfolioData = rawPortfolioData.filter(extension => extension.tier.length > 0);
+const portfolioData = rawPortfolioData.filter((extension) =>
+  extension.tier.length > 0
+);
 const portfolioLength = portfolioData.length;
 let i = 0;
 
-
-
 /// program
 
-portfolioData.map(async(extension) => {
-  const query = ({} as Extension);
+portfolioData.map(async (extension) => {
+  const query = {} as Extension;
 
   Object.entries(extension).forEach(([key, value]) => {
-    switch(key) {
+    switch (key) {
       case "pairs":
       case "premium": {
-        query[key] = value.length > 0 ?
-          createArray([value]) :
-          [];
+        query[key] = value.length > 0 ? createArray([value]) : [];
         break;
       }
 
@@ -48,9 +43,10 @@ portfolioData.map(async(extension) => {
       }
 
       case "tier": {
-        query[key] = ExtensionTier[stringTrim(String(value).toUpperCase())] === stringTrim(String(value).toUpperCase()) ?
-          ExtensionTier[stringTrim(String(value).toUpperCase())] :
-          ExtensionTier.DEFAULT;
+        query[key] = ExtensionTier[stringTrim(String(value).toUpperCase())] ===
+            stringTrim(String(value).toUpperCase())
+          ? ExtensionTier[stringTrim(String(value).toUpperCase())]
+          : ExtensionTier.DEFAULT;
         break;
       }
 
@@ -62,18 +58,19 @@ portfolioData.map(async(extension) => {
   query.registry = "beachfront";
 
   try {
-    const databaseQuery = e.select(e.insert(e.Extension, { ...query }), () => ({ ...e.Extension["*"] }));
+    const databaseQuery = e.select(
+      e.insert(e.Extension, { ...query }),
+      () => ({ ...e.Extension["*"] }),
+    );
     await databaseQuery.run(client);
 
     i++;
     console.log(`processed ${i}/${portfolioLength} ::: ${query.name}`);
-  } catch(_) {
+  } catch (_) {
     log.error(`Exception caught while importing "${query.name}".`);
     log.error(_);
   }
 });
-
-
 
 /// run importer (note: will need to manually `control+c` when it's finished):
 /// > deno run --allow-env --allow-net --allow-read --unstable --import-map import_map.json import.ts

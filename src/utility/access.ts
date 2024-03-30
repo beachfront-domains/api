@@ -1,45 +1,42 @@
 
 
 
-/// import
+// /// import
 
-import { createClient } from "edgedb";
-import e from "dbschema";
+// import e from "dbschema";
 
-/// util
+// /// util
 
-import { databaseParams } from "./constant.ts";
-
+// import { client } from "src/utility/index.ts";
 
 
-/// export
 
-export async function accessControl(ctx) {
-  if (!ctx || !ctx["x-session"])
-    return false;
+// /// export
 
-  const bearerTokenParts = ctx["x-session"].split(" ");
-  let sessionToken = "";
+// export async function accessControl(ctx) {
+//   if (!ctx || !ctx["x-session"])
+//     return false;
 
-  if (bearerTokenParts.length === 2 && bearerTokenParts[0].toLowerCase() === "bearer")
-    sessionToken = String(bearerTokenParts[1]);
-  else
-    return false;
+//   const bearerTokenParts = ctx["x-session"].split(" ");
+//   let sessionToken = "";
 
-  const client = createClient(databaseParams);
+//   if (bearerTokenParts.length === 2 && bearerTokenParts[0].toLowerCase() === "bearer")
+//     sessionToken = String(bearerTokenParts[1]);
+//   else
+//     return false;
 
-  const doesDocumentExist = e.select(e.api.Key, document => ({
-    ...e.api.Key["*"],
-    filter_single: e.op(document.id, "=", e.uuid(sessionToken))
-  }));
+//   const doesDocumentExist = e.select(e.api.Key, document => ({
+//     ...e.api.Key["*"],
+//     filter_single: e.op(document.id, "=", e.uuid(sessionToken))
+//   }));
 
-  const existenceResult = await doesDocumentExist.run(client);
+//   const existenceResult = await doesDocumentExist.run(client);
 
-  // TODO
-  // : check `existenceResult.url` to compare/match with `ctx` host/origin/referer
+//   // TODO
+//   // : check `existenceResult.url` to compare/match with `ctx` host/origin/referer
 
-  if (!existenceResult)
-    return false; /// key is nonexistent
+//   if (!existenceResult)
+//     return false; /// key is nonexistent
 
-  return true;
-}
+//   return true;
+// }

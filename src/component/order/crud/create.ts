@@ -20,6 +20,7 @@ import {
 
 import { DomainStatusCode } from "../../domain/schema.ts";
 import e from "dbschema";
+import { default as createDNS } from "src/component/domain/utility/create-dns.ts";
 import { default as isValidBinaryValue } from "../utility/binary.ts";
 import { default as processVendor } from "../utility/process.ts";
 import { totalPrice } from "src/utility/calculate/price.ts";
@@ -178,6 +179,7 @@ export default async(_root, args: OrderCreate, ctx, _info?): StandardResponse =>
     await createDomains({ domains: bagExistenceResult.bag, owner: customerExistenceResult.id });
     await deleteBag(bagExistenceResult.id);
     await sendReceipt({ domains: bagExistenceResult.bag, order: response, owner: customerExistenceResult });
+    await createDNSRecords(bagExistenceResult.bag);
 
     return { detail: response };
   } catch(_) {
@@ -193,6 +195,20 @@ export default async(_root, args: OrderCreate, ctx, _info?): StandardResponse =>
 
 
 /// helper
+
+// async function createDNSRecords(domains: Array<BagItem>) {
+//   domains.map(async(domain) => {
+//     const { name } = domain;
+//     await createDNS(name);
+//   });
+// }
+
+async function createDNSRecords(domains: Array<BagItem>): Promise<void> {
+  for (const domain of domains) {
+    const { name } = domain;
+    await createDNS(name);
+  }
+}
 
 function sendReceipt(data: { domains: Array<BagItem>, order: any, owner: string }) {
   const { domains, order, owner } = data;
@@ -344,6 +360,8 @@ async function createDomains(data: { domains: Array<BagItem>, owner: string }) {
       // TODO
       // : after inital DNS setup for domains is complete,
       //   update `status` to `DomainStatusCode.OK`
+      // : setup DNS records in PowerDNS (via another file, import function here)
+      // : setup website in Caddy
 
       const databaseQuery = e.select(newDocument, document => ({
         ...e.Domain["*"],
@@ -352,12 +370,12 @@ async function createDomains(data: { domains: Array<BagItem>, owner: string }) {
       }));
 
       await databaseQuery.run(client);
-  } catch(_) {
-    // TODO
-    // : create error ingest system : https://github.com/neuenet/pastry-api/issues/10
-    log.error(`[${thisFilePath}]› Exception caught while creating document.`);
-    log.error(_);
-  }
+    } catch(_) {
+      // TODO
+      // : create error ingest system : https://github.com/neuenet/pastry-api/issues/10
+      log.error(`[${thisFilePath}]› Exception caught while creating document.`);
+      log.error(_);
+    }
   });
 }
 

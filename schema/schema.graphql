@@ -107,7 +107,7 @@ type Mutation {
   """
   createDomain(params: DomainInput): DomainResponse
   deleteDomain(params: DomainQuery): BooleanResponse
-  updateDomain(updates: DomainInput, params: DomainQuery): DomainResponse
+  updateDomain(params: DomainQuery, updates: DomainInput): DomainResponse
 
   """
   Extension mutations

@@ -50,8 +50,6 @@ export async function accessControl(ctx) {
 
   if (new Date(Number(existingSession.expires)).getTime() < new Date().getTime()) {
     /// session is expired, so let's delete it
-    const client = createClient(databaseParams);
-
     const deleteQuery = e.delete(e.Session, session => ({
       filter_single: e.op(session.id, "=", e.uuid(existingSession.id))
     }));

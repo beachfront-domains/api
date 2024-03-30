@@ -40,11 +40,44 @@ enum DomainStatusCode {
   CLIENT_UPDATE_PROHIBITED
 }
 
+enum RecordType {
+  A
+  AAAA
+  CAA
+  CNAME
+  DNAME
+  DNSKEY
+  DS
+  HINFO
+  MX
+  NAPTR
+  NS
+  NSEC
+  NSEC3
+  # NULL
+  # OPT
+  PTR
+  RP
+  RRSIG
+  SOA
+  SRV
+  SSHFP
+  TLSA
+  TXT
+}
+
 
 
 #
 # Type
 #
+
+type DomainRecord {
+  name: String!
+  records: [String]
+  ttl: Int
+  type: RecordType!
+}
 
 type Domain {
   expiry: DateTime
@@ -55,6 +88,7 @@ type Domain {
   """
   name: String
   owner: Customer
+  record: [DomainRecord]
   status: DomainStatusCode
   #
   created: DateTime!
@@ -79,11 +113,20 @@ type DomainsResponse {
 # Input
 #
 
+input DomainRecordInput {
+  content: String
+  name: String
+  # records: [String]
+  ttl: Int
+  type: RecordType
+}
+
 input DomainInput {
   expiry: DateTime
-  extension: ID
+  # extension: ID
   name: String
   owner: ID
+  record: [DomainRecordInput]
   status: DomainStatusCode
   # no created
   # no id

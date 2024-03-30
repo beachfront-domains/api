@@ -4,6 +4,7 @@
 /// util
 
 import type { PaginationArgument } from "../pagination/schema.ts";
+import type { RecordType } from "../record/schema.ts";
 
 
 
@@ -50,6 +51,12 @@ export interface Domain {
   extension: string; /// ID of extension
   name: string;      /// format: `sld.extension` in ASCII
   owner: string;     /// ID of customer
+  record: {
+    name: string;
+    records: Array<string>;
+    ttl: number;
+    type: RecordType;
+  };
   status: DomainStatusCode;
   ///
   created: Date;
@@ -63,6 +70,12 @@ export interface DomainCreate {
     extension: string; /// ID of extension
     name: string;      /// format: `sld.extension` in ASCII
     owner?: string;    /// ID of customer
+    record?: {
+      name: string;
+      records: Array<string>;
+      ttl: number;
+      type: RecordType;
+    };
     status?: DomainStatusCode;
   }
 }
@@ -95,6 +108,12 @@ export interface DomainUpdate {
   updates: {
     expiry?: Date;
     owner?: string; /// ID of customer
+    record?: {
+      name: string;
+      records: Array<string>;
+      ttl: number;
+      type: RecordType;
+    };
     status?: DomainStatusCode;
   }
 }

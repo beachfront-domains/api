@@ -14,11 +14,13 @@ import {
   maxPaginationLimit,
   objectIsEmpty,
   orOperation,
+  personFromSession,
   stringTrim,
   validateUUID
 } from "src/utility/index.ts";
 
 import e from "dbschema";
+import { default as getRecords } from "../utility/get-record.ts";
 
 import type { Domain, DomainRequest, DomainsRequest } from "../schema.ts";
 
@@ -38,6 +40,13 @@ const thisFilePath = import.meta.filename;
 export async function get(_root, args: DomainRequest, ctx, _info?): StandardResponse {
   if (!await accessControl(ctx))
     return { detail: null };
+
+  const owner = await personFromSession(ctx);
+
+  if (!owner) {
+    log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
+    return { detail: null, error: { code: "TBA", message: "Authorization error" }};
+  }
 
   const { params } = args;
   const query = ({} as Domain);
@@ -70,16 +79,28 @@ export async function get(_root, args: DomainRequest, ctx, _info?): StandardResp
   /// existence check
   const doesDocumentExist = e.select(e.Domain, document => ({
     ...e.Domain["*"],
-    filter_single: orOperation(
-      e.op(document.id, "=", e.uuid(query.id)),
+    extension: e.Extension["*"],
+    owner: e.Customer["*"],
+    filter_single: e.any(e.set(
+      e.op(document.id, "?=", e.cast(e.uuid, query.id ?? e.set())),
+      // ^^ via https://discord.com/channels/841451783728529451/1218640180286591247/1219720674352828497
       e.op(document.name, "=", query.name)
-    )
+    ))
   }));
 
-  const existenceResult = await doesDocumentExist.run(client);
+  try {
+    const existenceResult = await doesDocumentExist.run(client);
 
-  if (existenceResult)
-    response = existenceResult;
+    if (existenceResult) {
+      if (existenceResult.owner.id !== owner.id)
+        return { detail: null };
+
+      response = existenceResult;
+      response.record = await getRecords(response.name);
+    }
+  } catch(error) {
+    console.log(error);
+  }
 
   return {
     detail: response

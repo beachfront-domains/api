@@ -10,6 +10,7 @@ export {
 } from "./constant.ts";
 
 export {
+  nameserverKey,
   serviceCoinmarketcap,
   serviceDictionary,
   serviceNinja,
@@ -33,6 +34,8 @@ export { uuidRegex, default as validateUUID } from "./validate/uuid.ts";
 export { validateDate } from "./validate/date.ts";
 export { validateDomain } from "./validate/domain.ts";
 export { zeroWidthRegex, default as validateZeroWidth } from "./validate/zero-width.ts";
+
+export const neuenic = "http://45.33.107.202:8081/api/v1/servers/localhost/zones";
 
 export type {
   DetailObject,
