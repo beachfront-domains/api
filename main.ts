@@ -8,11 +8,13 @@ import { GraphQLHTTP } from "dep/x/alpha.ts";
 import { makeExecutableSchema } from "dep/x/graphql-tools.ts";
 
 import {
-  Server,
+  // Server,
   green as shellGreen,
   magenta as shellMagenta,
   underline as shellUnderline
 } from "dep/std.ts";
+
+import { dedent } from "dep/x/dedent.ts";
 
 import cors from "https://deno.land/x/edge_cors/src/cors.ts"; // v0.2.1
 
@@ -35,11 +37,13 @@ const schema = makeExecutableSchema({
 
 /// program
 
+// await createDNS("test12.lynk");
+
 const meta = await getVersion();
 const packageVersion = meta.trim();
 const { port } = await checklist();
 
-const api = new Server({
+Deno.serve({
   handler: async(req) => {
     const { pathname } = new URL(req.url);
 
@@ -59,20 +63,20 @@ const api = new Server({
         url: "https://domains.beachfront/kb/developer"
       });
   },
+  hostname: "0.0.0.0",
+  onListen({ port }) {
+    console.log(
+      dedent`
+     ┌${repeatCharacter("─", 32)}┐
+     │ ${pad("BEACHFRONT API", 30)} │
+     │ ${shellGreen(pad(packageVersion, 30))} │
+     └${repeatCharacter("─", 32)}┘
+      LOCAL ${shellMagenta(`${shellUnderline(`0.0.0.0:${port}`)}`)}
+      `
+    );
+  },
   port
 });
-
-api.listenAndServe();
-
-console.log(
-  `
- ┌${repeatCharacter("─", 32)}┐
- │ ${pad("BEACHFRONT API", 30)} │
- │ ${shellGreen(pad(packageVersion, 30))} │
- └${repeatCharacter("─", 32)}┘
-  LOCAL ${shellMagenta(`${shellUnderline(`::1:${port}`)}`)}
-  `
-);
 
 
 
@@ -82,8 +86,7 @@ async function getVersion() {
   let version = "";
 
   try {
-    // await createDNS("super.lynk");
-    version = await Deno.readTextFileSync("./version.txt");
+    version = await Deno.readTextFile("./version.txt");
   } catch(_) {
     /// ignore
   }

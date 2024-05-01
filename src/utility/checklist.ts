@@ -18,10 +18,6 @@ const { bold: shellBold, red: shellRed } = colors;
 /// export
 
 export async function checklist() {
-  // TODO
-  // : check `Deno.args` for CLI overrides
-  // : priority -> CLI arguments > config file > `config` fallback in code
-
   const config = {
     database: "api",
     instance: "api",

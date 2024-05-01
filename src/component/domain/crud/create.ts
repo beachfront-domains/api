@@ -12,6 +12,7 @@ import {
   accessControl,
   client,
   personFromSession,
+  prettyFilePath,
   stringTrim
 } from "src/utility/index.ts";
 
@@ -22,16 +23,25 @@ import e from "dbschema";
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 import type { DomainCreate } from "../schema.ts";
 
-// const thisFilePath = "/src/component/domain/crud/create.ts";
-const thisFilePath = import.meta.filename;
+const thisFilePath = prettyFilePath(import.meta.filename);
 
 
 
 /// export
 
 export default async(_root, args: DomainCreate, ctx, _info?): StandardResponse => {
-  if (!await accessControl(ctx))
-    return { detail: null };
+  if (!await accessControl(ctx)) {
+    const message = "Authentication failed.";
+    log.warn(`[${thisFilePath}]› ${message}`);
+
+    return {
+      detail: null,
+      error: {
+        code: "TBA",
+        message
+      }
+    };
+  }
 
   const { params } = args;
   const query = ({} as Domain);
@@ -69,15 +79,29 @@ export default async(_root, args: DomainCreate, ctx, _info?): StandardResponse =
 
   /// vibe check
   if (!query.expiry || !query.extension || !query.name) {
-    const error = "Missing required parameter(s).";
-    log.warning(`[${thisFilePath}]› ${error}`);
-    return { detail: response }; // error: [{ code: "TBA", message: error }]
+    const message = "Missing required parameter(s).";
+    log.warn(`[${thisFilePath}]› ${message}`);
+
+    return {
+      detail: response,
+      error: {
+        code: "TBA",
+        message
+      }
+    };
   }
 
   if (!dotCheck(query.name)) {
-    const error = "Invalid domain.";
-    log.warning(`[${thisFilePath}]› ${error}`);
-    return { detail: response }; // error: [{ code: "TBA", message: error }]
+    const message = "Invalid domain.";
+    log.warn(`[${thisFilePath}]› ${message}`);
+
+    return {
+      detail: response,
+      error: {
+        code: "TBA",
+        message
+      }
+    };
   }
 
   const doesExtensionExist = e.select(e.Extension, extension => ({
@@ -88,13 +112,29 @@ export default async(_root, args: DomainCreate, ctx, _info?): StandardResponse =
   const extensionExistenceResult = await doesExtensionExist.run(client);
 
   if (!extensionExistenceResult) {
-    log.warning(`[${thisFilePath}]› Extension does not exist.`);
-    return { detail: response }; // error: [{ code: "TBA", message: error }]
+    const message = "Extension does not exist.";
+    log.warn(`[${thisFilePath}]› ${message}`);
+
+    return {
+      detail: response,
+      error: {
+        code: "TBA",
+        message
+      }
+    };
   }
 
   if (String(query.name).split(".")[1] !== toASCII(extensionExistenceResult.name)) {
-    log.warning(`[${thisFilePath}]› Domain does not match extension ID.`);
-    return { detail: response }; // error: [{ code: "TBA", message: error }]
+    const message = "Domain does not match extension ID.";
+    log.warn(`[${thisFilePath}]› ${message}`);
+
+    return {
+      detail: response,
+      error: {
+        code: "TBA",
+        message
+      }
+    };
   }
 
   const doesDocumentExist = e.select(e.Domain, domain => ({
@@ -105,7 +145,7 @@ export default async(_root, args: DomainCreate, ctx, _info?): StandardResponse =
   const existenceResult = await doesDocumentExist.run(client);
 
   if (existenceResult) {
-    log.warning(`[${thisFilePath}]› Existing document returned.`);
+    log.warn(`[${thisFilePath}]› Existing document returned.`);
     return { detail: existenceResult }; /// document exists, return it
   }
 
@@ -113,8 +153,16 @@ export default async(_root, args: DomainCreate, ctx, _info?): StandardResponse =
     const owner = await personFromSession(ctx);
 
     if (!owner) {
-      log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
-      return { detail: response }; // error: [{ code: "TBA", message: error }]
+      const message = "THIS ERROR SHOULD NEVER BE REACHED.";
+      log.warn(`[${thisFilePath}]› ${message}`);
+
+      return {
+        detail: response,
+        error: {
+          code: "TBA",
+          message
+        }
+      };
     }
 
     const newDocument = e.insert(e.Domain, {

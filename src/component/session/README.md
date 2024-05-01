@@ -27,7 +27,6 @@ mutation CreateSession($params: SessionInput) {
       device
       expires
       for {
-        avatar
         created
         email
         id
@@ -83,7 +82,6 @@ query GetSession($params: SessionQuery) {
       device
       expires
       for {
-        avatar
         created
         email
         id
@@ -145,7 +143,6 @@ query GetSessions($params: SessionsQuery, $pagination: PaginationOptions) {
       device
       expires
       for {
-        avatar
         created
         email
         id
@@ -212,7 +209,6 @@ mutation UpdateSession($params: SessionQuery, $updates: SessionInput) {
       device
       expires
       for {
-        avatar
         created
         email
         id

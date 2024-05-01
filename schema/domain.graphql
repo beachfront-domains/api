@@ -114,6 +114,11 @@ type DomainsResponse {
 #
 
 input DomainRecordInput {
+  """
+  Available actions are:
+  create, delete, and update
+  """
+  action: String
   content: String
   name: String
   # records: [String]

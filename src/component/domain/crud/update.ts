@@ -12,6 +12,7 @@ import {
   client,
   objectIsEmpty,
   // personFromSession,
+  prettyFilePath,
   stringTrim,
   validateDate
 } from "src/utility/index.ts";
@@ -25,7 +26,7 @@ import { default as updateRecord } from "../utility/update-record.ts";
 import type { DetailObject, LooseObject, StandardResponse } from "src/utility/index.ts";
 import type { DomainUpdate } from "../schema.ts";
 
-const thisFilePath = import.meta.filename;
+const thisFilePath = prettyFilePath(import.meta.filename);
 
 
 
@@ -34,7 +35,7 @@ const thisFilePath = import.meta.filename;
 export default async(_root, args: DomainUpdate, ctx, _info?): StandardResponse => {
   if (!await accessControl(ctx)) {
     const message = "Authentication failed.";
-    log.warning(`[${thisFilePath}]› ${message}`);
+    log.warn(`[${thisFilePath}]› ${message}`);
 
     return {
       detail: null,
@@ -48,15 +49,18 @@ export default async(_root, args: DomainUpdate, ctx, _info?): StandardResponse =
   // const owner = await personFromSession(ctx);
 
   // if (!owner) {
-  //   log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
+  //   log.warn(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
   //   return { detail: null, error: { code: "TBA", message: "Authorization error" }};
   // }
+
+  // TODO
+  // : ensure authenticated person has ownership of domain
 
   const { params, updates } = args;
 
   if (objectIsEmpty(params) || objectIsEmpty(updates)) {
     const message = "Missing required parameter(s).";
-    log.warning(`[${thisFilePath}]› ${message}`);
+    log.warn(`[${thisFilePath}]› ${message}`);
 
     return {
       detail: null,
@@ -107,7 +111,7 @@ export default async(_root, args: DomainUpdate, ctx, _info?): StandardResponse =
   /// vibe check
   if (updates.expiry && !query.expiry || updates.status && !query.status) {
     const message = "Vibe check failed.";
-    log.warning(`[${thisFilePath}]› ${message}`);
+    log.warn(`[${thisFilePath}]› ${message}`);
 
     return {
       detail: response,
@@ -130,7 +134,7 @@ export default async(_root, args: DomainUpdate, ctx, _info?): StandardResponse =
 
     if (!customerExistenceResult) {
       const message = "Cannot update, customer does not exist.";
-      log.warning(`[${thisFilePath}]› ${message}`);
+      log.warn(`[${thisFilePath}]› ${message}`);
 
       return {
         detail: response,
@@ -159,7 +163,7 @@ export default async(_root, args: DomainUpdate, ctx, _info?): StandardResponse =
 
   if (!existenceResult) {
     const message = "Cannot update nonexistent document.";
-    log.warning(`[${thisFilePath}]› ${message}`);
+    log.warn(`[${thisFilePath}]› ${message}`);
 
     return {
       detail: response,
@@ -170,29 +174,14 @@ export default async(_root, args: DomainUpdate, ctx, _info?): StandardResponse =
     };
   }
 
-  /// NOTE
-  /// : Updating a domain record is done in a different database; Postgres, via PowerDNS (external API)
-
   if (query.record) {
-    // TODO
-    // : add `hostname` to options
+    /// NOTE
+    /// : Updating a domain record is done in a different database; Postgres, via PowerDNS (external API)
 
-    // existenceResult.record = await getRecords(response.name);
-    // return { detail: existenceResult };
-    // return { detail: response };
-
-    log.info(query.record);
+    query.record.hostname = query.record.name;
+    query.record.name = existenceResult.name;
 
     try {
-      // const records = await updateRecord(query.record);
-      // response = existenceResult
-      // response.record = records;
-      // console.log(records);
-      // console.log(response);
-
-      query.record.hostname = query.record.name;
-      query.record.name = existenceResult.name;
-
       await updateRecord(query.record);
 
       response = existenceResult;
@@ -200,24 +189,17 @@ export default async(_root, args: DomainUpdate, ctx, _info?): StandardResponse =
 
       return { detail: response };
     } catch(exception) {
-      log.error(">>> womp");
-      log.error(exception);
+      log.error(`[${thisFilePath}]› ${exception}`);
 
       return {
         detail: response,
         error: {
           code: "TBA",
-          message: "idk yet"
+          message: "Issue updating DNS record."
         }
       };
     }
   }
-
-  // curl -X PATCH \
-  //   "http://localhost:8008/api/v1/servers/localhost/zones/example.org." \
-  //   -H "Content-Type: application/json" \
-  //   -H "X-API-Key: 1P@ssw0rd\!" \
-  //   --data '{"rrsets": [{"name": "test.example.org.", "type": "A", "ttl": 3600, "changetype": "REPLACE", "records": [{"content": "192.168.0.5", "disabled": false}]}]}'
 
   try {
     const updateQuery = e.update(e.Domain, document => ({

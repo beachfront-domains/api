@@ -49,7 +49,11 @@ function processRecords(records: Array<any>): Array<any> {
   const processedRecords = [];
 
   for (const record of records) {
-    processedRecords.push(record.content);
+    processedRecords.push(
+      /// NOTE
+      /// : PowerDNS requires/adds quotes around TXT records…we don't need/want them though
+      record.content.replace(/"/g, "")
+    );
   }
 
   return processedRecords;

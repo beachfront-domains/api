@@ -8,9 +8,14 @@ import { wretch } from "dep/x/wretch.ts";
 
 /// util
 
-import { nameserverKey, neuenic } from "src/utility/index.ts";
+import {
+  GOLFER,
+  nameserverKey,
+  neuenic,
+  prettyFilePath
+} from "src/utility/index.ts";
 
-const thisFilePath = import.meta.filename;
+const thisFilePath = prettyFilePath(import.meta.filename);
 
 
 
@@ -29,6 +34,7 @@ export default async(domain: string) => {
   // : add TLSA record
   // : increase serial
   // : rectify zone
+  // : CATCH ERRORS SO THEY BUBBLE UP, NOT BLOCK
 
   async function getDS() {
     try {
@@ -49,8 +55,15 @@ export default async(domain: string) => {
   }
 
   async function getTLSA() {
+    // http://50.116.2.11:3699/api
+    // curl -d '{ "domain": "test2.lynk", "ip": "50.116.2.11" }' -H "Content-Type: application/json" -H "Authorization: Bearer TOKEN" -X POST http://localhost:3699/api
+    // console.log("trying tlsa...");
     try {
-      const { tlsa } = await wretch(`https://acme.htools.work/tlsa/${domain}`).get().json();
+      // const { tlsa } = await wretch(`https://acme.htools.work/tlsa/${domain}`).get().json();
+      const { tlsa } = await wretch("http://50.116.2.11:3699/api", { headers: { "Authorization": `Bearer ${GOLFER}` }})
+        .post({ domain, ip: "50.116.2.11" })
+        .json();
+      // console.log(tlsa);
       return tlsa;
     } catch(error) {
       console.log(">>> getTLSA");
@@ -188,7 +201,8 @@ export default async(domain: string) => {
               changetype: "REPLACE",
               name: `${domain}.`,
               records: [{
-                content: `${domain}. hostmaster.${domain}. 0 10800 3600 604800 150`,
+                // content: `${domain}. hostmaster.${domain}. 0 10800 3600 604800 150`,
+                content: `${domain}. hostmaster.${domain}. 0 90 3600 3700 150`,
                 disabled: false
               }],
               type: "SOA",
