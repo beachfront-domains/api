@@ -4,7 +4,6 @@
 /// import
 
 import { log } from "dep/std.ts";
-// import { Resend } from "dep/x/resend.ts";
 
 /// util
 
@@ -18,7 +17,6 @@ import {
 } from "src/utility/index.ts";
 
 import e from "dbschema";
-// import { serviceResend } from "src/utility/env.ts";
 
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 import type { LoginCreate } from "../schema.ts";
@@ -125,10 +123,6 @@ export default async(_root, args: LoginCreate, _ctx?, _info?): StandardResponse 
     response = await databaseQuery.run(client);
 
     const loginLink = `${appURL}/access?${response.token}`;
-    // const resend = new Resend(serviceResend);
-    console.log(">>> wtf");
-    console.log(appURL);
-    console.log(loginLink);
 
     const emailBody = `
       <p>Hey!</p>

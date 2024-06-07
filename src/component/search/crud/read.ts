@@ -32,6 +32,8 @@ import type { SearchRequest, SearchResult } from "../schema.ts";
 const thisFilePath = import.meta.filename;
 
 import getPricing from "../utility/domain-pricing.ts";
+import premiumDomains from "../utility/premium.ts";
+import prohibitedDomains from "../utility/prohibited.ts";
 import removeVowels from "../utility/remove-vowels.ts";
 import sentimentAnalysis from "../utility/sentiment.ts";
 import thesaurus from "../utility/thesaurus.ts";
@@ -70,9 +72,6 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
   // : cache result of this search for later retrieval...but what about domain availability?
   //   : that could change at any time
 
-  /// NOTE
-  /// `name` is a required param (for now)
-
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "name": {
@@ -98,7 +97,7 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
           return char;
         }
 
-        return char.replace(specialCharactersRegex, '');
+        return char.replace(specialCharactersRegex, "");
     };
 
     // Process each character in the string
@@ -146,6 +145,11 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
     query.sld = query.name.split(".")[0];
   } else {
     query.sld = query.name;
+  }
+
+  if (prohibitedDomains.includes(query.sld)) {
+    log.warn(`[${thisFilePath}]› Prohibited domain`);
+    return { detail: results };
   }
 
   if (query.extension && query.extension.length < 3) {
@@ -517,6 +521,9 @@ async function findDomain(suppliedDomain: string) {
     if (premiumSLD === sld)
       isPremium = 1;
   });
+
+  if (premiumDomains.includes(sld))
+    isPremium = 1;
 
   /// Grab TLD pricing
   const { priceUSD } = await getPricing({ extension, premium: isPremium, sld, tier: String(tier) });

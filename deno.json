@@ -9,6 +9,7 @@
       "exclude": ["no-explicit-any"]
     }
   },
+  "lock": false,
   "tasks": {
     "dev": "deno run --allow-env --allow-net --allow-read --allow-run --allow-write main.ts development",
     "import": "deno run --allow-env --allow-net --allow-read import.ts",

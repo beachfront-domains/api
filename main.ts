@@ -4,7 +4,10 @@
 /// import
 
 // import { default as createDNS } from "src/component/domain/utility/create-dns.ts";
-import { cors } from "jsr:/@http/interceptor@0.13.0/cors";
+import { cors } from "jsr:/@http/interceptor@0.14.0/cors";
+import { intercept } from "jsr:/@http/interceptor@0.14.0/intercept";
+import { STATUS_CODE } from "https://deno.land/std@0.224.0/http/status.ts";
+
 import { GraphQLHTTP } from "dep/x/alpha.ts";
 import { makeExecutableSchema } from "dep/x/graphql-tools.ts";
 
@@ -16,8 +19,6 @@ import {
 } from "dep/std.ts";
 
 import { dedent } from "dep/x/dedent.ts";
-
-// import cors from "https://deno.land/x/edge_cors/src/cors.ts"; // v0.2.1
 
 /// util
 
@@ -44,56 +45,17 @@ const meta = await getVersion();
 const packageVersion = meta.trim();
 const { port } = await checklist();
 
-// const server = Deno.serve({ port: port() },
-//   intercept(
-//     () => new Response("Hello"),
-//     cors(),
-//   ),
-// ) as Deno.HttpServer;
-
 Deno.serve({
-  handler: async(req) => {
-    // if (req.method == "OPTIONS") {
-    //   const resp = new Response(null, { status: 204 });
-    //   const origin = req.headers.get("Origin") || "*";
-    //   const headers = resp.headers;
-
-    //   headers.set("Access-Control-Allow-Origin", origin);
-    //   headers.set("Access-Control-Allow-Methods", "*");
-
-    //   return resp;
-    // }
-
-    // console.log(req.headers);
-    // console.log("—");
-    // const origin = req.headers.get("Origin") || "*";
-    // const resp = await ctx.next();
-    // const headers = resp.headers;
-
-    // headers.set("Access-Control-Allow-Origin", origin);
-    // headers.set("Access-Control-Allow-Credentials", "true");
-
-    // headers.set(
-    //   "Access-Control-Allow-Headers",
-    //   "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With"
-    // );
-
-    // headers.set(
-    //   "Access-Control-Allow-Methods",
-    //   "POST, OPTIONS, GET, PUT, DELETE"
-    // );
-
+  handler: intercept(async(req) => {
     const { pathname } = new URL(req.url);
 
+    if (req.method === "OPTIONS") {
+      return new Response(null, {
+        status: STATUS_CODE.NoContent
+      });
+    }
+
     return pathname === "/graphql" ?
-      // cors(req, await GraphQLHTTP<Request>({
-      //   context: request => ({
-      //     request,
-      //     "x-session": new Headers(req.headers).get("authorization")
-      //   }),
-      //   graphiql: isDevelopment,
-      //   schema
-      // })(req)) :
       await GraphQLHTTP<Request>({
         context: request => ({
           request,
@@ -108,7 +70,7 @@ Deno.serve({
         title: "Not Acceptable",
         url: "https://domains.beachfront/kb/developer"
       });
-  },
+  }, cors({ allowOrigin: isDevelopment ? "*" : "https://beachfront.domains" })),
   hostname: "0.0.0.0",
   onListen({ port }) {
     console.log(
@@ -123,7 +85,7 @@ Deno.serve({
     );
   },
   port
-}, cors());
+}) as Deno.HttpServer;
 
 
 
