@@ -56,7 +56,7 @@ export async function get(_root, args: OrderRequest, ctx, _info?): StandardRespo
   /// vibe check
   if (!query.id || !validateUUID(query.id)) {
     const error = "Missing required parameter(s).";
-    log.warning(`[${thisFilePath}]› ${error}`);
+    log.warn(`[${thisFilePath}]› ${error}`);
     return { detail: response, error: { code: "TBA", message: error }};
   }
 
@@ -97,7 +97,7 @@ export async function getMore(_root, args: Partial<OrdersRequest>, ctx, _info?):
   let response: Array<any> | null = null; // Array<DetailObject>
 
   if (objectIsEmpty(params)) {
-    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    log.warn(`[${thisFilePath}]› Missing required parameter(s).`);
     return emptyResponse;
   }
 

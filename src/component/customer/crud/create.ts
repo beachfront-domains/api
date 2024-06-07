@@ -92,7 +92,7 @@ export default async(_root, args: CustomerCreate, ctx, _info?): StandardResponse
   /// vibe check
   if (query.email.length === 0) {
     const error = "Missing required parameter(s).";
-    log.warning(`[${thisFilePath}]› ${error}`);
+    log.warn(`[${thisFilePath}]› ${error}`);
     return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
@@ -104,7 +104,7 @@ export default async(_root, args: CustomerCreate, ctx, _info?): StandardResponse
   const existenceResult = await doesDocumentExist.run(client);
 
   if (existenceResult) {
-    log.warning(`[${thisFilePath}]› Existing document returned.`);
+    log.warn(`[${thisFilePath}]› Existing document returned.`);
     return { detail: existenceResult }; /// document exists, return it
   }
 

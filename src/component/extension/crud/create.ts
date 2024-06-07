@@ -69,7 +69,7 @@ export default async(_root, args: ExtensionCreate, ctx, _info?): StandardRespons
   /// vibe check
   if (!query.name || !query.registry) {
     const error = "Missing required parameter(s).";
-    log.warning(`[${thisFilePath}]› ${error}`);
+    log.warn(`[${thisFilePath}]› ${error}`);
     return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
@@ -81,7 +81,7 @@ export default async(_root, args: ExtensionCreate, ctx, _info?): StandardRespons
   const existenceResult = await doesDocumentExist.run(client);
 
   if (existenceResult) {
-    log.warning(`[${thisFilePath}]› Existing document returned.`);
+    log.warn(`[${thisFilePath}]› Existing document returned.`);
     return { detail: existenceResult }; /// document exists, return it
   }
 

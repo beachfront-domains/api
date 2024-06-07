@@ -58,7 +58,7 @@ export default async(_root, args: BagCreate, ctx, _info?): StandardResponse => {
 
   if (!query.customer && !query.bag) {
     const error = "Missing required parameter(s).";
-    log.warning(`[${thisFilePath}]› ${error}`);
+    log.warn(`[${thisFilePath}]› ${error}`);
     return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 

@@ -8,5 +8,10 @@
     "rules": {
       "exclude": ["no-explicit-any"]
     }
+  },
+  "tasks": {
+    "dev": "deno run --allow-env --allow-net --allow-read --allow-run --allow-write main.ts development",
+    "import": "deno run --allow-env --allow-net --allow-read import.ts",
+    "start": "deno run --allow-env --allow-net --allow-read --allow-run --allow-write main.ts"
   }
 }

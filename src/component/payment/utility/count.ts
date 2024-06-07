@@ -28,7 +28,7 @@ export default async(): Promise<number> => {
 
     documentCount = response.length;
   } catch(_) {
-    log.warning(`[${thisFilePath}]› Error retrieving document count.`);
+    log.warn(`[${thisFilePath}]› Error retrieving document count.`);
   }
 
   return documentCount;

@@ -48,6 +48,7 @@ module default {
     bag: array<tuple<
       duration: int16,
       name: str,
+      paired: array<str>,
       premium: int16,
       price: str,
       tier: ExtensionTier

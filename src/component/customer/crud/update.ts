@@ -40,7 +40,7 @@ export default async(_root, args: CustomerUpdate, ctx, _info?): StandardResponse
   const { params, updates } = args;
 
   if (objectIsEmpty(params) || objectIsEmpty(updates)) {
-    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    log.warn(`[${thisFilePath}]› Missing required parameter(s).`);
     return { detail: null };
   }
 
@@ -91,7 +91,7 @@ export default async(_root, args: CustomerUpdate, ctx, _info?): StandardResponse
     updates.loginMethod && !query.loginMethod ||
     updates.role && !query.role
   ) {
-    log.warning(`[${thisFilePath}]› Vibe check failed.`);
+    log.warn(`[${thisFilePath}]› Vibe check failed.`);
     return { detail: response };
   }
 
@@ -103,7 +103,7 @@ export default async(_root, args: CustomerUpdate, ctx, _info?): StandardResponse
     const existenceResult = await doesDocumentExist.run(client);
 
     if (existenceResult) {
-      log.warning(`[${thisFilePath}]› Cannot update, email in use.`);
+      log.warn(`[${thisFilePath}]› Cannot update, email in use.`);
       return { detail: response };
     }
   }
@@ -116,7 +116,7 @@ export default async(_root, args: CustomerUpdate, ctx, _info?): StandardResponse
     const existenceResult = await doesDocumentExist.run(client);
 
     if (existenceResult) {
-      log.warning(`[${thisFilePath}]› Cannot update, username in use.`);
+      log.warn(`[${thisFilePath}]› Cannot update, username in use.`);
       return { detail: response };
     }
 
@@ -145,7 +145,7 @@ export default async(_root, args: CustomerUpdate, ctx, _info?): StandardResponse
   const existenceResult = await doesDocumentExist.run(client);
 
   if (!existenceResult) {
-    log.warning(`[${thisFilePath}]› Cannot update nonexistent document.`);
+    log.warn(`[${thisFilePath}]› Cannot update nonexistent document.`);
     return { detail: response };
   }
 

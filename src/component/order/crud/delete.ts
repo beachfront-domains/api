@@ -48,7 +48,7 @@ export default async(_root, args: OrderRequest, ctx, _info?): StandardBooleanRes
   /// vibe check
   if (!query.id || !validateUUID(query.id)) {
     const error = "Missing required parameter(s).";
-    log.warning(`[${thisFilePath}]› ${error}`);
+    log.warn(`[${thisFilePath}]› ${error}`);
     return { success: false };
   }
 
@@ -60,7 +60,7 @@ export default async(_root, args: OrderRequest, ctx, _info?): StandardBooleanRes
   const existenceResult = await doesDocumentExist.run(client);
 
   if (!existenceResult) {
-    log.warning(`[${thisFilePath}]› Cannot delete nonexistent document.`);
+    log.warn(`[${thisFilePath}]› Cannot delete nonexistent document.`);
     return { success: true };
   }
 

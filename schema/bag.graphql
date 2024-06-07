@@ -11,6 +11,7 @@ type BagItem {
   """
   duration: Int
   name: String
+  paired: [String]
   premium: Int
   price: String
   tier: Tier
@@ -49,6 +50,7 @@ type BagsResponse {
 input BagItemInput {
   duration: Int
   name: String
+  paired: [String]
   premium: Int
   price: String
   tier: Tier

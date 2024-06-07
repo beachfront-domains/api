@@ -54,7 +54,7 @@ export default async(_root, args: ExtensionRequest, ctx, _info?): StandardBoolea
   const existenceResult = await doesDocumentExist.run(client);
 
   if (!existenceResult) {
-    log.warning(`[${thisFilePath}]› Cannot delete nonexistent document.`);
+    log.warn(`[${thisFilePath}]› Cannot delete nonexistent document.`);
     return { success: true };
   }
 
@@ -70,7 +70,7 @@ export default async(_root, args: ExtensionRequest, ctx, _info?): StandardBoolea
   const domainExistenceResult = await doDomainsExist.run(client);
 
   if (!domainExistenceResult) {
-    log.warning(`[${thisFilePath}]› Error deleting extension, at least one domain exists.`);
+    log.warn(`[${thisFilePath}]› Error deleting extension, at least one domain exists.`);
     return { success: false };
   }
 

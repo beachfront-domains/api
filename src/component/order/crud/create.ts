@@ -29,7 +29,7 @@ import type { BagItem } from "../../bag/schema.ts";
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 import type { Order, OrderCreate } from "../schema.ts";
 
-const appURL = "http://localhost:2513";
+const appURL = "http://localhost:2513"; // TODO: change this
 const thisFilePath = import.meta.filename;
 
 
@@ -99,7 +99,7 @@ export default async(_root, args: OrderCreate, ctx, _info?): StandardResponse =>
 
   if (!customerExistenceResult) {
     const error = "Customer does not exist.";
-    log.warning(`[${thisFilePath}]› ${error}`);
+    log.warn(`[${thisFilePath}]› ${error}`);
     return { detail: response, error: { code: "TBA", message: error }};
   }
 
@@ -112,13 +112,13 @@ export default async(_root, args: OrderCreate, ctx, _info?): StandardResponse =>
 
   if (!bagExistenceResult) {
     const error = "Bag does not exist.";
-    log.warning(`[${thisFilePath}]› ${error}`);
+    log.warn(`[${thisFilePath}]› ${error}`);
     return { detail: response, error: { code: "TBA", message: error }};
   }
 
   // if (bagExistenceResult.bag.length < 1) {
   //   const error = "How did this happen? Checking out with an empty bag?!";
-  //   log.warning(`[${thisFilePath}]› ${error}`);
+  //   log.warn(`[${thisFilePath}]› ${error}`);
   //   return { detail: response, error: { code: "TBA", message: error }};
   // }
 
@@ -320,7 +320,7 @@ async function createDomains(data: { domains: Array<BagItem>, owner: string }) {
     const extensionExistenceResult = await doesExtensionExist.run(client);
 
     if (!extensionExistenceResult) {
-      log.warning(`[${thisFilePath}]› Extension does not exist.`);
+      log.warn(`[${thisFilePath}]› Extension does not exist.`);
       return null;
     }
 
@@ -332,7 +332,7 @@ async function createDomains(data: { domains: Array<BagItem>, owner: string }) {
     const customerExistenceResult = await doesCustomerExist.run(client);
 
     if (!customerExistenceResult) {
-      log.warning(`[${thisFilePath}]› Customer does not exist.`);
+      log.warn(`[${thisFilePath}]› Customer does not exist.`);
       return null;
     }
 
@@ -344,7 +344,7 @@ async function createDomains(data: { domains: Array<BagItem>, owner: string }) {
     const domainExistenceResult = await doesDomainExist.run(client);
 
     if (domainExistenceResult) {
-      log.warning(`[${thisFilePath}]› Domain exists.`);
+      log.warn(`[${thisFilePath}]› Domain exists.`);
       return null;
     }
 
@@ -404,7 +404,7 @@ function vibeCheck(query: Order): void | DetailObject {
 
   if (errors.length > 0) {
     const error = `Missing or invalid required parameter(s): ${errors.join(", ")}.`;
-    log.warning(`[${thisFilePath}]› ${error}`);
+    log.warn(`[${thisFilePath}]› ${error}`);
     return { detail: null, error: { code: "TBA", message: error }};
   }
 }

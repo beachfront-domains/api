@@ -10,10 +10,10 @@ import { toASCII } from "dep/x/tr46.ts";
 /// util
 
 import {
-  // accessControl,
   client,
   hnsPrice,
-  // log,
+  isValidDomain,
+  isValidSLD,
   // maxPaginationLimit,
   objectIsEmpty,
   personFromSession,
@@ -22,9 +22,8 @@ import {
   validateZeroWidth
 } from "src/utility/index.ts";
 
-import tlds from "src/utility/tlds.ts";
-
 import e from "dbschema";
+import { phase1 as tlds } from "src/utility/tlds.ts";
 
 import type { LooseObject /*, SearchResponse*/ } from "src/utility/index.ts";
 import type { Extension } from "../../extension/schema.ts";
@@ -32,7 +31,6 @@ import type { SearchRequest, SearchResult } from "../schema.ts";
 
 const thisFilePath = import.meta.filename;
 
-// import dictionary from "../utility/dictionary.ts";
 import getPricing from "../utility/domain-pricing.ts";
 import removeVowels from "../utility/remove-vowels.ts";
 import sentimentAnalysis from "../utility/sentiment.ts";
@@ -64,7 +62,7 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
   const vowelessResult = ([] as SearchResult[]);
 
   if (!params || objectIsEmpty(params)) {
-    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    log.warn(`[${thisFilePath}]› Missing required parameter(s).`);
     return { detail: results, viewer: owner };
   }
 
@@ -78,11 +76,7 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
       case "name": {
-        query[key] = toASCII(         /// remove ambiguity
-          String(
-            stringTrim(String(value)) /// remove excess
-          ).replace(/\s/g, "")        /// remove spaces
-        );
+        query[key] = toASCII(removeSpecialCharacters(String(value)));
         break;
       }
 
@@ -91,16 +85,48 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
     }
   });
 
+  function removeSpecialCharacters(input: string) {
+    // Variable to track if the first period has been encountered
+    let firstPeriodEncountered = false;
+
+    // Function to replace special characters except for allowed patterns
+    const replaceSpecialCharacters = (char: string): string => {
+        const specialCharactersRegex = /(?<!x)n--|[^a-zA-Z0-9\s\-:;().]/g;
+
+        if (char === "." && !firstPeriodEncountered) {
+          firstPeriodEncountered = true;
+          return char;
+        }
+
+        return char.replace(specialCharactersRegex, '');
+    };
+
+    // Process each character in the string
+    let result = "";
+
+    for (const char of input) {
+      result += replaceSpecialCharacters(char);
+    }
+
+    return result;
+
+    /// via ChatGPT 4o
+  }
+
+  // console.log(">>> query");
+  // console.log(query);
+
   /// vibe check
   switch(true) {
     case !query.name:
     case query.name && query.name.length === 0: {
-      log.warning(`[${thisFilePath}]› Vibe check failed.`);
+      log.warn(`[${thisFilePath}]› Vibe check failed.`);
       return { detail: results, viewer: owner };
     }
 
+    case query.name && !isValidSLD(query.name.split(".")[0]):
     case query.name && validateZeroWidth(query.name): {
-      log.warning(`[${thisFilePath}]› Query contains invalid characters.`);
+      log.warn(`[${thisFilePath}]› Query contains invalid characters.`);
       return { detail: results, viewer: owner };
     }
 
@@ -112,7 +138,7 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
     if (query.name.split(".").length !== 2) {
       // TODO
       // : should we silently ignore this error?
-      log.warning(`[${thisFilePath}]› Too many dots.`);
+      log.warn(`[${thisFilePath}]› Too many dots.`);
       return { detail: results };
     }
 
@@ -125,7 +151,7 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
   if (query.extension && query.extension.length < 3) {
     /// NOTE
     /// `ani` is the shortest extension we own
-    log.warning(`[${thisFilePath}]› Invalid extension.\n${query.extension}/`);
+    log.warn(`[${thisFilePath}]› Invalid extension.\n${query.extension}/`);
     return { detail: results, viewer: owner };
   }
 
@@ -143,6 +169,8 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
         created,
         extension,
         name: domain,
+        pair: 0,
+        paired: [],
         premium,
         priceHNS: __formatHNS(priceUSD, hns),
         priceUSD
@@ -160,7 +188,7 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
   const extensionExistenceResult = await doesExtensionExist.run(client);
 
   if (!extensionExistenceResult) {
-    log.warning(`[${thisFilePath}]› Extension does not exist.\n${query.extension}/`);
+    log.warn(`[${thisFilePath}]› Extension does not exist.\n${query.extension}/`);
     return { detail: results, viewer: owner };
   }
 
@@ -185,7 +213,7 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
   //     if (sentiment === "negative")
   //       return { detail: results };
   //   } catch(error) {
-  //     log.warning(`[${thisFilePath}]› Error analyzing sentiment.`);
+  //     log.warn(`[${thisFilePath}]› Error analyzing sentiment.`);
   //     log.error(error);
 
   //     return { detail: results };
@@ -200,7 +228,17 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
   /// : in UI, add sparkle to pair results
 
   if (pairs && pairs.length > 0) {
-    pairs.forEach(async(pair) => {
+    let formattedPairs = [];
+
+    /// TODO
+    /// : fix `pairs` in EdgeDB database to properly do an array of extensions
+
+    if (pairs[0].includes(","))
+      pairs[0].split(",").map(pair => formattedPairs.push(pair.trim()));
+    else
+      formattedPairs = pairs;
+
+    formattedPairs.map(async(pair) => {
       const domain = `${query.sld}.${pair}`;
       const searchResult = await findDomain(domain);
       const hns = await hnsPrice();
@@ -209,18 +247,18 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
         return;
 
       const { available, created, premium, priceUSD } = searchResult;
-
-      /// TODO
-      /// : add `pair` key, boolean
+      const hammockPrice = (priceUSD / 2).toFixed(2);
 
       pairResults.push({
         available,
         created,
         extension: extensionExists,
         name: domain,
+        pair: 1,
+        paired: [],
         premium,
-        priceHNS: __formatHNS(priceUSD, hns),
-        priceUSD
+        priceHNS: __formatHNS(hammockPrice, hns),
+        priceUSD: hammockPrice
       });
     });
   }
@@ -266,7 +304,7 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
       console.info(query);
       console.groupEnd();
 
-      log.warning(`[${thisFilePath}]› How the heck did this occur?`);
+      log.warn(`[${thisFilePath}]› How the heck did this occur?`);
       return { detail: results, viewer: owner };
     }
 
@@ -277,6 +315,8 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
       created,
       extension: extensionExists,
       name: domain,
+      pair: 0,
+      paired: [],
       premium,
       priceHNS: __formatHNS(priceUSD, hns),
       priceUSD
@@ -301,6 +341,8 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
             created,
             extension: extensionExists,
             name: domainSansVowels,
+            pair: 0,
+            paired: [],
             premium,
             priceHNS: __formatHNS(priceUSD, hns),
             priceUSD
@@ -348,6 +390,10 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
     // : save results to database with an ID
     //   - send ID with response, so pagination can work
 
+    pairResults.map(pair => {
+      results[0].paired.push(pair.name);
+    });
+
     return {
       detail: [
         // TODO
@@ -373,7 +419,7 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
 
     const { source } = error;
 
-    log.warning(`[${thisFilePath}]› Error retrieving search results.`);
+    log.warn(`[${thisFilePath}]› Error retrieving search results.`);
     log.error(Object.keys(error));
     // log.error(error);
     log.error(source);
@@ -385,57 +431,6 @@ export default async(_root, args: SearchRequest, ctx, _info?) => {
 
 
 /// helper
-
-// async function __rawNeighborSearch(suppliedTLD: string): Promise<string[]> {
-//   const databaseConnection = await r.connect(databaseParams);
-//   let relatedTLDs: string[] = [];
-
-//   /// We expect a TLD to be supplied
-//   if (!suppliedTLD) {
-//     databaseConnection.close();
-//     return relatedTLDs;
-//   }
-
-//   // TODO
-//   // : search registry API for `collection`
-
-//   // gotql.query('mygraphqlendpoint.com.br/api', query, options)
-//   //   .then(response => console.log(response.data))
-//   //   .catch(console.error)
-
-//   let baseQuery: LooseObject = await r.table(tldDatabase)
-//     .filter({ name: suppliedTLD })
-//     .run(databaseConnection);
-
-//   baseQuery = baseQuery[0];
-
-//   /// TLD does not exist
-//   if (!baseQuery)
-//     return relatedTLDs;
-
-//   const { collection } = baseQuery;
-
-//   const tldQuery: LooseObject = await r.table(tldDatabase)
-//     .orderBy({ index: r.asc("name") })
-//     .filter((row: RDatum) => {
-//       return row("collection")
-//         .contains(collection[0])
-//         .or(row("collection").contains(collection[1]))
-//         .or(row("collection").contains(collection[2]))
-//         .or(row("collection").contains(collection[3]));
-//         /// ^ these extra "or"s silently fail, huzzah!
-//     })
-//     .pluck("name")
-//     .run(databaseConnection);
-
-//   tldQuery.map((tld: LooseObject) => {
-//     relatedTLDs.push(tld.name); /// or ascii?
-//   });
-
-//   relatedTLDs = [...new Set(relatedTLDs)]; /// remove possible duplicates
-
-//   return relatedTLDs;
-// }
 
 async function createCollection(suppliedArray: string[], suppliedExtension: string, hnsPrice: number) {
   const names: SearchResult[] = [];
@@ -463,6 +458,8 @@ async function createCollection(suppliedArray: string[], suppliedExtension: stri
       created,
       extension,
       name: toASCII(domain),
+      pair: 0,
+      paired: [],
       premium,
       priceHNS: __formatHNS(priceUSD, hnsPrice),
       priceUSD
@@ -475,36 +472,9 @@ async function createCollection(suppliedArray: string[], suppliedExtension: stri
   return [...new Set(names)]; /// remove duplicates
 }
 
-// TODO
-// : create function that takes an SLD and applies it to 25 random TLDs
-// : randomize the final list as well
-
-function isValidDomain(domain: string) {
-  /// TODO
-  /// : add to utility.ts
-
-  const domainRegex = /^(?!-)([A-Za-z0-9-\p{Emoji}]{1,63}(?<!-)\.?)+(0x01|0xa0|acapella|acappella|adults|afrobeat|afrohaus|airhead|airtime|alladat|ani|antifascist|aperitif|apocalypse|architech|astre|astres|astronautica|astronautical|await|backend|balaklava|bald|baldy|ballpoint|banjo|baremetal|bareserver|bareservers|barnacle|battlechip|battlechips|beachfront|bigblackdick|bigmood|biochip|biochips|bitmap|bitmaps|blvck|bootsector|braggart|brandalism|brinner|bubblegum|buttock|buttocks|buttsecks|canvass|caters|cerulean|cherub|chillwave|chown|chroot|cinephile|coda|codesh|colors|compile|conglomerate|coroutine|corsage|craftwork|creek|crud|cursor|cursors|cxnt|datastore|datastores|datastruct|datastructs|dedsec|dedware|dedwares|dedwarez|deepthrust|deepthrusts|dehost|demex|destroy|digestif|dingbat|dingbats|dinner|diskette|diskettes|disrespect|dist|diviner|diviners|divinity|doomscroll|doomsurf|dopameme|dribble|dribbles|drives|ecmascript|editor|editors|endif|exclamation|executable|external|extracurricular|fairpoint|freq|futuros|futurus|gamestart|garterbelt|glacier|gleefresh|goodscroll|grandiose|grundare|guffaw|halide|handyname|herbivore|hereinafter|hexa|hieroglyph|hieroglyphic|hieroglyphics|hieroglyphs|highball|homeroom|horoscopy|hsla|htop|httpx|humanoid|humanoids|hyphen|hyphop|illuminatus|impresario|inasmuch|incorpo|indexof|infocenter|infolink|initial|initials|innanet|insomuch|interior|internetpoint|internetpoints|jargon|jomo|kitsune|kolor|kolors|labia|labio|leapyear|lefty|lewk|lewks|libr|liek|lieu|liss|litre|localroot|lolwut|loupe|loverboi|loverboy|lunch|lynk|marshmallow|maru|marvelous|megatech|meicho|melanin|microsystem|microsystems|mideast|millennium|milliamp|millihenry|millivolt|moemoe|monochrome|moodring|moodrings|moonroom|mvc|nameserve|nbsp|nendoroid|nendoroids|neue|newline|nonsequitur|normie|normy|novae|nullstack|onprem|oooh|operand|outwork|pacote|pagefault|paizuri|param|parameter|params|pearlstone|permafrost|pharaoh|pharaohs|pigeon|playsmart|plethora|pluriverse|pondering|ponderings|postseason|postseasons|potemkin|puns|pxem|pynk|righty|rootserve|saturnalia|savepoint|savepoints|scrot|scrots|secks|serene|shimbun|shinbun|shindeiru|shinderu|shitpost|shitposts|shmup|shorthand|sidereal|sike|slanguage|snapback|snapbacks|soie|soundfont|soundfonts|soundteam|soundteams|southpaw|starboard|sugoi|sunroom|sushirrito|svpply|symbols|technobabble|telephoto|theblackfriday|thecybermonday|thique|tiddies|transmit|uchu|undernet|univeige|uranet|usenetwork|vendo|viii|ware|waveform|webbrowser|webrowser|webscape|websurf|weirdo|whizbang|woebegone|wordplay|xn--apritif-cya|xn--beaut-fsa|xn--co8hfc|xn--cr8h|xn--gi8hva|xn--pn8h7e|xn--pr9hoa|xn--qj8h57g|xn--r9j070h|xn--ri8hkv|xn--seorita-5za|xn--uch-70a|xor|xra|xref|yaga|yitties|yitty|yoink|yuck|yuletide|zaddy)$/u; /// `u` flag is for Unicode (emoji) support
-  return domainRegex.test(domain);
-
-  /*
-    const domainFormatRegex = /^(?!-)([A-Za-z0-9-\p{Emoji}]{1,63}(?<!-)\.?)+[A-Za-z]{2,}$/u;
-    const whitelist = ["0x01", "0xa0", "acapella", "afrobeat", ...]; // Add all your whitelisted domains here
-
-    function isValidDomain(domain: string): boolean {
-      // Check if the domain matches the general format
-      if (!domainFormatRegex.test(domain)) return false;
-
-      // Check if the domain is in the whitelist
-      return whitelist.includes(domain);
-    }
-
-    /// recommended by ChatGPT4
-  */
-}
-
 async function findDomain(suppliedDomain: string) {
   if (!isValidDomain(suppliedDomain)) {
-    log.warning(`[${thisFilePath}]› findDomain > Invalid domain\n${suppliedDomain}`);
+    log.warn(`[${thisFilePath}]› findDomain > Invalid domain\n${suppliedDomain}`);
     console.log(isValidDomain(suppliedDomain));
     return null;
   }
@@ -529,7 +499,7 @@ async function findDomain(suppliedDomain: string) {
   const domainExistenceResult = await doesDomainExist.run(client);
 
   if (!extensionExistenceResult) {
-    log.warning(`[${thisFilePath}]› findDomain > Extension doesn't exist`);
+    log.warn(`[${thisFilePath}]› findDomain > Extension doesn't exist: ${extension}`);
     return null;
   }
 
@@ -556,6 +526,7 @@ async function findDomain(suppliedDomain: string) {
     created: creationDate,
     extension: extensionExists,
     name: suppliedDomain,
+    paired: [],
     premium: isPremium,
     priceUSD
   };
@@ -584,7 +555,7 @@ async function blockNegativeNames(tld: string, sld: string): Promise<boolean> {
     if (sentiment === "negative")
       positiveSentiment = false;
   } catch(error) {
-    log.warning(`[${thisFilePath}]› Error analyzing sentiment.`);
+    log.warn(`[${thisFilePath}]› Error analyzing sentiment.`);
     log.error(error);
 
     positiveSentiment = false;

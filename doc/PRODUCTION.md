@@ -168,6 +168,10 @@ edgedb --instance beachfront
 edgedb --dsn edgedb://beachfrontAdmin:update-this-with-your-own-password@localhost:5656/beachfront --tls-security insecure
 ```
 
+### Seed database
+
+Extensions need to be added if we're starting fresh. `dbschema/default.esdl` has all the schema you need.
+
 
 
 ## Install Deno
@@ -218,6 +222,8 @@ ufw enable
 
 
 ## Configure process manager
+
+IGNORE EVERYTHING BELOW ABOUT PM2, IT IS WHOLLY UNRELIABLE AND FINICKY. JUST USE SYSTEMD.
 
 ### Install nvm
 

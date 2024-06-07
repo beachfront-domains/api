@@ -63,7 +63,7 @@ export default async(_root, args: SessionCreate, _ctx?, _info?): StandardRespons
   if (!query.for || !query.token) {
     const err = "Missing required parameter(s).";
 
-    log.warning(`[${thisFilePath}]› ${err}`);
+    log.warn(`[${thisFilePath}]› ${err}`);
     return { detail: response, error: { code: "TBA", message: err } };
   }
 
@@ -71,7 +71,7 @@ export default async(_root, args: SessionCreate, _ctx?, _info?): StandardRespons
   if (!verify(query.token)) {
     const err = "Token is invalid.";
 
-    log.warning(`[${thisFilePath}]› ${err}`);
+    log.warn(`[${thisFilePath}]› ${err}`);
     return { detail: response, error: { code: "TBA", message: err } };
   }
 
@@ -84,7 +84,7 @@ export default async(_root, args: SessionCreate, _ctx?, _info?): StandardRespons
   const customerExistenceResult = await doesCustomerExist.run(client);
 
   if (!customerExistenceResult) {
-    log.warning(`[${thisFilePath}]› Customer doesn't exist.`);
+    log.warn(`[${thisFilePath}]› Customer doesn't exist.`);
     return { detail: response };
   }
 
@@ -92,7 +92,7 @@ export default async(_root, args: SessionCreate, _ctx?, _info?): StandardRespons
   const { payload: { sub: jwtSubject }} = decode(query.token);
 
   if (customerExistenceResult.id !== jwtSubject.split("id|")[1]) {
-    log.warning(`[${thisFilePath}]› Token subject doesn't match customer.`);
+    log.warn(`[${thisFilePath}]› Token subject doesn't match customer.`);
     return { detail: response };
   }
 

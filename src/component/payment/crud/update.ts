@@ -36,7 +36,7 @@ export default async(_root, args: PaymentMethodUpdate, ctx, _info?): StandardRes
   const { params, updates } = args;
 
   if (objectIsEmpty(params) || objectIsEmpty(updates)) {
-    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    log.warn(`[${thisFilePath}]› Missing required parameter(s).`);
     return { detail: null };
   }
 
@@ -58,7 +58,7 @@ export default async(_root, args: PaymentMethodUpdate, ctx, _info?): StandardRes
 
   /// vibe check
   if (!query.mask) {
-    log.warning(`[${thisFilePath}]› Vibe check failed.`);
+    log.warn(`[${thisFilePath}]› Vibe check failed.`);
     return { detail: response };
   }
 
@@ -75,19 +75,19 @@ export default async(_root, args: PaymentMethodUpdate, ctx, _info?): StandardRes
   const existenceResult = await doesDocumentExist.run(client);
 
   if (!existenceResult) {
-    log.warning(`[${thisFilePath}]› Cannot update nonexistent document.`);
+    log.warn(`[${thisFilePath}]› Cannot update nonexistent document.`);
     return { detail: response };
   }
 
   const owner = await personFromSession(ctx);
 
   if (!owner) {
-    log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
+    log.warn(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
     return { detail: response };
   }
 
   if (existenceResult.customer.id !== owner.id) {
-    log.warning(`[${thisFilePath}]› Session customer ID doesn't match record's.`);
+    log.warn(`[${thisFilePath}]› Session customer ID doesn't match record's.`);
     return { detail: response };
   }
 

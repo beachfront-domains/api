@@ -34,7 +34,7 @@ export default async(_root, args: ExtensionUpdate, ctx, _info?): StandardRespons
   const { params, updates } = args;
 
   if (objectIsEmpty(params) || objectIsEmpty(updates)) {
-    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    log.warn(`[${thisFilePath}]› Missing required parameter(s).`);
     return { detail: null };
   }
 
@@ -84,7 +84,7 @@ export default async(_root, args: ExtensionUpdate, ctx, _info?): StandardRespons
   const existenceResult = await doesDocumentExist.run(client);
 
   if (!existenceResult) {
-    log.warning(`[${thisFilePath}]› Cannot update nonexistent document.`);
+    log.warn(`[${thisFilePath}]› Cannot update nonexistent document.`);
     return { detail: response };
   }
 

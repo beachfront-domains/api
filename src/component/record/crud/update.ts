@@ -39,7 +39,7 @@ export default async(_root, args: RecordUpdate, ctx, _info?): StandardResponse =
   let response: DetailObject | null = null;
 
   if (objectIsEmpty(params) || objectIsEmpty(updates)) {
-    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    log.warn(`[${thisFilePath}]› Missing required parameter(s).`);
     return { detail: response };
   }
 
@@ -65,7 +65,7 @@ export default async(_root, args: RecordUpdate, ctx, _info?): StandardResponse =
   const existenceResult = await doesDocumentExist.run(client);
 
   if (!existenceResult) {
-    log.warning(`[${thisFilePath}]› Cannot update nonexistent document.`);
+    log.warn(`[${thisFilePath}]› Cannot update nonexistent document.`);
     return { detail: response };
   }
 

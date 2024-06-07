@@ -4,9 +4,9 @@ Have pagination, will enumerate.
 
 
 
-######
+#
 # Type
-######
+#
 
 type Pagination {
   "This will most likely be the `created` parameter of a post or customer"
@@ -19,13 +19,16 @@ type Pagination {
 
 
 
-#######
+#
 # Input
-#######
+#
 
 input PaginationOptions {
-  after: DateTime
+  # after: DateTime
+  after: String
+  before: String
   first: Int
+  last: Int
 }
 
 

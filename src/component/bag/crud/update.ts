@@ -34,7 +34,7 @@ export default async(_root, args: BagUpdate, _ctx, _info?): StandardResponse => 
   const { params, updates } = args;
 
   if (objectIsEmpty(params) || objectIsEmpty(updates)) {
-    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    log.warn(`[${thisFilePath}]› Missing required parameter(s).`);
     return { detail: null };
   }
 
@@ -59,6 +59,10 @@ export default async(_root, args: BagUpdate, _ctx, _info?): StandardResponse => 
         query[key] = stringTrim(String(value));
         break;
       }
+
+      // TODO
+      // : handle "paired"
+      // : snag from extension search, don't trust client...or do this check on checkout?
 
       default:
         break;
@@ -88,7 +92,7 @@ export default async(_root, args: BagUpdate, _ctx, _info?): StandardResponse => 
   const existenceResult = await doesDocumentExist.run(client);
 
   if (!existenceResult) {
-    log.warning(`[${thisFilePath}]› Cannot update nonexistent document.`);
+    log.warn(`[${thisFilePath}]› Cannot update nonexistent document.`);
     return { detail: response };
   }
 
@@ -122,10 +126,9 @@ export default async(_root, args: BagUpdate, _ctx, _info?): StandardResponse => 
       }
     }));
 
-
     response = await e.select(updateQuery, document => ({
       ...e.Bag["*"],
-      customer: document.customer["*"],
+      customer: document.customer["*"]
     })).run(client);
 
     return { detail: response };

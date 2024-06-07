@@ -4,6 +4,7 @@
 /// export
 
 export {
+  appURL,
   databaseParams,
   isDevelopment,
   maxPaginationLimit
@@ -19,11 +20,13 @@ export {
 } from "./env.ts";
 
 export { accessControl, createSessionToken } from "./auth/access.ts";
+export { default as allowlist } from "./allowlist.ts";
 export { andOperation, client, orOperation } from "./edgedb.ts";
 export { checklist } from "./checklist.ts";
 export { decode, sign, verify } from "./auth/sign.ts";
 export { emailRegex, default as validateEmail } from "./validate/email.ts";
 export { default as hnsPrice } from "./hns-price.ts";
+export { isValidDomain, isValidSLD } from "./is-valid-domain.ts";
 export { objectIsEmpty } from "./is-object-empty.ts";
 export { default as personFromSession } from "./person-from-session.ts";
 export { default as prettyFilePath } from "./pretty-file-path.ts";

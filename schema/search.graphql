@@ -14,6 +14,10 @@ type SearchResult {
   "ASCII format"
   name: String
   "Boolean | 0: false, 1: true"
+  pair: Int
+  "Array of domains paired with this one"
+  paired: [String]
+  "Boolean | 0: false, 1: true"
   premium: Int
   priceHNS: Decimal
   priceUSD: Decimal

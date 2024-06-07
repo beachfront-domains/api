@@ -19,7 +19,6 @@ mutation CreateLogin($params: LoginInput) {
   createLogin(params: $params) {
     detail {
       for {
-        avatar
         created
         email
         id

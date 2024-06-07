@@ -4,6 +4,7 @@
 /// import
 
 // import { default as createDNS } from "src/component/domain/utility/create-dns.ts";
+import { cors } from "jsr:/@http/interceptor@0.13.0/cors";
 import { GraphQLHTTP } from "dep/x/alpha.ts";
 import { makeExecutableSchema } from "dep/x/graphql-tools.ts";
 
@@ -16,7 +17,7 @@ import {
 
 import { dedent } from "dep/x/dedent.ts";
 
-import cors from "https://deno.land/x/edge_cors/src/cors.ts"; // v0.2.1
+// import cors from "https://deno.land/x/edge_cors/src/cors.ts"; // v0.2.1
 
 /// util
 
@@ -24,7 +25,7 @@ import { checklist } from "src/utility/index.ts";
 import { Mutation, Query } from "src/schema/resolver.ts";
 import theSchema from "src/schema/index.ts";
 
-const isDevelopment = Deno.args.includes("--development");
+const isDevelopment = Deno.args.includes("development");
 
 const schema = makeExecutableSchema({
   resolvers: { Query, Mutation },
@@ -43,19 +44,64 @@ const meta = await getVersion();
 const packageVersion = meta.trim();
 const { port } = await checklist();
 
+// const server = Deno.serve({ port: port() },
+//   intercept(
+//     () => new Response("Hello"),
+//     cors(),
+//   ),
+// ) as Deno.HttpServer;
+
 Deno.serve({
   handler: async(req) => {
+    // if (req.method == "OPTIONS") {
+    //   const resp = new Response(null, { status: 204 });
+    //   const origin = req.headers.get("Origin") || "*";
+    //   const headers = resp.headers;
+
+    //   headers.set("Access-Control-Allow-Origin", origin);
+    //   headers.set("Access-Control-Allow-Methods", "*");
+
+    //   return resp;
+    // }
+
+    // console.log(req.headers);
+    // console.log("—");
+    // const origin = req.headers.get("Origin") || "*";
+    // const resp = await ctx.next();
+    // const headers = resp.headers;
+
+    // headers.set("Access-Control-Allow-Origin", origin);
+    // headers.set("Access-Control-Allow-Credentials", "true");
+
+    // headers.set(
+    //   "Access-Control-Allow-Headers",
+    //   "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With"
+    // );
+
+    // headers.set(
+    //   "Access-Control-Allow-Methods",
+    //   "POST, OPTIONS, GET, PUT, DELETE"
+    // );
+
     const { pathname } = new URL(req.url);
 
     return pathname === "/graphql" ?
-      cors(req, await GraphQLHTTP<Request>({
+      // cors(req, await GraphQLHTTP<Request>({
+      //   context: request => ({
+      //     request,
+      //     "x-session": new Headers(req.headers).get("authorization")
+      //   }),
+      //   graphiql: isDevelopment,
+      //   schema
+      // })(req)) :
+      await GraphQLHTTP<Request>({
         context: request => ({
           request,
           "x-session": new Headers(req.headers).get("authorization")
         }),
-        graphiql: isDevelopment,
+        graphiql: true, // isDevelopment,
         schema
-      })(req)) :
+      })(req) :
       Response.json({
         detail: "Please visit our documentation for information on how to use the beachfront/ API.",
         status: 406,
@@ -69,14 +115,15 @@ Deno.serve({
       dedent`
      ┌${repeatCharacter("─", 32)}┐
      │ ${pad("BEACHFRONT API", 30)} │
-     │ ${shellGreen(pad(packageVersion, 30))} │
+     │ ${isDevelopment ? fit("→ development") : fit("→ production")} │
+     │ ${shellGreen(fit(packageVersion))} │
      └${repeatCharacter("─", 32)}┘
       LOCAL ${shellMagenta(`${shellUnderline(`0.0.0.0:${port}`)}`)}
       `
     );
   },
   port
-});
+}, cors());
 
 
 
@@ -92,6 +139,12 @@ async function getVersion() {
   }
 
   return version;
+}
+
+function fit(input: string) {
+  // 34 - 4 (border + one space each side)
+  const remainingSpace = 30 - input.length;
+  return input + " ".repeat(remainingSpace);
 }
 
 function pad(input: string, paddingAmount: number): string {

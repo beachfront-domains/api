@@ -81,7 +81,7 @@ export async function getMore(_root, args: Partial<SessionsRequest>, _ctx?, _inf
   let response: Array<DetailObject> | null = null;
 
   if (objectIsEmpty(params)) {
-    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    log.warn(`[${thisFilePath}]› Missing required parameter(s).`);
 
     return {
       detail: response,

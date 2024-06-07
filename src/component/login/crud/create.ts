@@ -9,6 +9,8 @@ import { log } from "dep/std.ts";
 /// util
 
 import {
+  allowlist,
+  appURL,
   client,
   resend,
   sign,
@@ -21,7 +23,6 @@ import e from "dbschema";
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 import type { LoginCreate } from "../schema.ts";
 
-const appURL = "http://localhost:2513";
 const thisFilePath = import.meta.filename;
 
 
@@ -53,7 +54,14 @@ export default async(_root, args: LoginCreate, _ctx?, _info?): StandardResponse 
   if (!query.email) {
     const err = "Missing required parameter(s).";
 
-    log.warning(`[${thisFilePath}]› ${err}`);
+    log.warn(`[${thisFilePath}]› ${err}`);
+    return { detail: response, error: { code: "TBA", message: err }};
+  }
+
+  if (!allowlist.includes(query.email)) {
+    const err = "Unauthorized for beta access.";
+
+    log.warn(`[${thisFilePath}]› ${err}`);
     return { detail: response, error: { code: "TBA", message: err }};
   }
 
@@ -118,6 +126,9 @@ export default async(_root, args: LoginCreate, _ctx?, _info?): StandardResponse 
 
     const loginLink = `${appURL}/access?${response.token}`;
     // const resend = new Resend(serviceResend);
+    console.log(">>> wtf");
+    console.log(appURL);
+    console.log(loginLink);
 
     const emailBody = `
       <p>Hey!</p>

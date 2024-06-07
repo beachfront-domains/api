@@ -68,10 +68,10 @@ When running `edgedb` now, you'll get an error. This is because the CLI automati
 edgedb error: UnknownDatabaseError: database "edgedb" does not exist
 ```
 
-You can pass the `--database` flag to connect as expected though.
+You can pass the `--branch` flag to connect as expected though.
 
 ```sh
-edgedb --database beachfront
+edgedb --branch beachfront
 ```
 
 When upgrading EdgeDB, you'll need to re-create the `edgedb` database (it can be safely removed once the upgrade is complete though).
@@ -79,14 +79,15 @@ When upgrading EdgeDB, you'll need to re-create the `edgedb` database (it can be
 ### Schema Updates
 
 ```sh
+# edgedb migrate --instance beachfront --branch primary
 # whenever you make changes to the schema, run…
-edgedb migration create --instance beachfront --database beachfront
+edgedb migration create --instance beachfront --branch beachfront
 
 # …then, run this to apply changes
-edgedb migrate --instance beachfront --database beachfront
+edgedb migrate --instance beachfront --branch beachfront
 
 # query builder
-deno run -A --unstable https://deno.land/x/edgedb@v1.4.1/generate.ts edgeql-js --instance beachfront --database beachfront --target deno
+deno run -A https://deno.land/x/edgedb@v1.4.1/generate.ts edgeql-js --instance beachfront --database beachfront --target deno
 ```
 
 <!-- The query builder will generate files in `dbschema/edgeql-js`. You'll need to do a bit of manual work now. For every import that comes from `"/edgedb"`, replace with `"../../edgedb.ts";`. That way, the pastry-server binary will actually work when you compile it. -->

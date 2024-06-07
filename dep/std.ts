@@ -10,5 +10,3 @@ export * from "std/path/mod.ts";
 export * from "std/uuid/mod.ts";
 export * as log from "std/log/mod.ts";
 export { parse } from "std/flags/mod.ts";
-// export { Server } from "std/http/mod.ts";
-

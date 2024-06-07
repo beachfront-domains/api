@@ -16,6 +16,7 @@ export interface BagItem {
   /// : for products without duration, like merch, duration is `0`
   duration: number;
   name: string;
+  paired: Array<string>;
   premium: number;
   price: string;
   tier: ExtensionTier;

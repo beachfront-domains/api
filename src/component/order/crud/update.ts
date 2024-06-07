@@ -35,7 +35,7 @@ export default async(_root, args: OrderUpdate, ctx, _info?): StandardResponse =>
   const { params, updates } = args;
 
   if (objectIsEmpty(params) || objectIsEmpty(updates) || !validateUUID(stringTrim(params.id))) {
-    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    log.warn(`[${thisFilePath}]› Missing required parameter(s).`);
     return { detail: null };
   }
 
@@ -71,7 +71,7 @@ export default async(_root, args: OrderUpdate, ctx, _info?): StandardResponse =>
   /// vibe check
   if (updates.paid && !query.paid) {
     const error = "Invalid parameter(s).";
-    log.warning(`[${thisFilePath}]› ${error}`);
+    log.warn(`[${thisFilePath}]› ${error}`);
     return { detail: response, error: { code: "TBA", message: error }};
   }
 
@@ -84,7 +84,7 @@ export default async(_root, args: OrderUpdate, ctx, _info?): StandardResponse =>
   const existenceResult = await doesDocumentExist.run(client);
 
   if (!existenceResult) {
-    log.warning(`[${thisFilePath}]› Cannot update nonexistent document.`);
+    log.warn(`[${thisFilePath}]› Cannot update nonexistent document.`);
     return { detail: response };
   }
 

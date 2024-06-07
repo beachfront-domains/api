@@ -98,7 +98,7 @@ export const getMore = async(_root, args: Partial<PaymentMethodsRequest>, ctx, _
   let response: Array<any> | null = null; // Array<DetailObject>
 
   if (objectIsEmpty(params)) {
-    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    log.warn(`[${thisFilePath}]› Missing required parameter(s).`);
 
     return {
       detail: response,

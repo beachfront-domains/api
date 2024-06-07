@@ -93,7 +93,7 @@ export const getMore = async(_root, args: CustomersRequest, ctx, _info?): Standa
   let response: Array<any> | null = null; // Array<DetailObject>
 
   if (objectIsEmpty(params)) {
-    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    log.warn(`[${thisFilePath}]› Missing required parameter(s).`);
 
     return {
       detail: response,

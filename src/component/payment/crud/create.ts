@@ -58,13 +58,13 @@ export default async(_root, args: PaymentMethodCreate, ctx, _info?): StandardRes
 
   if (!query.kind || !query.mask) {
     const error = "Missing required parameter(s).";
-    log.warning(`[${thisFilePath}]› ${error}`);
+    log.warn(`[${thisFilePath}]› ${error}`);
     return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
   if (query.mask.length < 12) { /// credit card numbers have at least 12 digits
     const error = "Invalid length for mask.";
-    log.warning(`[${thisFilePath}]› ${error}`);
+    log.warn(`[${thisFilePath}]› ${error}`);
     return { detail: response }; // error: [{ code: "TBA", message: error }]
   }
 
@@ -81,7 +81,7 @@ export default async(_root, args: PaymentMethodCreate, ctx, _info?): StandardRes
     const owner = await personFromSession(ctx);
 
     if (!owner) {
-      log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
+      log.warn(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
       return { detail: response }; // error: [{ code: "TBA", message: error }]
     }
 

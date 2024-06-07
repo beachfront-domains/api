@@ -89,7 +89,7 @@ export async function getMore(_root, args: Partial<BagsRequest>, ctx, _info?): S
   let response: Array<any> | null = null; // Array<DetailObject>
 
   if (objectIsEmpty(params)) {
-    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    log.warn(`[${thisFilePath}]› Missing required parameter(s).`);
 
     return {
       detail: response,

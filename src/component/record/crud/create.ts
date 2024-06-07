@@ -161,7 +161,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
   if (!query.name || !query.type) {
     const err = "Missing required parameter(s).";
 
-    log.warning(`[${thisFilePath}]› ${err}`);
+    log.warn(`[${thisFilePath}]› ${err}`);
     return { detail: response };
   }
 
@@ -169,7 +169,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!query.tag || !query.value) {
       const err = "Missing required parameter(s).";
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -179,7 +179,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!constraint.test(query.value)) {
       const err = `Invalid CAA "value" content.`;
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -188,7 +188,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
       if (!ensureNumberWithinRange(query.flags, 0, 255)) {
         const err = `Invalid CAA "flags" value.`;
 
-        log.warning(`[${thisFilePath}]› ${err}`);
+        log.warn(`[${thisFilePath}]› ${err}`);
         return { detail: response };
       }
 
@@ -201,7 +201,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (query.issuerCritical && (query.issuerCritical !== 0 || query.issuerCritical !== 1)) {
       const err = `Invalid "issuerCritical" value.`;
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
   }
@@ -213,7 +213,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!validAlgorithmValues.includes(Number(query.algorithm))) {
       const err = `Invalid DNSKEY "algorithm" value.`;
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -223,7 +223,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!validFlagValues.includes(Number(query.flags))) {
       const err = `Invalid DNSKEY "flags" value.`;
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -237,7 +237,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!query.algorithm || !query.digest || !query.digestType || !query.keyTag) {
       const err = "Missing required parameter(s).";
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
   }
@@ -246,7 +246,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!query.cpu || !query.os) {
       const err = "Missing required parameter(s).";
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
   }
@@ -255,7 +255,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!query.exchange || !query.preference) {
       const err = "Missing required parameter(s).";
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -263,7 +263,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!ensureNumberWithinRange(query.preference, 0, 65535)) {
       const err = `Invalid MX "preference" value.`;
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
   }
@@ -272,7 +272,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!query.flags || !query.order || !query.preference || !query.regexp || !query.replacement || !query.services) {
       const err = "Missing required parameter(s).";
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -280,7 +280,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!ensureNumberWithinRange(query.order, 0, 65535)) {
       const err = `Invalid NAPTR "order" value.`;
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -288,7 +288,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!ensureNumberWithinRange(query.preference, 0, 65535)) {
       const err = `Invalid NAPTR "preference" value.`;
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -299,7 +299,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!query.nextDomain || !query.rrtypes) {
       const err = "Missing required parameter(s).";
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -311,7 +311,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!query.algorithm || !query.flags || !query.iterations || !query.nextDomain || !query.rrtypes || !query.salt) {
       const err = "Missing required parameter(s).";
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -325,7 +325,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!query.mbox || !query.txt) {
       const err = "Missing required parameter(s).";
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
   }
@@ -335,7 +335,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
         !query.labels || !query.originalTTL || !query.signature || !query.signersName  || !query.typeCovered) {
       const err = "Missing required parameter(s).";
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
   }
@@ -344,7 +344,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!query.expire || !query.minimum || !query.mname || !query.refresh || !query.retry || !query.rname || !query.serial) {
       const err = "Missing required parameter(s).";
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
   }
@@ -353,7 +353,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!query.port || !query.priority || !query.target || !query.weight) {
       const err = "Missing required parameter(s).";
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
   }
@@ -362,7 +362,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!query.algorithm || !query.fingerprint || !query.hash) {
       const err = "Missing required parameter(s).";
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -370,7 +370,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!ensureNumberWithinRange(query.algorithm, 1, 4)) {
       const err = `Invalid SSHFP "algorithm" value.`;
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -378,7 +378,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (query.hash !== 1 && query.hash !== 2) {
       const err = `Invalid SSHFP "hash" value.`;
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
   }
@@ -387,7 +387,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!query.certificate || !query.matchingType || !query.selector || !query.usage) {
       const err = "Missing required parameter(s).";
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -395,7 +395,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!ensureNumberWithinRange(query.matchingType, 0, 2)) {
       const err = `Invalid TLSA "matchingType" value.`;
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -403,7 +403,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (query.selector !== 0 && query.selector !== 1) {
       const err = `Invalid TLSA "selector" value.`;
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
 
@@ -411,7 +411,7 @@ export default async (_root, args: RecordCreate, ctx, _info?): StandardPlentyRes
     if (!ensureNumberWithinRange(query.usage, 0, 3)) {
       const err = `Invalid TLSA "usage" value.`;
 
-      log.warning(`[${thisFilePath}]› ${err}`);
+      log.warn(`[${thisFilePath}]› ${err}`);
       return { detail: response };
     }
   }

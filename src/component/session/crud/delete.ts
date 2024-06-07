@@ -47,7 +47,7 @@ export default async(_root, args: SessionRequest, ctx, _info?): StandardBooleanR
   const existenceResult = await doesDocumentExist.run(client);
 
   if (!existenceResult) {
-    log.warning(`[${thisFilePath}]› Cannot delete nonexistent document.`);
+    log.warn(`[${thisFilePath}]› Cannot delete nonexistent document.`);
     return { success: true };
   }
 

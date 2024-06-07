@@ -15,7 +15,7 @@ type Login {
 
 type LoginResponse {
   detail: Login
-  error: [Error]
+  error: Error
 }
 
 #

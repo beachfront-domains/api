@@ -44,7 +44,7 @@ export async function get(_root, args: DomainRequest, ctx, _info?): StandardResp
   const owner = await personFromSession(ctx);
 
   if (!owner) {
-    log.warning(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
+    log.warn(`[${thisFilePath}]› THIS ERROR SHOULD NEVER BE REACHED.`);
     return { detail: null, error: { code: "TBA", message: "Authorization error" }};
   }
 
@@ -72,7 +72,7 @@ export async function get(_root, args: DomainRequest, ctx, _info?): StandardResp
   /// vibe check
   if (params.id && !validateUUID(query.id)) {
     const error = "Missing required parameter(s).";
-    log.warning(`[${thisFilePath}]› ${error}`);
+    log.warn(`[${thisFilePath}]› ${error}`);
     return { detail: response, error: { code: "TBA", message: error }};
   }
 
@@ -128,7 +128,7 @@ export async function getMore(_root, args: Partial<DomainsRequest>, ctx, _info?)
   let response: Array<any> | null = null; // Array<DetailObject>
 
   if (objectIsEmpty(params)) {
-    log.warning(`[${thisFilePath}]› Missing required parameter(s).`);
+    log.warn(`[${thisFilePath}]› Missing required parameter(s).`);
     return emptyResponse;
   }
 
@@ -139,7 +139,12 @@ export async function getMore(_root, args: Partial<DomainsRequest>, ctx, _info?)
   if (limit > maxPaginationLimit)
     return emptyResponse;
 
-  let cursor = pagination && pagination.after && String(pagination.after) || null;
+  const pageBackward = pagination && pagination.before && String(pagination.before).length > 0 || false;
+  // let pageForward = false;
+
+  let cursor = pagination && pagination.after && String(pagination.after) ||
+    pagination && pagination.before && String(pagination.before)
+    null;
   let cursorId;
   let offset = 0;
 
@@ -168,7 +173,7 @@ export async function getMore(_root, args: Partial<DomainsRequest>, ctx, _info?)
   const baseShape = e.shape(e.Domain, document => ({
     ...e.Domain["*"],
     extension: e.Extension["*"],
-    order_by: document.created,
+    // order_by: document.created,
     owner: e.Customer["*"]
   }));
 
@@ -189,6 +194,11 @@ export async function getMore(_root, args: Partial<DomainsRequest>, ctx, _info?)
   const totalDocuments = allDocuments.length;
 
   if (cursor) {
+    // console.log(">>> cursor");
+    // console.log(cursor);
+    // console.log(atob(cursor));
+    // console.log(btoa(cursor));
+
     try {
       cursorId = atob(cursor);
     } catch(_) {
@@ -196,10 +206,29 @@ export async function getMore(_root, args: Partial<DomainsRequest>, ctx, _info?)
     }
 
     allDocuments.find((document, index) => {
-      if (document.id === cursorId)
-        offset = index + 1;
+      if (document.id === cursorId) {
+        // console.log("cursorId     :", cursorId);
+        // console.log("offset       :", offset);
+        // offset = index + 1;
+
+        offset = pageBackward ?
+          (index - limit) - limit :
+          index + 1;
+
+        if (offset < 0)
+          offset = 0;
+
+        // console.log("pageBackward :", pageBackward);
+        // console.log("index        :", index);
+        // console.log("limit        :", limit);
+        // console.log("offset       :", offset);
+        // console.log("\n");
+      }
     });
   }
+
+  // console.log(">>> offset");
+  // console.log(offset);
 
   response = await e.select(e.Domain, document => ({
     ...baseShape(document),
@@ -215,14 +244,24 @@ export async function getMore(_root, args: Partial<DomainsRequest>, ctx, _info?)
     } : {}),
     limit,
     offset
+    // offset: pageBackward ? offset - limit : offset
   })).run(client);
 
+  if (response.length > 0) {
+    response = response.map(async(res) => {
+      res.record = await getRecords(res.name);
+      return res;
+    });
+  }
+
+  const finalResponse = await Promise.all(response);
+
   /// inspired by https://stackoverflow.com/a/62565528
-  cursor = response && response.length > 0 ?
-    btoa(response.slice(-1)[0].id) :
+  cursor = finalResponse && finalResponse.length > 0 ?
+    btoa(finalResponse.slice(-1)[0].id) :
     null;
 
-  if (response && response.length > 0) {
+  if (finalResponse && finalResponse.length > 0) {
     if (offset + limit >= totalDocuments)
       hasNextPage = false;
     else
@@ -237,8 +276,11 @@ export async function getMore(_root, args: Partial<DomainsRequest>, ctx, _info?)
   // TODO
   // : unknown if full linked documents are returned
 
+  // console.log(">>> finalResponse");
+  // console.log(finalResponse);
+
   return {
-    detail: response,
+    detail: finalResponse,
     pageInfo: {
       cursor,
       hasNextPage,
