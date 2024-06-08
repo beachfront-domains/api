@@ -4,6 +4,7 @@
 /// import
 
 import { log } from "dep/std.ts";
+import { Stripe } from "dep/x/stripe.ts";
 
 /// util
 
@@ -17,6 +18,7 @@ import {
 } from "src/utility/index.ts";
 
 import e from "dbschema";
+import { STRIPE_SECRET } from "src/utility/stripe/constant.ts";
 
 import type { DetailObject, StandardResponse } from "src/utility/index.ts";
 import type { LoginCreate } from "../schema.ts";
@@ -93,6 +95,20 @@ export default async(_root, args: LoginCreate, _ctx?, _info?): StandardResponse 
     }
   }
 
+  if (!customerExistenceResult.stripe || customerExistenceResult.stripe === "") {
+    const stripeId = await createStripeCustomer(customerExistenceResult);
+
+    const updateQuery = e.update(e.Customer, customer => ({
+      filter_single: e.op(customer.id, "=", e.uuid(customerExistenceResult.id)),
+      set: {
+        stripe: stripeId,
+        updated: e.datetime_of_transaction()
+      }
+    }));
+
+    await e.select(updateQuery, () => ({ ...e.Customer["*"] })).run(client);
+  }
+
   try {
     const jwt = sign({
       exp: Math.floor(
@@ -121,6 +137,9 @@ export default async(_root, args: LoginCreate, _ctx?, _info?): StandardResponse 
     }));
 
     response = await databaseQuery.run(client);
+
+    console.log(">>> customerExistenceResult");
+    console.log(response);
 
     const loginLink = `${appURL}/access?${response.token}`;
 
@@ -168,6 +187,22 @@ export default async(_root, args: LoginCreate, _ctx?, _info?): StandardResponse 
 
 
 /// helper
+
+async function createStripeCustomer(info: any): Promise<string> {
+  const stripe = new Stripe(STRIPE_SECRET);
+  const { email, id, name } = info;
+
+  const customer = await stripe.customers.create({
+    description: id,
+    email,
+    metadata: {
+      beachfront: id
+    },
+    name
+  });
+
+  return customer.id || "";
+}
 
 function createUsername(suppliedEmail: string): string {
   // TODO

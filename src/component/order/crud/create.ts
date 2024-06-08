@@ -159,6 +159,16 @@ export default async(_root, args: OrderCreate, ctx, _info?): StandardResponse =>
 
   // 4242 4242 4242 4242
 
+  // TODO
+  // : will paired domains renew at regular price?
+
+  /// NOTE
+  /// We do not care about `paired` in orders
+  bagExistenceResult.bag = bagExistenceResult.bag.map(item => {
+    delete item.paired;
+    return item;
+  });
+
   try {
     const newDocument = e.insert(e.Order, {
       ...query,
@@ -373,7 +383,7 @@ async function createDomains(data: { domains: Array<BagItem>, owner: string }) {
     } catch(_) {
       // TODO
       // : create error ingest system : https://github.com/neuenet/pastry-api/issues/10
-      log.error(`[${thisFilePath}]› Exception caught while creating document.`);
+      log.error(`[${thisFilePath}]› Exception caught while creating domains.`);
       log.error(_);
     }
   });

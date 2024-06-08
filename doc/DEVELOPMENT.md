@@ -87,7 +87,7 @@ edgedb migration create --instance beachfront --branch beachfront
 edgedb migrate --instance beachfront --branch beachfront
 
 # query builder
-deno run -A https://deno.land/x/edgedb@v1.4.1/generate.ts edgeql-js --instance beachfront --database beachfront --target deno
+deno run -A https://deno.land/x/edgedb@v1.4.1/generate.ts edgeql-js --instance beachfront --database primary --target deno
 ```
 
 <!-- The query builder will generate files in `dbschema/edgeql-js`. You'll need to do a bit of manual work now. For every import that comes from `"/edgedb"`, replace with `"../../edgedb.ts";`. That way, the pastry-server binary will actually work when you compile it. -->
