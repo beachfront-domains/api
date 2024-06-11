@@ -67,6 +67,9 @@ export default async(_root, args: SessionCreate, _ctx?, _info?): StandardRespons
     return { detail: response, error: { code: "TBA", message: err } };
   }
 
+  console.log(">>> query");
+  console.log(query);
+
   /// validate token
   if (!verify(query.token)) {
     const err = "Token is invalid.";
@@ -121,6 +124,7 @@ export default async(_root, args: SessionCreate, _ctx?, _info?): StandardRespons
     // TODO
     // : create error ingest system : https://github.com/neuenet/pastry-api/issues/10
     log.error(`[${thisFilePath}]› Exception caught while creating document.`);
+    console.log(_);
     return { detail: response };
   }
 }

@@ -43,7 +43,9 @@ input SessionInput {
 }
 
 input SessionQuery {
+  for: String
   id: ID
+  token: String
 }
 
 input SessionsQuery {

@@ -10,9 +10,14 @@ import { log } from "dep/std.ts";
 import {
   accessControl,
   client,
+  decode,
   maxPaginationLimit,
-  objectIsEmpty
+  objectIsEmpty,
+  verify
 } from "src/utility/index.ts";
+
+import { decode as base64decode } from "src/utility/auth/helper.ts";
+import { /*decodeSessionToken,*/ verifySessionToken } from "src/utility/auth/access.ts";
 
 import e from "dbschema";
 
@@ -33,8 +38,10 @@ const thisFilePath = import.meta.filename;
 /// export
 
 export async function get(_root, args: SessionRequest, ctx, _info?): StandardResponse {
-  if (!await accessControl(ctx))
-    return { detail: null };
+  // if (!await accessControl(ctx))
+  //   return { detail: null };
+  // console.log("\n>>> args");
+  // console.log(args);
 
   const { params } = args;
   const query: LooseObject = {};
@@ -42,7 +49,13 @@ export async function get(_root, args: SessionRequest, ctx, _info?): StandardRes
 
   Object.entries(params).forEach(([key, value]) => {
     switch(key) {
-      case "id": {
+      // case "for": {
+      //   query[key] = base64decode(String(value)) || null;
+      // }
+
+      case "for":
+      case "id":
+      case "token": {
         query[key] = String(value);
         break;
       }
@@ -53,13 +66,51 @@ export async function get(_root, args: SessionRequest, ctx, _info?): StandardRes
     }
   });
 
-  const doesDocumentExist = e.select(e.Session, document => ({
+  /// vibe check
+  // if (query.for && !query.token || !query.for && query.token) {
+  //   const err = "Missing required parameter(s).";
+
+  //   log.warn(`[${thisFilePath}]› ${err}`);
+  //   return { detail: response, error: { code: "TBA", message: err } };
+  // }
+
+  /// validate token
+  if (query.token) {
+    if (query.token && !verifySessionToken(query.token, query.for)) {
+      const err = "Token is invalid.";
+
+      log.warn(`[${thisFilePath}]› ${err}`);
+      return { detail: response, error: { code: "TBA", message: err } };
+    }
+  }
+
+  /// ensure focus of session exists
+  const doesCustomerExist = e.select(e.Customer, customer => ({
+    ...e.Customer["*"],
+    filter_single: e.op(customer.id, "=", e.uuid(query.for))
+  }));
+
+  const customerExistenceResult = await doesCustomerExist.run(client);
+
+  if (!customerExistenceResult) {
+    log.warn(`[${thisFilePath}]› Customer doesn't exist.`);
+    return { detail: response };
+  }
+
+  // TODO
+  // : make sure `existenceResult.for` matches `for`
+
+  const doesSessionExist = e.select(e.Session, document => ({
     ...e.Session["*"],
-    filter_single: e.op(document.id, "=", e.uuid(query.id)),
+    filter_single: e.any(e.set(
+      e.op(document.token, "?=", query.token),
+      e.op(document.id, "?=", e.cast(e.uuid, query.id ?? e.set()))
+      // ^^ via https://discord.com/channels/841451783728529451/1218640180286591247/1219720674352828497
+    )),
     for: document.for["*"]
   }));
 
-  const existenceResult = await doesDocumentExist.run(client);
+  const existenceResult = await doesSessionExist.run(client);
 
   if (existenceResult)
     response = existenceResult;
