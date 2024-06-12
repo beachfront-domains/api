@@ -67,8 +67,8 @@ export default async(_root, args: SessionCreate, _ctx?, _info?): StandardRespons
     return { detail: response, error: { code: "TBA", message: err } };
   }
 
-  console.log(">>> query");
-  console.log(query);
+  // console.log(">>> query");
+  // console.log(query);
 
   /// validate token
   if (!verify(query.token)) {

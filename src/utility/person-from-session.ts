@@ -15,10 +15,10 @@ export default async (ctx) => {
     return false;
 
   const bearerTokenParts = ctx["x-session"].split(" ");
-  let sessionToken = "";
+  let sessionId = "";
 
   if (bearerTokenParts.length === 2 && bearerTokenParts[0].toLowerCase() === "bearer")
-    sessionToken = bearerTokenParts[1];
+    sessionId = bearerTokenParts[1];
   else
     return false;
 
@@ -27,7 +27,8 @@ export default async (ctx) => {
 
   const doesDocumentExist = e.select(e.Session, document => ({
     ...e.Session["*"],
-    filter: e.op(document.token, "=", sessionToken),
+    // filter: e.op(document.token, "=", sessionToken),
+    filter: e.op(document.id, "=", e.uuid(sessionId)),
     for: document.for["*"]
   }));
 

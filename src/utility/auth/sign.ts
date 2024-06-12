@@ -88,7 +88,7 @@ export function verify(jwt) {
     const { header, payload, signature } = decodedToken;
     const { exp, iat, nbf } = payload;
     const currentTimeInSeconds = Math.floor(Date.now() / 1000);
-    console.log(currentTimeInSeconds);
+
     switch(true) {
       case !exp:
       case !iat:
@@ -105,16 +105,13 @@ export function verify(jwt) {
       default:
         break;
     }
-    console.log(">>> decodedToken");
-    console.log(decodedToken);
+
     /// combine message parts (re-stringify and encode)
     const messageHash = `${base64encode(JSON.stringify(header))}.${base64encode(JSON.stringify(payload))}`;
-    console.log(">>> messageHash");
-    console.log(messageHash);
+
     /// decode signature
     const decodedSignature = base64decode(String(signature));
-    console.log(">>> decodedSignature");
-    console.log(decodedSignature);
+
     /// verify that signature signed message
     return key.verify(messageHash, decodedSignature);
   } catch(_) {

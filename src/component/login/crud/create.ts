@@ -138,8 +138,8 @@ export default async(_root, args: LoginCreate, _ctx?, _info?): StandardResponse 
 
     response = await databaseQuery.run(client);
 
-    console.log(">>> customerExistenceResult");
-    console.log(response);
+    // console.log(">>> customerExistenceResult");
+    // console.log(response);
 
     const loginLink = `${appURL}/access?${response.token}`;
 
