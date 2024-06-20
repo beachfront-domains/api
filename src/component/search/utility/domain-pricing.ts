@@ -28,7 +28,7 @@ const beachfrontMarkupBase = {
   rare: new Big("15"),
   epic: new Big("20.50"),
   legendary: new Big("25"),
-  mythic: new Big("2000")
+  mythic: new Big("3500")
 };
 
 const beachfrontMarkupPremium = {
