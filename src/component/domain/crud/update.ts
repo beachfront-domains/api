@@ -178,6 +178,18 @@ export default async(_root, args: DomainUpdate, ctx, _info?): StandardResponse =
     /// NOTE
     /// : Updating a domain record is done in a different database; Postgres, via PowerDNS (external API)
 
+    const dotCount = String(query.record.name).split(".").length - 1;
+
+    if (query.record.type === "CNAME" && dotCount < 2) {
+      return {
+        detail: response,
+        error: {
+          code: "TBA",
+          message: "CNAME hostname cannot be root."
+        }
+      };
+    }
+
     query.record.hostname = query.record.name;
     query.record.name = existenceResult.name;
 

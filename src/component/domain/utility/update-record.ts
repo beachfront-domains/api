@@ -230,6 +230,9 @@ export default async(domain: Object<any>): Promise<boolean> => { /// Promise<Arr
 function processStringContent(content: string, type: string) {
   const similarHostnameTypes = ["CNAME", "TXT"];
 
+  if (content.length > 0 && similarHostnameTypes.includes("CNAME"))
+    return `"${content}".`; /// CNAME requires a trailing dot, at least for bare TLDs
+
   if (content.length > 0 && similarHostnameTypes.includes(type.toUpperCase()))
     return `"${content}"`;
 
