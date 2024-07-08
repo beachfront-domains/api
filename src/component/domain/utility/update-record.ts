@@ -231,10 +231,10 @@ function processStringContent(content: string, type: string) {
   const similarHostnameTypes = ["CNAME", "TXT"];
 
   if (content.length > 0 && similarHostnameTypes.includes("CNAME"))
-    return `"${content}".`; /// CNAME requires a trailing dot, at least for bare TLDs
+    return `${content}.`; /// CNAME requires a trailing dot, at least for bare TLDs
 
   if (content.length > 0 && similarHostnameTypes.includes(type.toUpperCase()))
-    return `"${content}"`;
+    return `"${content}"`; /// TXT needs to be in quotes
 
   return content;
 }
