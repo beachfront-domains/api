@@ -14,5 +14,11 @@ export default [
   "spencersolberg@outlook.com",
   "peihsunk@gmail.com",
   "lakeishashantelle@gmail.com",
-  "teleyinex@gmail.com"
+  "teleyinex@gmail.com",
+  /// batch 002
+  "scootermagruderproductions@gmail.com",
+  "admin@groupglobal.net",
+  "noschleiff@gmail.com",
+  "alex.neto@gmail.com",
+  "davidangelreyes@gmail.com"
 ];

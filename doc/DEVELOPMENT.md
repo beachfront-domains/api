@@ -16,13 +16,13 @@ git clone git@github.com:beachfront-registrar/api.git && cd api
 edgedb project init
 
 # run this every time
-denon start --development
+denon start development
 
 # run denon with a stacktrace for Deno devs if a panic occurs
-RUST_BACKTRACE=1 denon start --development
+RUST_BACKTRACE=1 denon start development
 
 # what denon does under the hood:
-deno run --allow-env --allow-net --allow-read --unstable --import-map import_map.json main.ts --development
+deno run --allow-env --allow-net --allow-read --unstable --import-map import_map.json main.ts development
 ```
 
 That's it. Denon abstracts away a lot of Deno's default verboseness. Still, here's a breakdown of the Deno permissions required to run this module:
