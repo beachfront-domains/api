@@ -80,6 +80,14 @@ import {
 //   verify
 // } from "../component/access/index.ts";
 
+import {
+  create as createWebsite,
+  // del as deleteWebsite,
+  getWebsite as website,
+  getWebsites as websites,
+  // update as updateWebsite
+} from "../component/website/index.ts";
+
 
 
 /// export
@@ -102,7 +110,9 @@ export const Query = {
   // paymentMethods,
   search,
   session,
-  sessions
+  sessions,
+  website,
+  websites
 };
 
 export const Mutation = {
@@ -115,6 +125,7 @@ export const Mutation = {
   createOrder,
   // createPaymentMethod,
   createSession,
+  createWebsite,
   deleteBag,
   deleteCustomer,
   deleteDomain,

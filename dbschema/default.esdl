@@ -178,11 +178,19 @@ module default {
   }
 
   type Session extending BaseRecord {
-    property expires -> datetime;
-    property device -> str;
+    expires -> datetime;
+    device -> str;
     required link `for` -> Customer;
-    property ip -> str;
-    property nickname -> str;
-    required property token -> str;
+    ip -> str;
+    nickname -> str;
+    required token -> str;
+  }
+
+  type Website extending BaseRecord {
+    content: str;
+    required link domain -> Domain;
+    link owner: Customer;
+    #
+    index on (.domain);
   }
 }

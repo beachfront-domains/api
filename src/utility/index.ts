@@ -7,12 +7,15 @@ export {
   appURL,
   databaseParams,
   isDevelopment,
-  maxPaginationLimit
+  maxPaginationLimit,
+  sandcastleURL
 } from "./constant.ts";
 
 export {
   GOLFER,
   nameserverKey,
+  RIPTIDE,
+  SANDCASTLE,
   serviceCoinmarketcap,
   serviceDictionary,
   serviceNinja,

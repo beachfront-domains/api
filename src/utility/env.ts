@@ -16,6 +16,7 @@ import type { LooseObject } from "./interface.ts";
 
 export const {
   GOLFER,
+  RIPTIDE,
   SANDCASTLE,
   // SECURITY
   keyEncryption,

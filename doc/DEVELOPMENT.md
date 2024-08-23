@@ -79,12 +79,11 @@ When upgrading EdgeDB, you'll need to re-create the `edgedb` database (it can be
 ### Schema Updates
 
 ```sh
-# edgedb migrate --instance beachfront --branch primary
 # whenever you make changes to the schema, run…
-edgedb migration create --instance beachfront --branch beachfront
+edgedb --instance beachfront --branch primary migration create
 
 # …then, run this to apply changes
-edgedb migrate --instance beachfront --branch beachfront
+edgedb --instance beachfront --branch primary migrate
 
 # query builder
 deno run -A https://deno.land/x/edgedb@v1.4.1/generate.ts edgeql-js --instance beachfront --database primary --target deno

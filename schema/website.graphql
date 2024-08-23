@@ -1,0 +1,59 @@
+
+
+
+#
+# Type
+#
+
+type Website {
+  content: String
+  domain: Domain
+  owner: Customer
+  #
+  created: DateTime!
+  id: ID!
+  updated: DateTime!
+}
+
+type WebsiteResponse {
+  detail: Website
+  error: Error
+}
+
+type WebsitesResponse {
+  detail: [Website]
+  error: Error
+  pageInfo: Pagination
+}
+
+
+
+#
+# Input
+#
+
+input WebsiteInput {
+  content: String
+  domain: String
+  owner: ID
+  # no created
+  # no id
+  # no updated
+}
+
+input WebsiteQuery {
+  """
+  Expects `sld.extension` format
+  Will automatically parse and search for ASCII representations of domain parts
+  """
+  domain: String
+  id: ID
+}
+
+input WebsitesQuery {
+  owner: ID
+}
+
+
+
+### be sure to keep this file in sync with `src/component/website/schema.ts`

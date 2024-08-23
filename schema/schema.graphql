@@ -11,6 +11,7 @@ scalar Decimal
 # import from "pagination.graphql"
 # import from "search.graphql"
 # import from "session.graphql"
+# import from "website.graphql"
 
 """
 All the queries that enable the registrar API to function
@@ -79,6 +80,12 @@ type Query {
   """
   session(params: SessionQuery): SessionResponse
   sessions(params: SessionsQuery, pagination: PaginationOptions): SessionsResponse
+
+  """
+  Website queries
+  """
+  website(params: WebsiteQuery): WebsiteResponse
+  websites(params: WebsitesQuery, pagination: PaginationOptions): WebsitesResponse
 }
 
 type Mutation {
@@ -149,4 +156,11 @@ type Mutation {
   createSession(params: SessionInput): SessionResponse
   deleteSession(params: SessionQuery): BooleanResponse
   updateSession(updates: SessionInput, params: SessionQuery): SessionResponse
+
+  """
+  Website mutations
+  """
+  createWebsite(params: WebsiteInput): WebsiteResponse
+  # deleteWebsite(params: WebsiteQuery): BooleanResponse
+  # updateWebsite(updates: WebsiteInput, params: WebsiteQuery): WebsiteResponse
 }

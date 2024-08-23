@@ -95,3 +95,11 @@ export type {
   SessionsRequest,
   SessionUpdate
 } from "../component/session/schema.ts";
+
+export type {
+  Website,
+  WebsiteCreate,
+  WebsiteRequest,
+  WebsitesRequest,
+  WebsiteUpdate
+} from "../component/website/schema.ts";
